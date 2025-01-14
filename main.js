@@ -170,6 +170,9 @@ gltfLoader.load(url, (gltf) => {
 
 
     if (el.name == 'player') {
+
+
+
       // let importedPlayer = el.clone();
       // el = new THREE.Group();
       // player = el;
@@ -204,6 +207,13 @@ gltfLoader.load(url, (gltf) => {
       playerBody1.userData.param = new THREE.Vector3(size.x / 2, size.y / 2, size.z / 2)
       addPhysicsToObject(playerBody1, playerBody1.position, 'dynamic', 1, 'player2')
 
+
+      let geometryTest = new THREE.SphereGeometry(size.y / 2, 15);
+      let materialTest = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: true, side: THREE.DoubleSide, opacity: 1.0, transparent: true })
+      let testMesh = new THREE.Mesh(geometryTest, materialTest);
+      testMesh.position.z = playerBody1.position.z;
+      scene.add(testMesh)
+
       // player.userData.collideFront = false;
       // player.userData.collideBottom = false;
 
@@ -225,6 +235,41 @@ gltfLoader.load(url, (gltf) => {
       groundsMas.push(ground);
       allObjCollision.push(ground);
       scene.add(el.clone());
+    }
+    else if (el.name.includes('testtt')) {
+
+      el.position.set(0, 0, 0)
+      // groundSize = size;
+      // groundPos = el.position;
+      // ground = el;
+      // ground.userData.mass = 0;
+      // ground.userData.param = new THREE.Vector3(size.x / 2, size.y / 2, size.z / 2)
+      //addPhysicsToObject(el, el.position, 'dynamic', Math.random(), 'ground')
+      // groundsMas.push(ground);
+      // allObjCollision.push(ground);
+      let ii = el.clone()
+      scene.add(ii);
+
+      const box1 = new THREE.Box3().setFromObject(ii);
+      const size1 = new THREE.Vector3();
+      box1.getSize(size1);
+      const position = new THREE.Vector3();
+      box1.getCenter(position);
+
+      const scale = new THREE.Vector3();
+      ii.getWorldScale(scale);
+
+
+      let geometryTest = new THREE.BoxGeometry(size1.x, size1.y, size1.z);
+      let materialTest = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: true, side: THREE.DoubleSide, opacity: 1.0, transparent: true })
+      let testMesh = new THREE.Mesh(geometryTest, materialTest);
+
+      testMesh.position.copy(position);
+      //testMesh.
+
+      //testMesh.scale.set(scale.x, scale.y, scale.z);
+
+      scene.add(testMesh)
     }
     // else if (el.name.includes('wall')) {
     //   allObjCollision.push(el);
