@@ -21,7 +21,7 @@ const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
-scene.fog = new THREE.Fog(scene.background, 1, 150);
+scene.fog = new THREE.Fog(scene.background, 0.001, 100);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -128,6 +128,10 @@ gltfLoader.load(url, (gltf) => {
     }
   });
 
+  let gr = root.children.find((value, index, array) => value.name == "ground")
+  const groundBox = new THREE.Box3().setFromObject(gr);
+  const groundSize = groundBox.getSize(new THREE.Vector3());
+
   root.traverse((el) => {
 
     if (el.name == 'player') {
@@ -141,17 +145,27 @@ gltfLoader.load(url, (gltf) => {
 
     }
     else if (el.name.includes('ground')) {
-
+      const box = new THREE.Box3().setFromObject(el);
+      const size = box.getSize(new THREE.Vector3());
       let groundBlock = el.clone();
+      groundBlock.position.z = size.z / 2;
       groundBlock.userData.mass = 0;
       addPhysicsToObject(groundBlock);
       scene.add(groundBlock);
 
     }
     else if (el.name.includes('area')) {
-      console.log(el)
       let areaBlock = el.clone();
       scene.add(areaBlock);
+    }
+    else if (el.name.includes('snowblock')) {
+      const box = new THREE.Box3().setFromObject(el);
+      const size = box.getSize(new THREE.Vector3());
+      for (var i = 0; i < Math.floor(groundSize.z / size.z); i++) {
+        let snowBlock = el.clone();
+        snowBlock.position.z = size.z * i + size.z / 2;
+        scene.add(snowBlock);
+      }
 
     }
 
@@ -171,7 +185,7 @@ function animate() {
   if (dataLoaded) {
 
     //camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    camera.position.y = player.position.y + 7;
+    camera.position.y = player.position.y + 5;
     camera.position.z = player.position.z - 7;
 
 
@@ -250,20 +264,20 @@ function onTouchMove(e) {
 function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
-      if (playerBody.linvel().z < 3) {
 
-        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: 7.5 }, true);
-        player.userData.playerStart = true;
-      }
+
+      playerBody.setLinvel({ x: playerBody.linvel().x, y: playerBody.linvel().y, z: 10.0 }, true);
+      player.userData.playerStart = true;
+
       break;
     case 'KeyS':
       player.userData.playerBraking = true;
       break;
     case 'KeyA':
-
+      playerBody.setLinvel({ x: 3.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
       break;
     case 'KeyD':
-
+      playerBody.setLinvel({ x: -3.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
       break;
   }
 }
@@ -275,10 +289,10 @@ function onKeyUp(event) {
       player.userData.playerBraking = false;
       break;
     case 'KeyA':
-
+      playerBody.setLinvel({ x: 0.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
       break;
     case 'KeyD':
-
+      playerBody.setLinvel({ x: 0.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
       break;
   }
 }
