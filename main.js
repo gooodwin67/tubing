@@ -57,7 +57,7 @@ dirLight.shadow.bias = - 0.0001;
 // scene.add(dirLightHelper);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 4, 7);
+camera.position.set(0, 4, -10);
 
 
 let stats = new Stats();
@@ -84,58 +84,28 @@ const ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
 
 
 
-
-
-
-
-
-
-
 let plane;
 
 let player;
 let playerBody;
-let playerBody1;
-
-let playerBottomBlock;
-let playerRightBlock;
-let playerLeftBlock;
-let playerFrontBlock;
-
+let playerCollider;
 
 let ground;
-let groundBody;
-
-
-let playerSpeed = 3;
-let intersects;
-
-let snow;
-
-
 
 
 
 let dynamicBodies = [];
 
 let mouse = new THREE.Vector3;
-let targetPosition = new THREE.Vector3;
 let raycaster = new THREE.Raycaster;
 
 let dataLoaded = false;
 
-let playerPosMarker = false;
 let groundsMas = [];
-let posMarker = 0;
 
-let groundSize;
-let groundPos;
-let snowSize;
 
 let allObjCollision = [];
 
-
-const worldGrav = 9.8;
 
 
 
@@ -151,8 +121,6 @@ const url = 'map.glb';
 gltfLoader.load(url, (gltf) => {
   const root = gltf.scene;
 
-
-
   root.traverse(function (child) {
     if (child.isMesh) {
       child.castShadow = true;
@@ -160,155 +128,39 @@ gltfLoader.load(url, (gltf) => {
     }
   });
 
-
   root.traverse((el) => {
-
-    const box = new THREE.Box3().setFromObject(el);
-    const size = box.getSize(new THREE.Vector3());
-
-
-
 
     if (el.name == 'player') {
 
-
-
-      // let importedPlayer = el.clone();
-      // el = new THREE.Group();
-      // player = el;
-
-
-      // const geometryBottom = new THREE.BoxGeometry(size.x / 10, 0.2, size.z / 10);
-      // const materialBottom = new THREE.MeshBasicMaterial({ color: 0xffff00, opacity: 0, transparent: false });
-      // playerBottomBlock = new THREE.Mesh(geometryBottom, materialBottom);
-      // playerBottomBlock.position.y = -size.y / 2;
-      // playerBottomBlock.position.z = size.y / 6;
-
-      // const geometryRight = new THREE.BoxGeometry(0.1, size.y / 10, size.z / 10);
-      // const materialRight = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-      // playerRightBlock = new THREE.Mesh(geometryRight, materialRight);
-      // playerRightBlock.position.x = size.x / 2;
-
-      // const geometryLeft = new THREE.BoxGeometry(0.1, size.y / 10, size.z / 10);
-      // const materialLeft = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-      // playerLeftBlock = new THREE.Mesh(geometryLeft, materialLeft);
-      // playerLeftBlock.position.x = -size.x / 2;
-
-      // const geometryFront = new THREE.BoxGeometry(size.x / 4, size.y / 4, 0.2);
-      // const materialFront = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-      // playerFrontBlock = new THREE.Mesh(geometryFront, materialFront);
-      // playerFrontBlock.position.z = -size.z / 2;
-      // playerFrontBlock.position.y = size.z / 2;
-
-      //player.add(importedPlayer, playerBottomBlock, playerRightBlock, playerLeftBlock, playerFrontBlock);
-      playerBody1 = el.clone();
-
-      playerBody1.userData.mass = 1;
-      playerBody1.userData.param = new THREE.Vector3(size.x / 2, size.y / 2, size.z / 2)
-      addPhysicsToObject(playerBody1, playerBody1.position, 'dynamic', 1, 'player2')
-
-
-      let geometryTest = new THREE.SphereGeometry(size.y / 2, 15);
-      let materialTest = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: true, side: THREE.DoubleSide, opacity: 1.0, transparent: true })
-      let testMesh = new THREE.Mesh(geometryTest, materialTest);
-      testMesh.position.z = playerBody1.position.z;
-      scene.add(testMesh)
-
-      // player.userData.collideFront = false;
-      // player.userData.collideBottom = false;
-
-
-      //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -2 }, true);
-
-      scene.add(playerBody1)
-      //camera.lookAt(new THREE.Vector3(camera.position.x, playerBody1.position.y, playerBody1.position.z));
+      player = el.clone();
+      player.userData.mass = 1;
+      player.userData.playerStart = false;
+      player.userData.playerBraking = false;
+      addPhysicsToObject(player)
+      scene.add(player)
 
     }
-
     else if (el.name.includes('ground')) {
-      groundSize = size;
-      groundPos = el.position;
-      ground = el;
-      ground.userData.mass = 0;
-      ground.userData.param = new THREE.Vector3(size.x / 2, size.y / 2, size.z / 2)
-      addPhysicsToObject(el, el.position, 'fixed', Math.random(), 'ground')
-      groundsMas.push(ground);
-      allObjCollision.push(ground);
-      scene.add(el.clone());
+
+      let groundBlock = el.clone();
+      groundBlock.userData.mass = 0;
+      addPhysicsToObject(groundBlock);
+      scene.add(groundBlock);
+
     }
-    else if (el.name.includes('testtt')) {
+    else if (el.name.includes('area')) {
+      console.log(el)
+      let areaBlock = el.clone();
+      scene.add(areaBlock);
 
-      el.position.set(0, 0, 0)
-      // groundSize = size;
-      // groundPos = el.position;
-      // ground = el;
-      // ground.userData.mass = 0;
-      // ground.userData.param = new THREE.Vector3(size.x / 2, size.y / 2, size.z / 2)
-      //addPhysicsToObject(el, el.position, 'dynamic', Math.random(), 'ground')
-      // groundsMas.push(ground);
-      // allObjCollision.push(ground);
-      let ii = el.clone()
-      scene.add(ii);
-
-      const box1 = new THREE.Box3().setFromObject(ii);
-      const size1 = new THREE.Vector3();
-      box1.getSize(size1);
-      const position = new THREE.Vector3();
-      box1.getCenter(position);
-
-      const scale = new THREE.Vector3();
-      ii.getWorldScale(scale);
-
-
-      let geometryTest = new THREE.BoxGeometry(size1.x, size1.y, size1.z);
-      let materialTest = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: true, side: THREE.DoubleSide, opacity: 1.0, transparent: true })
-      let testMesh = new THREE.Mesh(geometryTest, materialTest);
-
-      testMesh.position.copy(position);
-      //testMesh.
-
-      //testMesh.scale.set(scale.x, scale.y, scale.z);
-
-      scene.add(testMesh)
     }
-    // else if (el.name.includes('wall')) {
-    //   allObjCollision.push(el);
-    //   scene.add(el.clone());
-    // }
 
-    // else if (el.name.includes('snow')) {
-    //   snowSize = size;
-    //   for (var i = 0; i <= Math.ceil(groundSize.z / snowSize.z) + 1; i++) {
-    //     snow = el.clone();
-    //     snow.position.set(snow.position.x, snow.position.y, snow.position.z - (i * 8.8))
-    //     scene.add(snow);
-    //     //allObjCollision.push(snow);
-    //   }
-    // }
-    // else if (el.name.includes('area')) {
-    //   scene.add(el.clone());
-    // }
+
   })
-
-
-  //scene.add(root);
-
-  let geometryPlane = new THREE.BoxGeometry(50, 0.5, 500);
-  let materialPlane = new THREE.MeshPhongMaterial({ color: 0x0000ff, side: THREE.DoubleSide, opacity: 0.0, transparent: true })
-  plane = new THREE.Mesh(geometryPlane, materialPlane);
-  //plane.position.set(playerBody.position.x, playerBody.position.y - 1, playerBody.position.z - 2);
-
-  //scene.add(plane);
 
   dataLoaded = true;
 
 });
-
-
-
-
-
-
 
 
 
@@ -319,10 +171,8 @@ function animate() {
   if (dataLoaded) {
 
     //camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    //camera.position.z = playerBody1.position.z + 7;
-
-
-
+    camera.position.y = player.position.y + 7;
+    camera.position.z = player.position.z - 7;
 
 
     playerMove();
@@ -333,9 +183,6 @@ function animate() {
       dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
       dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
     }
-
-
-
 
 
 
@@ -355,18 +202,19 @@ renderer.setAnimationLoop(animate);
 // document.addEventListener('touchend', onTouchEnd);
 // document.addEventListener('touchstart', onTouchMove);
 // document.addEventListener('touchmove', onTouchMove);
-
-function onTouchEnd() {
-
-
-
-
-
-}
+window.addEventListener('keydown', onKeyDown);
+window.addEventListener('keyup', onKeyUp);
 
 function playerMove() {
 
+  //console.log(playerBody.linvel().z);
 
+  if (player.userData.playerBraking) {
+    playerCollider.setFriction(3);
+  }
+  else {
+    playerCollider.setFriction(0);
+  }
 }
 
 function onTouchMove(e) {
@@ -399,34 +247,73 @@ function onTouchMove(e) {
   }
 }
 
+function onKeyDown(event) {
+  switch (event.code) {
+    case 'KeyW':
+      if (playerBody.linvel().z < 3) {
 
-function addPhysicsToObject(obj, pos, mode, id, name) {
+        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: 7.5 }, true);
+        player.userData.playerStart = true;
+      }
+      break;
+    case 'KeyS':
+      player.userData.playerBraking = true;
+      break;
+    case 'KeyA':
+
+      break;
+    case 'KeyD':
+
+      break;
+  }
+}
+function onKeyUp(event) {
+  switch (event.code) {
+    case 'KeyW':
+      break;
+    case 'KeyS':
+      player.userData.playerBraking = false;
+      break;
+    case 'KeyA':
+
+      break;
+    case 'KeyD':
+
+      break;
+  }
+}
+
+
+function addPhysicsToObject(obj) {
   let body;
   let shape;
-  if (name == 'player2') {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(pos.x, pos.y, pos.z).setCanSleep(false).enabledRotations(false))
-    shape = RAPIER.ColliderDesc.ball(obj.userData.param.y).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
-  }
-  else if (name == 'ground') {
-    let quater = obj.quaternion;
 
-    let posit = obj.getWorldPosition(new THREE.Vector3);
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(posit.x, posit.y, posit.z).setRotation({ w: quater.w, x: quater.x, y: quater.y, z: quater.z }).setCanSleep(false))
-    shape = RAPIER.ColliderDesc.cuboid(obj.userData.param.x, obj.userData.param.y, obj.userData.param.z).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+  const originalRotation = obj.rotation.clone();
+  obj.rotation.set(0, 0, 0);
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = box.getSize(new THREE.Vector3());
+  obj.rotation.copy(originalRotation);
+
+
+  if (obj.name == 'player') {
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setCanSleep(false).enabledRotations(false).setLinearDamping(0))
+    shape = RAPIER.ColliderDesc.ball(size.y / 2).setMass(obj.userData.mass).setRestitution(0.5).setFriction(0);
+    playerBody = body;
+
+    playerCollider = world.createCollider(shape, body)
+    dynamicBodies.push([obj, body, obj.id])
   }
-  else if (name == 'wall') {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(pos.x, pos.y, pos.z).setCanSleep(false))
-    shape = RAPIER.ColliderDesc.cuboid(obj.userData.param.x, obj.userData.param.я, obj.userData.param.z).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+  else if (obj.name.includes('ground')) {
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0.5).setFriction(0);
+    world.createCollider(shape, body)
+    dynamicBodies.push([obj, body, obj.id])
   }
 
-  if (name == 'wall') {
-    //const shape = RAPIER.ColliderDesc.trimesh(obj.geometry.attributes.position.array, obj.geometry.index.array);
-  }
 
-  body.userData = { id: id }
-  if (id == 1) playerBody = body
-  world.createCollider(shape, body)
-  dynamicBodies.push([obj, body, id])
+
+
+
   // if (obj.children.length > 0) {
   //   dynamicBodies.push([obj.children[0], body, id])
   //   //dynamicBodies.push([obj.children[1], body, id + 100])
