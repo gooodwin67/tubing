@@ -141,16 +141,12 @@ gltfLoader.load(url, (gltf) => {
       player.userData.playerStart = false;
       player.userData.playerBraking = false;
       player.userData.hSpeed = 0;
-      player.userData.maxHSpeed = 3;
+      player.userData.maxHSpeed = 5;
       player.userData.stepSpeed = 2;
       player.userData.maxSpeed = 16;
 
       addPhysicsToObject(player)
       scene.add(player)
-      camera.position.y = player.position.y + 3;
-      camera.position.z = player.position.z;
-      camera.position.x = player.position.x + 10;
-      camera.lookAt(player.position)
 
     }
     else if (el.name.includes('ground')) {
@@ -201,8 +197,8 @@ function animate() {
   if (dataLoaded) {
 
     //camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    // camera.position.y = player.position.y + 5;
-    // camera.position.z = player.position.z - 7;
+    camera.position.y = player.position.y + 5;
+    camera.position.z = player.position.z - 7;
 
 
     playerMove();
@@ -343,12 +339,23 @@ function addPhysicsToObject(obj) {
 
 
   if (obj.name.includes('player')) {
-    console.log(obj)
+
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
+    // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // cube.position.set(obj.position.x, obj.position.y, obj.position.z)
+    // cube.rotation.copy(originalRotation);
+    // scene.add(cube);
+
+    // camera.position.x = player.position.x;
+    // camera.position.y = player.position.y + 5;
+    // camera.position.z = player.position.z;
+    // camera.lookAt(player.position)
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
@@ -357,11 +364,18 @@ function addPhysicsToObject(obj) {
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(10))
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(10);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
+
+    const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.4 });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(obj.position.x, obj.position.y, obj.position.z)
+    cube.rotation.copy(originalRotation);
+    scene.add(cube);
   }
 
 
