@@ -21,7 +21,7 @@ const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
-scene.fog = new THREE.Fog(scene.background, 0.001, 100);
+scene.fog = new THREE.Fog(scene.background, 1, 300);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -30,7 +30,7 @@ hemiLight.position.set(0, 50, 0);
 scene.add(hemiLight);
 
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
-//scene.add(hemiLightHelper);
+scene.add(hemiLightHelper);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.color.setHSL(0.1, 1, 0.95);
@@ -140,34 +140,50 @@ gltfLoader.load(url, (gltf) => {
       player.userData.mass = 1;
       player.userData.playerStart = false;
       player.userData.playerBraking = false;
+      player.userData.hSpeed = 0;
+      player.userData.maxHSpeed = 3;
+      player.userData.stepSpeed = 2;
+      player.userData.maxSpeed = 16;
+
       addPhysicsToObject(player)
       scene.add(player)
+      camera.position.y = player.position.y + 3;
+      camera.position.z = player.position.z;
+      camera.position.x = player.position.x + 10;
+      camera.lookAt(player.position)
 
     }
     else if (el.name.includes('ground')) {
       const box = new THREE.Box3().setFromObject(el);
       const size = box.getSize(new THREE.Vector3());
       let groundBlock = el.clone();
-      groundBlock.position.z = size.z / 2;
+      //groundBlock.position.z = size.z / 2;
       groundBlock.userData.mass = 0;
       addPhysicsToObject(groundBlock);
       scene.add(groundBlock);
-
+    }
+    else if (el.name.includes('wall')) {
+      const box = new THREE.Box3().setFromObject(el);
+      const size = box.getSize(new THREE.Vector3());
+      let wallBlock = el.clone();
+      wallBlock.userData.mass = 1;
+      addPhysicsToObject(wallBlock);
+      scene.add(wallBlock);
     }
     else if (el.name.includes('area')) {
       let areaBlock = el.clone();
       scene.add(areaBlock);
     }
-    else if (el.name.includes('snowblock')) {
-      const box = new THREE.Box3().setFromObject(el);
-      const size = box.getSize(new THREE.Vector3());
-      for (var i = 0; i < Math.floor(groundSize.z / size.z); i++) {
-        let snowBlock = el.clone();
-        snowBlock.position.z = size.z * i + size.z / 2;
-        scene.add(snowBlock);
-      }
+    // else if (el.name.includes('snowblock')) {
+    //   const box = new THREE.Box3().setFromObject(el);
+    //   const size = box.getSize(new THREE.Vector3());
+    //   for (var i = 0; i < Math.floor(groundSize.z / size.z); i++) {
+    //     let snowBlock = el.clone();
+    //     snowBlock.position.z = size.z * i + size.z / 2;
+    //     scene.add(snowBlock);
+    //   }
 
-    }
+    // }
 
 
   })
@@ -185,13 +201,17 @@ function animate() {
   if (dataLoaded) {
 
     //camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    camera.position.y = player.position.y + 5;
-    camera.position.z = player.position.z - 7;
+    // camera.position.y = player.position.y + 5;
+    // camera.position.z = player.position.z - 7;
 
 
     playerMove();
 
     world.step();
+    // dynamicBodies.forEach((el) => {
+    //   console.log(world.intersectionPair(playerBody, el[0]));
+    // })
+
 
     for (let i = 0, n = dynamicBodies.length; i < n; i++) {
       dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
@@ -221,7 +241,15 @@ window.addEventListener('keyup', onKeyUp);
 
 function playerMove() {
 
-  //console.log(playerBody.linvel().z);
+
+
+
+  if (playerBody.linvel().z > 1) {
+    playerBody.setLinvel({ x: player.userData.hSpeed, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+  }
+  else {
+    player.userData.hSpeed = 0;
+  }
 
   if (player.userData.playerBraking) {
     playerCollider.setFriction(3);
@@ -266,18 +294,21 @@ function onKeyDown(event) {
     case 'KeyW':
 
 
-      playerBody.setLinvel({ x: playerBody.linvel().x, y: playerBody.linvel().y, z: 10.0 }, true);
+      if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: player.userData.stepSpeed }, true);
+      }
       player.userData.playerStart = true;
 
       break;
     case 'KeyS':
+      playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
       break;
     case 'KeyA':
-      playerBody.setLinvel({ x: 3.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+      if (playerBody.linvel().x < player.userData.maxHSpeed) player.userData.hSpeed += player.userData.maxHSpeed;
       break;
     case 'KeyD':
-      playerBody.setLinvel({ x: -3.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+      if (playerBody.linvel().x > -player.userData.maxHSpeed) player.userData.hSpeed -= player.userData.maxHSpeed;
       break;
   }
 }
@@ -286,13 +317,15 @@ function onKeyUp(event) {
     case 'KeyW':
       break;
     case 'KeyS':
-      player.userData.playerBraking = false;
+      if (playerBody.linvel().y < 0.1) {
+        player.userData.playerBraking = false;
+      }
       break;
     case 'KeyA':
-      playerBody.setLinvel({ x: 0.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+
       break;
     case 'KeyD':
-      playerBody.setLinvel({ x: 0.0, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+
       break;
   }
 }
@@ -309,17 +342,24 @@ function addPhysicsToObject(obj) {
   obj.rotation.copy(originalRotation);
 
 
-  if (obj.name == 'player') {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setCanSleep(false).enabledRotations(false).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.ball(size.y / 2).setMass(obj.userData.mass).setRestitution(0.5).setFriction(0);
+  if (obj.name.includes('player')) {
+    console.log(obj)
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
-
     playerCollider = world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0.5).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    world.createCollider(shape, body)
+    dynamicBodies.push([obj, body, obj.id])
+  }
+  if (obj.name.includes('wall')) {
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(10))
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(10);
+
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
   }
