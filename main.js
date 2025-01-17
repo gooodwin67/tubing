@@ -19,6 +19,8 @@ import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 await RAPIER.init();
 const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
+const eventQueue = new RAPIER.EventQueue(true);
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
 scene.fog = new THREE.Fog(scene.background, 1, 300);
@@ -107,7 +109,7 @@ let groundsMas = [];
 let allObjCollision = [];
 
 
-
+let targetCube;
 
 
 
@@ -141,14 +143,26 @@ gltfLoader.load(url, (gltf) => {
       player.userData.playerStart = false;
       player.userData.playerBraking = false;
       player.userData.hSpeed = 0;
-      player.userData.maxHSpeed = 5;
+      player.userData.maxHSpeed = 0.2;
       player.userData.stepSpeed = 2;
       player.userData.maxSpeed = 16;
 
-      player.userData.rotationY = 0;
+      player.userData.right = false;
+      player.userData.left = false;
+
+      player.userData.isIntersect = false;
 
       addPhysicsToObject(player)
-      scene.add(player)
+      scene.add(player);
+
+      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+      targetCube = new THREE.Mesh(geometry, material);
+      targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
+      targetCube.userData.hPos = 0;
+
+      scene.add(targetCube);
+
 
     }
     else if (el.name.includes('ground')) {
@@ -202,13 +216,21 @@ function animate() {
     camera.position.y = player.position.y + 5;
     camera.position.z = player.position.z - 7;
 
+    targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
+
 
     playerMove();
 
-    world.step();
-    // dynamicBodies.forEach((el) => {
-    //   console.log(world.intersectionPair(playerBody, el[0]));
-    // })
+    world.step(eventQueue);
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      /* Handle the collision event. */
+      //player.userData.isIntersect = started
+      //console.log(handle2)
+      // world.narrowPhase.contactPair(handle1, handle2, (manifold, flipped) => {
+      //   console.log(handle1);
+      // });
+    });
+
 
 
     for (let i = 0, n = dynamicBodies.length; i < n; i++) {
@@ -256,8 +278,33 @@ function playerMove() {
   //   playerCollider.setFriction(0);
   // }
 
-  playerBody.setRotation({ w: 0.0, x: 0.0, y: player.userData.rotationY, z: 0.0 })
+  // const direction = {
+  //   x: targetCube.position.x - playerBody.translation().x,
+  //   y: targetCube.position.y - playerBody.translation().y,
+  //   z: targetCube.position.z - playerBody.translation().z
+  // };
+  targetCube.position.x += player.userData.hSpeed;
+  const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
+
+  const forceMagnitude = -10; // Сила, с которой будет двигаться сфера
+  playerBody.setLinvel({
+    x: direction.x * forceMagnitude,
+    y: playerBody.linvel().y,
+    z: playerBody.linvel().z
+  });
+
+  if (player.userData.left && player.userData.isIntersect) {
+    player.userData.hSpeed += player.userData.maxHSpeed;
+  }
+  if (player.userData.right && player.userData.isIntersect) {
+    player.userData.hSpeed -= player.userData.maxHSpeed;
+  }
+
+
+
+
 }
+
 
 function onTouchMove(e) {
 
@@ -304,14 +351,18 @@ function onKeyDown(event) {
       //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
 
-      player.userData.rotationY += 0.1;
+
       break;
     case 'KeyA':
-      player.userData.hSpeed += player.userData.maxHSpeed;
+
+
+      player.userData.left = 'true'
 
       break;
     case 'KeyD':
-      player.userData.hSpeed -= player.userData.maxHSpeed;
+
+
+      player.userData.right = 'true'
 
       break;
   }
@@ -327,8 +378,12 @@ function onKeyUp(event) {
       break;
     case 'KeyA':
 
+      player.userData.left = false;
+
       break;
     case 'KeyD':
+
+      player.userData.right = false;
 
       break;
   }
@@ -351,6 +406,7 @@ function addPhysicsToObject(obj) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
+    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     playerCollider = world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
     // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
@@ -390,6 +446,7 @@ function addPhysicsToObject(obj) {
 
 
 
+
   // if (obj.children.length > 0) {
   //   dynamicBodies.push([obj.children[0], body, id])
   //   //dynamicBodies.push([obj.children[1], body, id + 100])
@@ -399,8 +456,6 @@ function addPhysicsToObject(obj) {
   // }
 
 }
-
-
 
 
 
