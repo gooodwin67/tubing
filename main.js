@@ -145,6 +145,8 @@ gltfLoader.load(url, (gltf) => {
       player.userData.stepSpeed = 2;
       player.userData.maxSpeed = 16;
 
+      player.userData.rotationY = 0;
+
       addPhysicsToObject(player)
       scene.add(player)
 
@@ -240,19 +242,21 @@ function playerMove() {
 
 
 
-  if (playerBody.linvel().z > 1) {
-    playerBody.setLinvel({ x: player.userData.hSpeed, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
-  }
-  else {
-    player.userData.hSpeed = 0;
-  }
+  // if (playerBody.linvel().z > 1) {
+  //   playerBody.setLinvel({ x: player.userData.hSpeed / 5, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+  // }
+  // else {
+  //   player.userData.hSpeed = 0;
+  // }
 
-  if (player.userData.playerBraking) {
-    playerCollider.setFriction(3);
-  }
-  else {
-    playerCollider.setFriction(0);
-  }
+  // if (player.userData.playerBraking) {
+  //   playerCollider.setFriction(3);
+  // }
+  // else {
+  //   playerCollider.setFriction(0);
+  // }
+
+  playerBody.setRotation({ w: 0.0, x: 0.0, y: player.userData.rotationY, z: 0.0 })
 }
 
 function onTouchMove(e) {
@@ -297,14 +301,18 @@ function onKeyDown(event) {
 
       break;
     case 'KeyS':
-      playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
+      //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
+
+      player.userData.rotationY += 0.1;
       break;
     case 'KeyA':
-      if (playerBody.linvel().x < player.userData.maxHSpeed) player.userData.hSpeed += player.userData.maxHSpeed;
+      player.userData.hSpeed += player.userData.maxHSpeed;
+
       break;
     case 'KeyD':
-      if (playerBody.linvel().x > -player.userData.maxHSpeed) player.userData.hSpeed -= player.userData.maxHSpeed;
+      player.userData.hSpeed -= player.userData.maxHSpeed;
+
       break;
   }
 }
