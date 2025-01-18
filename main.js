@@ -6,7 +6,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-import RAPIER from '@dimforge/rapier3d-compat';
+import RAPIER, { RayColliderHit } from '@dimforge/rapier3d-compat';
 
 
 import { OrbitControls } from "three/addons/controls/OrbitControls";
@@ -20,6 +20,7 @@ await RAPIER.init();
 const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
 const eventQueue = new RAPIER.EventQueue(true);
+
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
@@ -93,6 +94,7 @@ let playerBody;
 let playerCollider;
 
 let ground;
+let groundBody;
 
 
 
@@ -150,7 +152,7 @@ gltfLoader.load(url, (gltf) => {
       player.userData.right = false;
       player.userData.left = false;
 
-      player.userData.isIntersect = false;
+      player.userData.onGround = false;
 
       addPhysicsToObject(player)
       scene.add(player);
@@ -172,6 +174,7 @@ gltfLoader.load(url, (gltf) => {
       //groundBlock.position.z = size.z / 2;
       groundBlock.userData.mass = 0;
       addPhysicsToObject(groundBlock);
+      allObjCollision.push(groundBlock);
       scene.add(groundBlock);
     }
     else if (el.name.includes('wall')) {
@@ -180,6 +183,7 @@ gltfLoader.load(url, (gltf) => {
       let wallBlock = el.clone();
       wallBlock.userData.mass = 1;
       addPhysicsToObject(wallBlock);
+      allObjCollision.push(wallBlock);
       scene.add(wallBlock);
     }
     else if (el.name.includes('area')) {
@@ -205,6 +209,8 @@ gltfLoader.load(url, (gltf) => {
 });
 
 
+const raycaster1 = new THREE.Raycaster();
+const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
 
 
@@ -221,15 +227,8 @@ function animate() {
 
     playerMove();
 
-    world.step(eventQueue);
-    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-      /* Handle the collision event. */
-      //player.userData.isIntersect = started
-      //console.log(handle2)
-      // world.narrowPhase.contactPair(handle1, handle2, (manifold, flipped) => {
-      //   console.log(handle1);
-      // });
-    });
+    world.step();
+
 
 
 
@@ -293,10 +292,18 @@ function playerMove() {
     z: playerBody.linvel().z
   });
 
-  if (player.userData.left && player.userData.isIntersect) {
+  raycaster1.set(player.position, direction1);
+  const intersects = raycaster1.intersectObjects(allObjCollision);
+  if (intersects.length > 0) {
+    if (intersects[0].distance < 0.4) player.userData.onGround = true;
+    else player.userData.onGround = false;
+  }
+
+
+  if (player.userData.left && player.userData.onGround) {
     player.userData.hSpeed += player.userData.maxHSpeed;
   }
-  if (player.userData.right && player.userData.isIntersect) {
+  if (player.userData.right && player.userData.onGround) {
     player.userData.hSpeed -= player.userData.maxHSpeed;
   }
 
@@ -406,7 +413,8 @@ function addPhysicsToObject(obj) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
-    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+    playerCollider = shape;
+    // shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     playerCollider = world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
     // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
@@ -423,8 +431,9 @@ function addPhysicsToObject(obj) {
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 3, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     world.createCollider(shape, body)
+    groundBody = body;
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
