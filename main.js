@@ -122,7 +122,7 @@ let targetCube;
 
 
 const gltfLoader = new GLTFLoader();
-const url = 'map.glb';
+const url = './map.glb';
 gltfLoader.load(url, (gltf) => {
   const root = gltf.scene;
 
