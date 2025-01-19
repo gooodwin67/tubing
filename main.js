@@ -1,4 +1,5 @@
 // npx vite --host
+// npm install vite-plugin-top-level-await --save-dev
 
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
