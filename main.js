@@ -1,6 +1,9 @@
 // npx vite --host
 // npm install vite-plugin-top-level-await --save-dev
 
+// npm run build 
+// npm run deploy 
+
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 
@@ -34,13 +37,13 @@ hemiLight.position.set(0, 50, 0);
 scene.add(hemiLight);
 
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
-scene.add(hemiLightHelper);
+// scene.add(hemiLightHelper);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.color.setHSL(0.1, 1, 0.95);
 dirLight.position.set(- 1, 1.75, 1);
 dirLight.position.multiplyScalar(30);
-scene.add(dirLight);
+// scene.add(dirLight);
 
 dirLight.castShadow = true;
 
@@ -79,8 +82,8 @@ controls.enableDamping = true;
 controls.target.set(0, 0, 0);
 /*/////////////////////////////////////////////////////*/
 
-const ambientLight = new THREE.AmbientLight(0xaaaaaa); // soft white light
-//scene.add(ambientLight);
+const ambientLight = new THREE.AmbientLight(0xaaaaaa, 4); // soft white light
+scene.add(ambientLight);
 
 
 /*/////////////////////////////////////////////////////*/
@@ -145,10 +148,13 @@ gltfLoader.load(url, (gltf) => {
       player.userData.mass = 1;
       player.userData.playerStart = false;
       player.userData.playerBraking = false;
-      player.userData.hSpeed = 0;
+      player.userData.hTransition = 0;
+      player.userData.hSpeed = 10;
       player.userData.maxHSpeed = 0.2;
       player.userData.stepSpeed = 2;
       player.userData.maxSpeed = 16;
+
+      player.userData.resetHAngle = false;
 
       player.userData.right = false;
       player.userData.left = false;
@@ -265,10 +271,10 @@ function playerMove() {
 
 
   // if (playerBody.linvel().z > 1) {
-  //   playerBody.setLinvel({ x: player.userData.hSpeed / 5, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
+  //   playerBody.setLinvel({ x: player.userData.hTransition / 5, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
   // }
   // else {
-  //   player.userData.hSpeed = 0;
+  //   player.userData.hTransition = 0;
   // }
 
   // if (player.userData.playerBraking) {
@@ -283,12 +289,12 @@ function playerMove() {
   //   y: targetCube.position.y - playerBody.translation().y,
   //   z: targetCube.position.z - playerBody.translation().z
   // };
-  targetCube.position.x += player.userData.hSpeed;
+  targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
 
-  const forceMagnitude = -10; // Сила, с которой будет двигаться сфера
+  
   playerBody.setLinvel({
-    x: direction.x * forceMagnitude,
+    x: direction.x * -player.userData.hSpeed,
     y: playerBody.linvel().y,
     z: playerBody.linvel().z
   });
@@ -302,11 +308,28 @@ function playerMove() {
 
 
   if (player.userData.left && player.userData.onGround) {
-    player.userData.hSpeed += player.userData.maxHSpeed;
+    if (player.userData.hTransition < 5) player.userData.hTransition += player.userData.maxHSpeed;
   }
   if (player.userData.right && player.userData.onGround) {
-    player.userData.hSpeed -= player.userData.maxHSpeed;
+    if (player.userData.hTransition > -5) player.userData.hTransition -= player.userData.maxHSpeed;
   }
+
+  if (player.userData.resetHAngle ) {
+    if (!player.userData.left && !player.userData.right) {
+      if (player.userData.hTransition < -player.userData.maxHSpeed) {
+        player.userData.hTransition += player.userData.maxHSpeed;
+      }
+      else if (player.userData.hTransition > player.userData.maxHSpeed) {
+        player.userData.hTransition -= player.userData.maxHSpeed;
+      }
+      else {
+        player.userData.hTransition = 0;
+      }
+        
+    }
+  }
+  
+  
 
 
 
@@ -438,8 +461,8 @@ function addPhysicsToObject(obj) {
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(10);
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 4, size.z / 4).setMass(obj.userData.mass*20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
@@ -449,7 +472,7 @@ function addPhysicsToObject(obj) {
     const cube = new THREE.Mesh(geometry, material);
     cube.position.set(obj.position.x, obj.position.y, obj.position.z)
     cube.rotation.copy(originalRotation);
-    scene.add(cube);
+    //scene.add(cube);
   }
 
 
