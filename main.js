@@ -17,13 +17,15 @@ import { OrbitControls } from "three/addons/controls/OrbitControls";
 
 import { detectCollisionCubes } from "./functions/detectColisions";
 import { detectCollisionCubeAndArray } from "./functions/detectColisions";
+import { detectDevice } from "./functions/detectColisions";
 
 
 
 await RAPIER.init();
 const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
-const eventQueue = new RAPIER.EventQueue(true);
+const isMobile = detectDevice();
+
 
 
 const scene = new THREE.Scene();
@@ -42,8 +44,8 @@ const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.color.setHSL(0.1, 1, 0.95);
 dirLight.position.set(- 1, 1.75, 1);
-dirLight.position.multiplyScalar(30);
-// scene.add(dirLight);
+//dirLight.position.multiplyScalar(10);
+scene.add(dirLight);
 
 dirLight.castShadow = true;
 
@@ -60,8 +62,8 @@ dirLight.shadow.camera.bottom = - d;
 dirLight.shadow.camera.far = 3500;
 dirLight.shadow.bias = - 0.0001;
 
-// const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
-// scene.add(dirLightHelper);
+const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
+scene.add(dirLightHelper);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 4, -10);
@@ -77,13 +79,13 @@ document.body.appendChild(renderer.domElement);
 renderer.shadowMap.enabled = true;
 /*/////////////////////////////////////////////////////*/
 
-let controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.target.set(0, 0, 0);
+// let controls = new OrbitControls(camera, renderer.domElement);
+// controls.enableDamping = true;
+// controls.target.set(0, 0, 0);
 /*/////////////////////////////////////////////////////*/
 
 const ambientLight = new THREE.AmbientLight(0xaaaaaa, 4); // soft white light
-scene.add(ambientLight);
+//scene.add(ambientLight);
 
 
 /*/////////////////////////////////////////////////////*/
@@ -150,7 +152,7 @@ gltfLoader.load(url, (gltf) => {
       player.userData.playerBraking = false;
       player.userData.hTransition = 0;
       player.userData.hSpeed = 10;
-      player.userData.maxHSpeed = 0.2;
+      player.userData.maxHSpeed = 0.08;
       player.userData.stepSpeed = 2;
       player.userData.maxSpeed = 16;
 
@@ -163,6 +165,9 @@ gltfLoader.load(url, (gltf) => {
 
       addPhysicsToObject(player)
       scene.add(player);
+
+      dirLight.position.set(player.position.x, player.position.y, player.position.z);
+      dirLight.position.multiplyScalar(2);
 
       const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
       const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
@@ -213,6 +218,33 @@ gltfLoader.load(url, (gltf) => {
 
   dataLoaded = true;
 
+  function texture(url, scalex, scaley) {
+    var map = new THREE.TextureLoader().load('Textures/' + url);
+    map.repeat.set(scalex, scaley);
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    return map;
+  }
+
+
+  // construct the ground
+
+  var ground2 = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 60),
+    new THREE.MeshStandardMaterial({
+      color: 'white', depthWrite: false,
+      map: texture('snow-5-2.jpg', 4, 12),
+      // normalMap: texture('normal.jpg', 10, 10),
+      normalScale: new THREE.Vector2(0.5, 0.5),
+    })
+  );
+  ground2.position.y = allObjCollision[1].position.y + 0.3;
+  ground2.position.x = allObjCollision[1].position.x;
+  ground2.position.z = allObjCollision[1].position.z;
+  ground2.rotation.x = -Math.PI / 2;
+  ground2.receiveShadow = true;
+  //scene.add(ground2);
+
 });
 
 
@@ -225,9 +257,12 @@ function animate() {
 
   if (dataLoaded) {
 
-    //camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
+    camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
     camera.position.y = player.position.y + 5;
     camera.position.z = player.position.z - 7;
+
+    //dirLight.position.set(player.position.x + 2, player.position.y + 100, player.position.z + 50);
+
 
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
 
@@ -259,9 +294,9 @@ function animate() {
 }
 renderer.setAnimationLoop(animate);
 
-// document.addEventListener('touchend', onTouchEnd);
-// document.addEventListener('touchstart', onTouchMove);
-// document.addEventListener('touchmove', onTouchMove);
+document.addEventListener('touchend', onTouchEnd);
+document.addEventListener('touchstart', onTouchMove);
+document.addEventListener('touchmove', onTouchMove);
 window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 
@@ -292,7 +327,7 @@ function playerMove() {
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
 
-  
+
   playerBody.setLinvel({
     x: direction.x * -player.userData.hSpeed,
     y: playerBody.linvel().y,
@@ -314,7 +349,7 @@ function playerMove() {
     if (player.userData.hTransition > -5) player.userData.hTransition -= player.userData.maxHSpeed;
   }
 
-  if (player.userData.resetHAngle ) {
+  if (player.userData.resetHAngle) {
     if (!player.userData.left && !player.userData.right) {
       if (player.userData.hTransition < -player.userData.maxHSpeed) {
         player.userData.hTransition += player.userData.maxHSpeed;
@@ -325,11 +360,11 @@ function playerMove() {
       else {
         player.userData.hTransition = 0;
       }
-        
+
     }
   }
-  
-  
+
+
 
 
 
@@ -341,7 +376,7 @@ function onTouchMove(e) {
 
 
 
-  if (player.userData.playerOnGround) {
+  if (player.userData.onGround) {
 
 
     e = e.changedTouches[0];
@@ -353,18 +388,40 @@ function onTouchMove(e) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    plane.geometry.computeBoundingBox();
-    var box1 = plane.geometry.boundingBox.clone();
-    box1.applyMatrix4(plane.matrixWorld);
+    if (mouse.y > 0) {
+      if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: player.userData.stepSpeed }, true);
+      }
+    }
+    else {
+      if (mouse.x > 0) {
+        player.userData.left = false
+        player.userData.right = true
+      }
+      else {
+        player.userData.right = false
+        player.userData.left = true
+      }
+    }
 
-    intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
+
+    // plane.geometry.computeBoundingBox();
+    // var box1 = plane.geometry.boundingBox.clone();
+    // box1.applyMatrix4(plane.matrixWorld);
+
+    // intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
 
 
 
 
-    if (intersects) targetPosition = new THREE.Vector3(intersects.x * 2, player.position.y, player.position.z);
+    // if (intersects) targetPosition = new THREE.Vector3(intersects.x * 2, player.position.y, player.position.z);
 
   }
+}
+
+function onTouchEnd(e) {
+  player.userData.right = false;
+  player.userData.left = false;
 }
 
 function onKeyDown(event) {
@@ -387,13 +444,13 @@ function onKeyDown(event) {
     case 'KeyA':
 
 
-      player.userData.left = 'true'
+      player.userData.left = true
 
       break;
     case 'KeyD':
 
 
-      player.userData.right = 'true'
+      player.userData.right = true
 
       break;
   }
@@ -462,7 +519,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 4, size.z / 4).setMass(obj.userData.mass*20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 4, size.z / 4).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
