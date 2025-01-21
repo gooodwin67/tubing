@@ -218,31 +218,31 @@ gltfLoader.load(url, (gltf) => {
 
   dataLoaded = true;
 
-  function texture(url, scalex, scaley) {
-    var map = new THREE.TextureLoader().load('Textures/' + url);
-    map.repeat.set(scalex, scaley);
-    map.wrapS = THREE.RepeatWrapping;
-    map.wrapT = THREE.RepeatWrapping;
-    return map;
-  }
+  // function texture(url, scalex, scaley) {
+  //   var map = new THREE.TextureLoader().load('Textures/' + url);
+  //   map.repeat.set(scalex, scaley);
+  //   map.wrapS = THREE.RepeatWrapping;
+  //   map.wrapT = THREE.RepeatWrapping;
+  //   return map;
+  // }
 
 
   // construct the ground
 
-  var ground2 = new THREE.Mesh(
-    new THREE.PlaneGeometry(20, 60),
-    new THREE.MeshStandardMaterial({
-      color: 'white', depthWrite: false,
-      map: texture('snow-5-2.jpg', 4, 12),
-      // normalMap: texture('normal.jpg', 10, 10),
-      normalScale: new THREE.Vector2(0.5, 0.5),
-    })
-  );
-  ground2.position.y = allObjCollision[1].position.y + 0.3;
-  ground2.position.x = allObjCollision[1].position.x;
-  ground2.position.z = allObjCollision[1].position.z;
-  ground2.rotation.x = -Math.PI / 2;
-  ground2.receiveShadow = true;
+  // var ground2 = new THREE.Mesh(
+  //   new THREE.PlaneGeometry(20, 60),
+  //   new THREE.MeshStandardMaterial({
+  //     color: 'white', depthWrite: false,
+  //     map: texture('snow-5-2.jpg', 4, 12),
+  //     // normalMap: texture('normal.jpg', 10, 10),
+  //     normalScale: new THREE.Vector2(0.5, 0.5),
+  //   })
+  // );
+  // ground2.position.y = allObjCollision[1].position.y + 0.3;
+  // ground2.position.x = allObjCollision[1].position.x;
+  // ground2.position.z = allObjCollision[1].position.z;
+  // ground2.rotation.x = -Math.PI / 2;
+  // ground2.receiveShadow = true;
   //scene.add(ground2);
 
 });
@@ -427,6 +427,7 @@ function onTouchEnd(e) {
 function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
+    case 'ArrowUp':
 
 
       if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
@@ -436,19 +437,20 @@ function onKeyDown(event) {
 
       break;
     case 'KeyS':
+    case 'ArrowDown':
       //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
 
 
       break;
     case 'KeyA':
-
+    case 'ArrowLeft':
 
       player.userData.left = true
 
       break;
     case 'KeyD':
-
+    case 'ArrowRight':
 
       player.userData.right = true
 
@@ -458,18 +460,21 @@ function onKeyDown(event) {
 function onKeyUp(event) {
   switch (event.code) {
     case 'KeyW':
+    case 'ArrowUp':
       break;
     case 'KeyS':
+    case 'ArrowDown':
       if (playerBody.linvel().y < 0.1) {
         player.userData.playerBraking = false;
       }
       break;
     case 'KeyA':
-
+    case 'ArrowLeft':
       player.userData.left = false;
 
       break;
     case 'KeyD':
+    case 'ArrowRight':
 
       player.userData.right = false;
 
