@@ -28,9 +28,14 @@ const isMobile = detectDevice();
 
 
 
+
+
+
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
 scene.fog = new THREE.Fog(scene.background, 1, 300);
+
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -258,7 +263,7 @@ function animate() {
   if (dataLoaded) {
 
     camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    camera.position.y = player.position.y + 5;
+    camera.position.y = player.position.y + 4;
     camera.position.z = player.position.z - 7;
 
     //dirLight.position.set(player.position.x + 2, player.position.y + 100, player.position.z + 50);
@@ -524,7 +529,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 4, size.z / 4).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 3, size.y / 3, size.z / 3).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
