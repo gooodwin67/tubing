@@ -26,6 +26,10 @@ const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
 const isMobile = detectDevice();
 
+let clock = new THREE.Clock();
+let delta = 0;
+// 30 fps
+let interval = 1 / 60;
 
 
 
@@ -82,6 +86,26 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 renderer.shadowMap.enabled = true;
+
+window.addEventListener('resize', onWindowResize, false);
+
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// document.body.addEventListener("keydown", function () {
+//   this.requestFullscreen();
+// }, false);
+document.body.addEventListener("touchstart", function () {
+  this.requestFullscreen().then(() => {
+    screen.orientation.lock("landscape");
+  })
+
+}, false);
+
 /*/////////////////////////////////////////////////////*/
 
 // let controls = new OrbitControls(camera, renderer.domElement);
@@ -188,6 +212,7 @@ gltfLoader.load(url, (gltf) => {
       const box = new THREE.Box3().setFromObject(el);
       const size = box.getSize(new THREE.Vector3());
       let groundBlock = el.clone();
+
       //groundBlock.position.z = size.z / 2;
       groundBlock.userData.mass = 0;
       addPhysicsToObject(groundBlock);
@@ -258,13 +283,26 @@ const direction1 = new THREE.Vector3(0, -1, 0); // Направление вни
 
 
 
+
+
 function animate() {
 
   if (dataLoaded) {
 
-    camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
-    camera.position.y = player.position.y + 4;
-    camera.position.z = player.position.z - 7;
+
+    if (isMobile) {
+      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
+      //camera.position.x = player.position.x;
+      camera.position.y = player.position.y + 3;
+      camera.position.z = player.position.z - 3;
+    }
+    else {
+      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
+
+      camera.position.y = player.position.y + 3;
+      camera.position.z = player.position.z - 5;
+    }
+
 
     //dirLight.position.set(player.position.x + 2, player.position.y + 100, player.position.z + 50);
 
@@ -291,13 +329,33 @@ function animate() {
   }
 
 
-
-
   stats.update();
-  renderer.render(scene, camera);
+
 
 }
-renderer.setAnimationLoop(animate);
+
+
+renderer.setAnimationLoop(() => {
+
+
+  delta += clock.getDelta();
+
+  if (delta > interval) {
+    animate()
+    renderer.render(scene, camera);
+
+
+    delta = delta % interval;
+  }
+
+
+
+
+});
+
+
+
+
 
 document.addEventListener('touchend', onTouchEnd);
 document.addEventListener('touchstart', onTouchMove);
