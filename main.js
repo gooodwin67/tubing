@@ -300,7 +300,7 @@ function animate() {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
 
       camera.position.y = player.position.y + 3;
-      camera.position.z = player.position.z - 5;
+      camera.position.z = player.position.z - 6;
     }
 
 
@@ -366,7 +366,12 @@ window.addEventListener('keyup', onKeyUp);
 function playerMove() {
 
 
-
+  if (playerBody.rotation().x > 0.4) {
+    playerBody.setRotation({ w: 1.0, x: 0.4, y: 0.0, z: 0.0 });
+  }
+  else if (playerBody.rotation().x < -0.4) {
+    playerBody.setRotation({ w: 1.0, x: -0.4, y: 0.0, z: 0.0 });
+  }
 
   // if (playerBody.linvel().z > 1) {
   //   playerBody.setLinvel({ x: player.userData.hTransition / 5, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
@@ -559,11 +564,11 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('player')) {
 
+
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
-    // shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     playerCollider = world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
     // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
@@ -580,7 +585,7 @@ function addPhysicsToObject(obj) {
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 3, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     world.createCollider(shape, body)
     groundBody = body;
     dynamicBodies.push([obj, body, obj.id])
