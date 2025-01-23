@@ -8,12 +8,53 @@
  <style>
   body {
    margin: 0;
+   background: #1C1D21;
+  }
+
+  #overlay {
+   position: absolute;
+   z-index: 1;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   opacity: 1;
+   background-color: #000000;
+   color: #ffffff;
+  }
+
+  #overlay>div {
+   text-align: center;
+  }
+
+  #overlay>div>button {
+   height: 20px;
+   width: 100px;
+   background: transparent;
+   color: #ffffff;
+   outline: 1px solid #ffffff;
+   border: 0px;
+   cursor: pointer;
+  }
+
+  #overlay>div>p {
+   color: #777777;
+   font-size: 12px;
   }
  </style>
-  <script type="module" crossorigin src="./assets/index-DkU2IDv1.js"></script>
+  <script type="module" crossorigin src="./assets/index-DIXakiTX.js"></script>
 </head>
 
 <body>
+ <div id="overlay">
+  <div>
+   <button id="startButton">Click to Play</button>
+   <p>Automatic audio playback requires a user interaction.</p>
+  </div>
+ </div>
 
 </body>
 
