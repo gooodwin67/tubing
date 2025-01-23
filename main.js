@@ -19,6 +19,9 @@ import { detectCollisionCubes } from "./functions/detectColisions";
 import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 import { detectDevice } from "./functions/detectColisions";
 
+var startButton = document.getElementById('startButton');
+startButton.addEventListener('click', init);
+
 
 
 await RAPIER.init();
@@ -53,7 +56,7 @@ const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.color.setHSL(0.1, 1, 0.95);
 dirLight.position.set(- 1, 1.75, 1);
-//dirLight.position.multiplyScalar(10);
+dirLight.position.multiplyScalar(10);
 scene.add(dirLight);
 
 dirLight.castShadow = true;
@@ -72,7 +75,7 @@ dirLight.shadow.camera.far = 3500;
 dirLight.shadow.bias = - 0.0001;
 
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
-scene.add(dirLightHelper);
+//scene.add(dirLightHelper);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 4, -10);
@@ -127,6 +130,7 @@ let plane;
 let player;
 let playerBody;
 let playerCollider;
+let soundSlide;
 
 let ground;
 let groundBody;
@@ -139,6 +143,7 @@ let mouse = new THREE.Vector3;
 let raycaster = new THREE.Raycaster;
 
 let dataLoaded = false;
+let buttonSend = false;
 
 let groundsMas = [];
 
@@ -248,6 +253,11 @@ gltfLoader.load(url, (gltf) => {
 
   dataLoaded = true;
 
+
+
+
+
+
   // function texture(url, scalex, scaley) {
   //   var map = new THREE.TextureLoader().load('Textures/' + url);
   //   map.repeat.set(scalex, scaley);
@@ -282,12 +292,41 @@ const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
 
+function init() {
+  var overlay = document.getElementById('overlay');
+  overlay.remove();
+  const listener = new THREE.AudioListener();
+  player.add(listener);
+
+  // create a global audio source
+
+
+  // load a sound and set it as the Audio object's buffer
+  const audioLoader = new THREE.AudioLoader();
+  audioLoader.load('assets/audio/slide.mp3', function (buffer) {
+    soundSlide = new THREE.PositionalAudio(listener);
+    soundSlide.setBuffer(buffer);
+    soundSlide.setLoop(true);
+    soundSlide.setRefDistance(100);
+    soundSlide.setVolume(1);
+    buttonSend = true;
+  });
+
+
+}
+
 
 
 
 function animate() {
 
-  if (dataLoaded) {
+  if (dataLoaded && buttonSend) {
+    if (playerBody.linvel().z > 3 && player.userData.onGround) {
+      if (!soundSlide.isPlaying) soundSlide.play();
+    }
+    else {
+      if (soundSlide.isPlaying) soundSlide.stop()
+    }
 
 
     if (isMobile) {
@@ -304,7 +343,6 @@ function animate() {
     }
 
 
-    //dirLight.position.set(player.position.x + 2, player.position.y + 100, player.position.z + 50);
 
 
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
