@@ -130,7 +130,9 @@ let plane;
 let player;
 let playerBody;
 let playerCollider;
+
 let soundSlide;
+let soundJump;
 
 let ground;
 let groundBody;
@@ -144,6 +146,7 @@ let raycaster = new THREE.Raycaster;
 
 let dataLoaded = false;
 let buttonSend = false;
+let buttonSend2 = false;
 
 let groundsMas = [];
 
@@ -196,6 +199,7 @@ gltfLoader.load(url, (gltf) => {
       player.userData.left = false;
 
       player.userData.onGround = false;
+      player.userData.flying = false;
 
       addPhysicsToObject(player)
       scene.add(player);
@@ -307,9 +311,20 @@ function init() {
     soundSlide = new THREE.PositionalAudio(listener);
     soundSlide.setBuffer(buffer);
     soundSlide.setLoop(true);
-    soundSlide.setRefDistance(100);
+    soundSlide.setRefDistance(40);
     soundSlide.setVolume(1);
     buttonSend = true;
+    player.add(soundSlide);
+  });
+
+  audioLoader.load('assets/audio/jump.mp3', function (buffer) {
+    soundJump = new THREE.PositionalAudio(listener);
+    soundJump.setBuffer(buffer);
+    soundJump.setLoop(false);
+    soundJump.setRefDistance(40);
+    soundJump.setVolume(0.4);
+    buttonSend2 = true;
+    player.add(soundJump);
   });
 
 
@@ -320,13 +335,14 @@ function init() {
 
 function animate() {
 
-  if (dataLoaded && buttonSend) {
+  if (dataLoaded && buttonSend && buttonSend2) {
     if (playerBody.linvel().z > 3 && player.userData.onGround) {
       if (!soundSlide.isPlaying) soundSlide.play();
     }
     else {
       if (soundSlide.isPlaying) soundSlide.stop()
     }
+
 
 
     if (isMobile) {
@@ -336,10 +352,10 @@ function animate() {
       camera.position.z = player.position.z - 3;
     }
     else {
-      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z));
+      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
 
       camera.position.y = player.position.y + 4;
-      camera.position.z = player.position.z - 5;
+      camera.position.z = player.position.z - 4;
     }
 
 
@@ -438,8 +454,18 @@ function playerMove() {
   raycaster1.set(player.position, direction1);
   const intersects = raycaster1.intersectObjects(allObjCollision);
   if (intersects.length > 0) {
-    if (intersects[0].distance < 0.4) player.userData.onGround = true;
-    else player.userData.onGround = false;
+    if (intersects[0].distance < 0.4) {
+      player.userData.flying = false;
+      if (!player.userData.onGround && !player.userData.flying) {
+        soundJump.play();
+
+      }
+      player.userData.onGround = true;
+    }
+    else {
+      player.userData.onGround = false;
+      player.userData.flying = true;
+    }
   }
 
 
