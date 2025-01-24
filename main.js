@@ -228,49 +228,49 @@ async function init() {
 
 }
 
-async function loadAudio() {
-  const listener = new THREE.AudioListener();
-  player.add(listener);
+// async function loadAudio() {
+//   const listener = new THREE.AudioListener();
+//   player.add(listener);
 
 
-  const audioLoader = new THREE.AudioLoader();
-  await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
-    soundSlide = new THREE.PositionalAudio(listener);
-    soundSlide.setBuffer(buffer);
-    soundSlide.setLoop(true);
-    soundSlide.setRefDistance(40);
-    soundSlide.setVolume(1);
-    player.add(soundSlide);
-  });
+//   const audioLoader = new THREE.AudioLoader();
+//   await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
+//     soundSlide = new THREE.PositionalAudio(listener);
+//     soundSlide.setBuffer(buffer);
+//     soundSlide.setLoop(true);
+//     soundSlide.setRefDistance(40);
+//     soundSlide.setVolume(1);
+//     player.add(soundSlide);
+//   });
 
-  await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
-    soundJump = new THREE.PositionalAudio(listener);
-    soundJump.setBuffer(buffer);
-    soundJump.setLoop(false);
-    soundJump.setRefDistance(40);
-    soundJump.setVolume(0.4);
-    player.add(soundJump);
-  });
+//   await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
+//     soundJump = new THREE.PositionalAudio(listener);
+//     soundJump.setBuffer(buffer);
+//     soundJump.setLoop(false);
+//     soundJump.setRefDistance(40);
+//     soundJump.setVolume(0.4);
+//     player.add(soundJump);
+//   });
 
-  await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
-    soundAround = new THREE.PositionalAudio(listener);
-    soundAround.setBuffer(buffer);
-    soundAround.setLoop(true);
-    soundAround.setRefDistance(40);
-    soundAround.setVolume(1);
-    player.add(soundAround);
-  });
+//   await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
+//     soundAround = new THREE.PositionalAudio(listener);
+//     soundAround.setBuffer(buffer);
+//     soundAround.setLoop(true);
+//     soundAround.setRefDistance(40);
+//     soundAround.setVolume(1);
+//     player.add(soundAround);
+//   });
 
-  // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
-  //   soundMusic = new THREE.PositionalAudio(listener);
-  //   soundMusic.setBuffer(buffer);
-  //   soundMusic.setLoop(true);
-  //   soundMusic.setRefDistance(40);
-  //   soundMusic.setVolume(0.4);
-  //   player.add(soundMusic);
-  // });
+//   // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
+//   //   soundMusic = new THREE.PositionalAudio(listener);
+//   //   soundMusic.setBuffer(buffer);
+//   //   soundMusic.setLoop(true);
+//   //   soundMusic.setRefDistance(40);
+//   //   soundMusic.setVolume(0.4);
+//   //   player.add(soundMusic);
+//   // });
 
-}
+// }
 
 async function initAllData() {
   await init()
@@ -279,7 +279,7 @@ async function initAllData() {
   var overlay = document.getElementById('overlay');
   overlay.remove();
 
-  soundAround.play();
+  //soundAround.play();
 
   // playerParticleSystem = getParticleSystem({
   //   camera: camera,
