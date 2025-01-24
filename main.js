@@ -234,7 +234,7 @@ async function loadAudio() {
 
 
   const audioLoader = new THREE.AudioLoader();
-  await audioLoader.loadAsync('assets/audio/slide.mp3?raw=true').then((buffer) => {
+  await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
     soundSlide = new THREE.PositionalAudio(listener);
     soundSlide.setBuffer(buffer);
     soundSlide.setLoop(true);
@@ -243,7 +243,7 @@ async function loadAudio() {
     player.add(soundSlide);
   });
 
-  await audioLoader.loadAsync('assets/audio/jump.mp3').then((buffer) => {
+  await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
     soundJump = new THREE.PositionalAudio(listener);
     soundJump.setBuffer(buffer);
     soundJump.setLoop(false);
@@ -252,7 +252,7 @@ async function loadAudio() {
     player.add(soundJump);
   });
 
-  await audioLoader.loadAsync('assets/audio/around.mp3').then((buffer) => {
+  await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
     soundAround = new THREE.PositionalAudio(listener);
     soundAround.setBuffer(buffer);
     soundAround.setLoop(true);
