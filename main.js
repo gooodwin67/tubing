@@ -234,7 +234,7 @@ async function loadAudio() {
 
 
   const audioLoader = new THREE.AudioLoader();
-  await audioLoader.loadAsync('assets/audio/slide.mp3').then((buffer) => {
+  await audioLoader.loadAsync('assets/audio/slide.mp3?raw=true').then((buffer) => {
     soundSlide = new THREE.PositionalAudio(listener);
     soundSlide.setBuffer(buffer);
     soundSlide.setLoop(true);
