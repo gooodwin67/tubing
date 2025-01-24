@@ -281,20 +281,20 @@ async function initAllData() {
 
   soundAround.play();
 
-  playerParticleSystem = getParticleSystem({
-    camera: camera,
-    emitter: camera,
-    parent: scene,
-    rate: 350,
-    texture: "smoke.png",
-    maxSize: 1,
-    radius: 1,
-    maxLife: 20.7,
-    color: new THREE.Color(0xffffff),
-  });
+  // playerParticleSystem = getParticleSystem({
+  //   camera: camera,
+  //   emitter: camera,
+  //   parent: scene,
+  //   rate: 350,
+  //   texture: "smoke.png",
+  //   maxSize: 1,
+  //   radius: 1,
+  //   maxLife: 20.7,
+  //   color: new THREE.Color(0xffffff),
+  // });
 
   dataLoaded = true;
-  console.log(targetCube)
+
 }
 
 
@@ -409,7 +409,7 @@ function playerMove() {
     }
   }
 
-  playerParticleSystem.update(0.16);
+  // playerParticleSystem.update(0.16);
 
 
 }
