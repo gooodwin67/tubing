@@ -274,7 +274,7 @@ async function loadAudio() {
 
 async function initAllData() {
   await init()
-  await loadAudio()
+  //await loadAudio()
 
   var overlay = document.getElementById('overlay');
   overlay.remove();
@@ -302,12 +302,12 @@ async function initAllData() {
 function animate() {
 
   if (dataLoaded) {
-    if (playerBody.linvel().z > 3 && player.userData.onGround) {
-      if (!soundSlide.isPlaying) soundSlide.play();
-    }
-    else {
-      if (soundSlide.isPlaying) soundSlide.stop()
-    }
+    // if (playerBody.linvel().z > 3 && player.userData.onGround) {
+    //   if (!soundSlide.isPlaying) soundSlide.play();
+    // }
+    // else {
+    //   if (soundSlide.isPlaying) soundSlide.stop()
+    // }
 
 
     if (isMobile) {
@@ -375,7 +375,7 @@ function playerMove() {
     if (intersects[0].distance < 0.4) {
       player.userData.flying = false;
       if (!player.userData.onGround && !player.userData.flying) {
-        soundJump.play();
+        // soundJump.play();
 
       }
       player.userData.onGround = true;
