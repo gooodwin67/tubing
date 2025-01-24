@@ -19,30 +19,56 @@ import { detectCollisionCubes } from "./functions/detectColisions";
 import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 import { detectDevice } from "./functions/detectColisions";
 
+import { getParticleSystem } from "./getParticleSystem.js";
+
 var startButton = document.getElementById('startButton');
-startButton.addEventListener('click', init);
+startButton.addEventListener('click', initAllData);
 
 
 
-await RAPIER.init();
-const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
+let world;
 
-const isMobile = detectDevice();
+let plane;
+
+let player;
+let playerBody;
+let playerCollider;
+
+let playerParticleSystem;
+
+let soundSlide;
+let soundJump;
+let soundAround;
+let soundMusic;
+
+let ground;
+let groundBody;
+
+let dynamicBodies = [];
+
+let mouse = new THREE.Vector3;
+let raycaster = new THREE.Raycaster;
+
+let dataLoaded = false;
+
+let groundsMas = [];
+
+let allObjCollision = [];
+
+let targetCube;
+
+let isMobile = detectDevice();
 
 let clock = new THREE.Clock();
 let delta = 0;
-// 30 fps
 let interval = 1 / 60;
 
-
-
-
-
+const raycaster1 = new THREE.Raycaster();
+const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
 scene.fog = new THREE.Fog(scene.background, 1, 300);
-
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -77,13 +103,14 @@ dirLight.shadow.bias = - 0.0001;
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 //scene.add(dirLightHelper);
 
+const ambientLight = new THREE.AmbientLight(0xaaaaaa, 4); // soft white light
+//scene.add(ambientLight);
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 4, -10);
 
-
 let stats = new Stats();
 document.body.appendChild(stats.dom);
-
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -91,258 +118,196 @@ document.body.appendChild(renderer.domElement);
 renderer.shadowMap.enabled = true;
 
 window.addEventListener('resize', onWindowResize, false);
-
-
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// document.body.addEventListener("keydown", function () {
-//   this.requestFullscreen();
-// }, false);
-document.body.addEventListener("touchstart", function () {
-  this.requestFullscreen().then(() => {
-    screen.orientation.lock("landscape");
-  })
+async function init() {
 
-}, false);
+  await RAPIER.init();
+  world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
-/*/////////////////////////////////////////////////////*/
+  isMobile = detectDevice();
 
-// let controls = new OrbitControls(camera, renderer.domElement);
-// controls.enableDamping = true;
-// controls.target.set(0, 0, 0);
-/*/////////////////////////////////////////////////////*/
+  document.body.addEventListener("touchstart", function () {
+    this.requestFullscreen().then(() => {
+      screen.orientation.lock("landscape");
+    })
 
-const ambientLight = new THREE.AmbientLight(0xaaaaaa, 4); // soft white light
-//scene.add(ambientLight);
+  }, false);
 
 
-/*/////////////////////////////////////////////////////*/
+  // let controls = new OrbitControls(camera, renderer.domElement);
+  // controls.enableDamping = true;
+  // controls.target.set(0, 0, 0);
 
 
+  const gltfLoader = new GLTFLoader();
+  const url = 'models/map.glb';
+  await gltfLoader.loadAsync(url).then((gltf) => {
+    const root = gltf.scene;
 
+    root.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
 
-let plane;
+    let gr = root.children.find((value, index, array) => value.name == "ground")
+    const groundBox = new THREE.Box3().setFromObject(gr);
+    const groundSize = groundBox.getSize(new THREE.Vector3());
 
-let player;
-let playerBody;
-let playerCollider;
+    root.traverse((el) => {
 
-let soundSlide;
-let soundJump;
+      if (el.name == 'player') {
 
-let ground;
-let groundBody;
+        player = el.clone();
+        player.userData.mass = 1;
+        player.userData.playerStart = false;
+        player.userData.playerBraking = false;
+        player.userData.hTransition = 0;
+        player.userData.hSpeed = 10;
+        player.userData.maxHSpeed = 0.08;
+        player.userData.stepSpeed = 2;
+        player.userData.maxSpeed = 16;
 
+        player.userData.resetHAngle = false;
 
+        player.userData.right = false;
+        player.userData.left = false;
 
-let dynamicBodies = [];
+        player.userData.onGround = false;
+        player.userData.flying = false;
 
-let mouse = new THREE.Vector3;
-let raycaster = new THREE.Raycaster;
+        addPhysicsToObject(player)
+        scene.add(player);
 
-let dataLoaded = false;
-let buttonSend = false;
-let buttonSend2 = false;
 
-let groundsMas = [];
+        const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+        targetCube = new THREE.Mesh(geometry, material);
+        targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
+        targetCube.userData.hPos = 0;
 
+        scene.add(targetCube);
 
-let allObjCollision = [];
 
+      }
+      else if (el.name.includes('ground')) {
+        const box = new THREE.Box3().setFromObject(el);
+        const size = box.getSize(new THREE.Vector3());
+        let groundBlock = el.clone();
 
-let targetCube;
+        //groundBlock.position.z = size.z / 2;
+        groundBlock.userData.mass = 0;
+        addPhysicsToObject(groundBlock);
+        allObjCollision.push(groundBlock);
+        scene.add(groundBlock);
+      }
+      else if (el.name.includes('wall')) {
+        const box = new THREE.Box3().setFromObject(el);
+        const size = box.getSize(new THREE.Vector3());
+        let wallBlock = el.clone();
+        wallBlock.userData.mass = 1;
+        addPhysicsToObject(wallBlock);
+        allObjCollision.push(wallBlock);
+        scene.add(wallBlock);
+      }
+      else if (el.name.includes('area')) {
+        let areaBlock = el.clone();
+        scene.add(areaBlock);
+      }
 
+    })
 
-
-
-
-
-
-
-const gltfLoader = new GLTFLoader();
-const url = 'models/map.glb';
-gltfLoader.load(url, (gltf) => {
-  const root = gltf.scene;
-
-  root.traverse(function (child) {
-    if (child.isMesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-    }
-  });
-
-  let gr = root.children.find((value, index, array) => value.name == "ground")
-  const groundBox = new THREE.Box3().setFromObject(gr);
-  const groundSize = groundBox.getSize(new THREE.Vector3());
-
-  root.traverse((el) => {
-
-    if (el.name == 'player') {
-
-      player = el.clone();
-      player.userData.mass = 1;
-      player.userData.playerStart = false;
-      player.userData.playerBraking = false;
-      player.userData.hTransition = 0;
-      player.userData.hSpeed = 10;
-      player.userData.maxHSpeed = 0.08;
-      player.userData.stepSpeed = 2;
-      player.userData.maxSpeed = 16;
-
-      player.userData.resetHAngle = false;
-
-      player.userData.right = false;
-      player.userData.left = false;
-
-      player.userData.onGround = false;
-      player.userData.flying = false;
-
-      addPhysicsToObject(player)
-      scene.add(player);
-
-      dirLight.position.set(player.position.x, player.position.y, player.position.z);
-      dirLight.position.multiplyScalar(2);
-
-      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
-      targetCube = new THREE.Mesh(geometry, material);
-      targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
-      targetCube.userData.hPos = 0;
-
-      scene.add(targetCube);
-
-
-    }
-    else if (el.name.includes('ground')) {
-      const box = new THREE.Box3().setFromObject(el);
-      const size = box.getSize(new THREE.Vector3());
-      let groundBlock = el.clone();
-
-      //groundBlock.position.z = size.z / 2;
-      groundBlock.userData.mass = 0;
-      addPhysicsToObject(groundBlock);
-      allObjCollision.push(groundBlock);
-      scene.add(groundBlock);
-    }
-    else if (el.name.includes('wall')) {
-      const box = new THREE.Box3().setFromObject(el);
-      const size = box.getSize(new THREE.Vector3());
-      let wallBlock = el.clone();
-      wallBlock.userData.mass = 1;
-      addPhysicsToObject(wallBlock);
-      allObjCollision.push(wallBlock);
-      scene.add(wallBlock);
-    }
-    else if (el.name.includes('area')) {
-      let areaBlock = el.clone();
-      scene.add(areaBlock);
-    }
-    // else if (el.name.includes('snowblock')) {
-    //   const box = new THREE.Box3().setFromObject(el);
-    //   const size = box.getSize(new THREE.Vector3());
-    //   for (var i = 0; i < Math.floor(groundSize.z / size.z); i++) {
-    //     let snowBlock = el.clone();
-    //     snowBlock.position.z = size.z * i + size.z / 2;
-    //     scene.add(snowBlock);
-    //   }
-
-    // }
-
-
-  })
-
-  dataLoaded = true;
-
-
-
-
-
-
-  // function texture(url, scalex, scaley) {
-  //   var map = new THREE.TextureLoader().load('Textures/' + url);
-  //   map.repeat.set(scalex, scaley);
-  //   map.wrapS = THREE.RepeatWrapping;
-  //   map.wrapT = THREE.RepeatWrapping;
-  //   return map;
-  // }
-
-
-  // construct the ground
-
-  // var ground2 = new THREE.Mesh(
-  //   new THREE.PlaneGeometry(20, 60),
-  //   new THREE.MeshStandardMaterial({
-  //     color: 'white', depthWrite: false,
-  //     map: texture('snow-5-2.jpg', 4, 12),
-  //     // normalMap: texture('normal.jpg', 10, 10),
-  //     normalScale: new THREE.Vector2(0.5, 0.5),
-  //   })
-  // );
-  // ground2.position.y = allObjCollision[1].position.y + 0.3;
-  // ground2.position.x = allObjCollision[1].position.x;
-  // ground2.position.z = allObjCollision[1].position.z;
-  // ground2.rotation.x = -Math.PI / 2;
-  // ground2.receiveShadow = true;
-  //scene.add(ground2);
-
-});
-
-
-const raycaster1 = new THREE.Raycaster();
-const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
-
-
-function init() {
-  var overlay = document.getElementById('overlay');
-  overlay.remove();
-  const listener = new THREE.AudioListener();
-  player.add(listener);
-
-  // create a global audio source
-
-
-  // load a sound and set it as the Audio object's buffer
-  const audioLoader = new THREE.AudioLoader();
-  audioLoader.load('assets/audio/slide.mp3', function (buffer) {
-    soundSlide = new THREE.PositionalAudio(listener);
-    soundSlide.setBuffer(buffer);
-    soundSlide.setLoop(true);
-    soundSlide.setRefDistance(40);
-    soundSlide.setVolume(1);
-    buttonSend = true;
-    player.add(soundSlide);
-  });
-
-  audioLoader.load('assets/audio/jump.mp3', function (buffer) {
-    soundJump = new THREE.PositionalAudio(listener);
-    soundJump.setBuffer(buffer);
-    soundJump.setLoop(false);
-    soundJump.setRefDistance(40);
-    soundJump.setVolume(0.4);
-    buttonSend2 = true;
-    player.add(soundJump);
   });
 
 
 }
 
+async function loadAudio() {
+  const listener = new THREE.AudioListener();
+  player.add(listener);
+
+
+  const audioLoader = new THREE.AudioLoader();
+  await audioLoader.loadAsync('assets/audio/slide.mp3').then((buffer) => {
+    soundSlide = new THREE.PositionalAudio(listener);
+    soundSlide.setBuffer(buffer);
+    soundSlide.setLoop(true);
+    soundSlide.setRefDistance(40);
+    soundSlide.setVolume(1);
+    player.add(soundSlide);
+  });
+
+  await audioLoader.loadAsync('assets/audio/jump.mp3').then((buffer) => {
+    soundJump = new THREE.PositionalAudio(listener);
+    soundJump.setBuffer(buffer);
+    soundJump.setLoop(false);
+    soundJump.setRefDistance(40);
+    soundJump.setVolume(0.4);
+    player.add(soundJump);
+  });
+
+  await audioLoader.loadAsync('assets/audio/around.mp3').then((buffer) => {
+    soundAround = new THREE.PositionalAudio(listener);
+    soundAround.setBuffer(buffer);
+    soundAround.setLoop(true);
+    soundAround.setRefDistance(40);
+    soundAround.setVolume(1);
+    player.add(soundAround);
+  });
+
+  // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
+  //   soundMusic = new THREE.PositionalAudio(listener);
+  //   soundMusic.setBuffer(buffer);
+  //   soundMusic.setLoop(true);
+  //   soundMusic.setRefDistance(40);
+  //   soundMusic.setVolume(0.4);
+  //   player.add(soundMusic);
+  // });
+
+}
+
+async function initAllData() {
+  await init()
+  await loadAudio()
+
+  var overlay = document.getElementById('overlay');
+  overlay.remove();
+
+  soundAround.play();
+
+  playerParticleSystem = getParticleSystem({
+    camera: camera,
+    emitter: camera,
+    parent: scene,
+    rate: 350,
+    texture: "smoke.png",
+    maxSize: 1,
+    radius: 1,
+    maxLife: 20.7,
+    color: new THREE.Color(0xffffff),
+  });
+
+  dataLoaded = true;
+  console.log(targetCube)
+}
 
 
 
 function animate() {
 
-  if (dataLoaded && buttonSend && buttonSend2) {
+  if (dataLoaded) {
     if (playerBody.linvel().z > 3 && player.userData.onGround) {
       if (!soundSlide.isPlaying) soundSlide.play();
     }
     else {
       if (soundSlide.isPlaying) soundSlide.stop()
     }
-
 
 
     if (isMobile) {
@@ -358,18 +323,11 @@ function animate() {
       camera.position.z = player.position.z - 4;
     }
 
-
-
-
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
-
 
     playerMove();
 
     world.step();
-
-
-
 
     for (let i = 0, n = dynamicBodies.length; i < n; i++) {
       dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
@@ -377,38 +335,21 @@ function animate() {
     }
 
 
-
-
-
   }
-
 
   stats.update();
 
-
 }
 
-
 renderer.setAnimationLoop(() => {
-
-
   delta += clock.getDelta();
-
   if (delta > interval) {
     animate()
     renderer.render(scene, camera);
-
-
     delta = delta % interval;
   }
 
-
-
-
 });
-
-
-
 
 
 document.addEventListener('touchend', onTouchEnd);
@@ -419,31 +360,8 @@ window.addEventListener('keyup', onKeyUp);
 
 function playerMove() {
 
-
-
-
-  // if (playerBody.linvel().z > 1) {
-  //   playerBody.setLinvel({ x: player.userData.hTransition / 5, y: playerBody.linvel().y, z: playerBody.linvel().z }, true);
-  // }
-  // else {
-  //   player.userData.hTransition = 0;
-  // }
-
-  // if (player.userData.playerBraking) {
-  //   playerCollider.setFriction(3);
-  // }
-  // else {
-  //   playerCollider.setFriction(0);
-  // }
-
-  // const direction = {
-  //   x: targetCube.position.x - playerBody.translation().x,
-  //   y: targetCube.position.y - playerBody.translation().y,
-  //   z: targetCube.position.z - playerBody.translation().z
-  // };
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
-
 
   playerBody.setLinvel({
     x: direction.x * -player.userData.hSpeed,
@@ -491,9 +409,7 @@ function playerMove() {
     }
   }
 
-
-
-
+  playerParticleSystem.update(0.16);
 
 
 }
@@ -501,10 +417,7 @@ function playerMove() {
 
 function onTouchMove(e) {
 
-
-
   if (player.userData.onGround) {
-
 
     e = e.changedTouches[0];
 
@@ -530,19 +443,6 @@ function onTouchMove(e) {
         player.userData.left = true
       }
     }
-
-
-    // plane.geometry.computeBoundingBox();
-    // var box1 = plane.geometry.boundingBox.clone();
-    // box1.applyMatrix4(plane.matrixWorld);
-
-    // intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
-
-
-
-
-    // if (intersects) targetPosition = new THREE.Vector3(intersects.x * 2, player.position.y, player.position.z);
-
   }
 }
 
@@ -555,32 +455,23 @@ function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
-
-
       if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
         playerBody.applyImpulse({ x: 0.0, y: 0.0, z: player.userData.stepSpeed }, true);
       }
       player.userData.playerStart = true;
-
       break;
     case 'KeyS':
     case 'ArrowDown':
       //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
-
-
       break;
     case 'KeyA':
     case 'ArrowLeft':
-
       player.userData.left = true
-
       break;
     case 'KeyD':
     case 'ArrowRight':
-
       player.userData.right = true
-
       break;
   }
 }
@@ -602,9 +493,7 @@ function onKeyUp(event) {
       break;
     case 'KeyD':
     case 'ArrowRight':
-
       player.userData.right = false;
-
       break;
   }
 }
@@ -619,7 +508,6 @@ function addPhysicsToObject(obj) {
   const box = new THREE.Box3().setFromObject(obj);
   const size = box.getSize(new THREE.Vector3());
   obj.rotation.copy(originalRotation);
-
 
   if (obj.name.includes('player')) {
 
@@ -637,10 +525,6 @@ function addPhysicsToObject(obj) {
     // cube.rotation.copy(originalRotation);
     // scene.add(cube);
 
-    // camera.position.x = player.position.x;
-    // camera.position.y = player.position.y + 5;
-    // camera.position.z = player.position.z;
-    // camera.lookAt(player.position)
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
@@ -656,26 +540,15 @@ function addPhysicsToObject(obj) {
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
 
-    const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.4 });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.set(obj.position.x, obj.position.y, obj.position.z)
-    cube.rotation.copy(originalRotation);
+    // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.4 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // cube.position.set(obj.position.x, obj.position.y, obj.position.z)
+    // cube.rotation.copy(originalRotation);
     //scene.add(cube);
   }
 
 
-
-
-
-
-  // if (obj.children.length > 0) {
-  //   dynamicBodies.push([obj.children[0], body, id])
-  //   //dynamicBodies.push([obj.children[1], body, id + 100])
-  // }
-  // else {
-  //   dynamicBodies.push([obj, body, id])
-  // }
 
 }
 
