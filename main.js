@@ -30,6 +30,8 @@ let world;
 
 let plane;
 
+let menuItems = [];
+
 let player;
 let playerBody;
 let playerCollider;
@@ -68,7 +70,7 @@ const direction1 = new THREE.Vector3(0, -1, 0); // Направление вни
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
-scene.fog = new THREE.Fog(scene.background, 1, 300);
+//scene.fog = new THREE.Fog(scene.background, 1, 300);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -139,9 +141,9 @@ async function init() {
   }, false);
 
 
-  // let controls = new OrbitControls(camera, renderer.domElement);
-  // controls.enableDamping = true;
-  // controls.target.set(0, 0, 0);
+  let controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(0, 0, 0);
 
 
   const gltfLoader = new GLTFLoader();
@@ -225,7 +227,29 @@ async function init() {
 
   });
 
+  dataLoaded = true;
 
+
+}
+
+function loadMenu() {
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const cube = new THREE.Mesh(geometry, material);
+  cube.position.set(2, 2, 0)
+  cube.name = 'level1'
+  scene.add(cube);
+  menuItems.push(cube)
+
+  const geometry2 = new THREE.BoxGeometry(2, 2, 2);
+  const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const cube2 = new THREE.Mesh(geometry2, material2);
+  cube2.position.set(-2, 2, 0);
+  cube2.name = 'level2'
+  scene.add(cube2);
+  menuItems.push(cube2)
+
+  camera.lookAt(cube.position)
 }
 
 // async function loadAudio() {
@@ -273,8 +297,10 @@ async function init() {
 // }
 
 async function initAllData() {
-  await init()
+  //await init()
   //await loadAudio()
+
+  loadMenu();
 
   var overlay = document.getElementById('overlay');
   overlay.remove();
@@ -293,7 +319,7 @@ async function initAllData() {
   //   color: new THREE.Color(0xffffff),
   // });
 
-  dataLoaded = true;
+
 
 }
 
@@ -357,6 +383,8 @@ document.addEventListener('touchstart', onTouchMove);
 document.addEventListener('touchmove', onTouchMove);
 window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
+
+document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 function playerMove() {
 
@@ -444,6 +472,37 @@ function onTouchMove(e) {
       }
     }
   }
+}
+
+
+function onDocumentMouseDown(e) {
+  e.preventDefault();
+  var rect = renderer.domElement.getBoundingClientRect();
+
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = - ((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  menuItems.forEach((item) => {
+    item.geometry.computeBoundingBox();
+    var box1 = item.geometry.boundingBox.clone();
+    box1.applyMatrix4(item.matrixWorld);
+
+    let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
+
+
+    if (intersects) {
+
+      console.log(item)
+      if (item.name == 'level2') {
+        init();
+      }
+
+    }
+  })
+
+
 }
 
 function onTouchEnd(e) {
