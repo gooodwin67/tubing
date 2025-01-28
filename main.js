@@ -151,7 +151,7 @@ async function init() {
 
 
   const gltfLoader = new GLTFLoader();
-  const url = 'public/models/map-menu.glb';
+  const url = 'models/map-menu.glb';
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
@@ -249,7 +249,7 @@ async function init() {
 
 async function loadMenu(level) {
   const gltfLoader = new GLTFLoader();
-  const url = 'public/models/map' + level + '.glb';
+  const url = 'models/map' + level + '.glb';
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
