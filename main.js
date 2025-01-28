@@ -30,7 +30,7 @@ let world;
 
 let plane;
 
-let menuItems = [];
+let levelItems = [];
 
 let player;
 let playerBody;
@@ -70,42 +70,45 @@ const direction1 = new THREE.Vector3(0, -1, 0); // Направление вни
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdceef6);
-//scene.fog = new THREE.Fog(scene.background, 1, 300);
+scene.fog = new THREE.Fog(scene.background, 1, 300);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
 hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-hemiLight.position.set(0, 50, 0);
+hemiLight.position.set(0, 100, 0);
+
 scene.add(hemiLight);
 
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
-// scene.add(hemiLightHelper);
+//scene.add(hemiLightHelper);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.color.setHSL(0.1, 1, 0.95);
-dirLight.position.set(- 1, 1.75, 1);
+dirLight.position.set(0, 1, 0);
 dirLight.position.multiplyScalar(10);
-scene.add(dirLight);
 
 dirLight.castShadow = true;
+scene.add(dirLight);
+
+
 
 dirLight.shadow.mapSize.width = 2048;
 dirLight.shadow.mapSize.height = 2048;
 
-const d = 50;
+const d = 500;
 
 dirLight.shadow.camera.left = - d;
 dirLight.shadow.camera.right = d;
 dirLight.shadow.camera.top = d;
 dirLight.shadow.camera.bottom = - d;
 
-dirLight.shadow.camera.far = 3500;
-dirLight.shadow.bias = - 0.0001;
+dirLight.shadow.camera.far = 350;
+dirLight.shadow.bias = - 0.001;
 
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
-//scene.add(dirLightHelper);
+scene.add(dirLightHelper);
 
-const ambientLight = new THREE.AmbientLight(0xaaaaaa, 4); // soft white light
+const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 //scene.add(ambientLight);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -118,6 +121,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
@@ -147,7 +151,7 @@ async function init() {
 
 
   const gltfLoader = new GLTFLoader();
-  const url = 'models/map.glb';
+  const url = 'public/models/map-menu.glb';
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
@@ -158,9 +162,9 @@ async function init() {
       }
     });
 
-    let gr = root.children.find((value, index, array) => value.name == "ground")
-    const groundBox = new THREE.Box3().setFromObject(gr);
-    const groundSize = groundBox.getSize(new THREE.Vector3());
+    // let gr = root.children.find((value, index, array) => value.name == "ground")
+    // const groundBox = new THREE.Box3().setFromObject(gr);
+    // const groundSize = groundBox.getSize(new THREE.Vector3());
 
     root.traverse((el) => {
 
@@ -222,6 +226,11 @@ async function init() {
         let areaBlock = el.clone();
         scene.add(areaBlock);
       }
+      else if (el.name.includes('selectlevel')) {
+        let areaBlock = el.clone();
+        scene.add(areaBlock);
+        levelItems.push(el);
+      }
 
     })
 
@@ -232,24 +241,54 @@ async function init() {
 
 }
 
-function loadMenu() {
-  const geometry = new THREE.BoxGeometry(2, 2, 2);
-  const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-  const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(2, 2, 0)
-  cube.name = 'level1'
-  scene.add(cube);
-  menuItems.push(cube)
+async function loadMenu(level) {
+  const gltfLoader = new GLTFLoader();
+  const url = 'public/models/map' + level + '.glb';
+  await gltfLoader.loadAsync(url).then((gltf) => {
+    const root = gltf.scene;
 
-  const geometry2 = new THREE.BoxGeometry(2, 2, 2);
-  const material2 = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  const cube2 = new THREE.Mesh(geometry2, material2);
-  cube2.position.set(-2, 2, 0);
-  cube2.name = 'level2'
-  scene.add(cube2);
-  menuItems.push(cube2)
+    root.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
 
-  camera.lookAt(cube.position)
+    // let gr = root.children.find((value, index, array) => value.name == "ground")
+    // const groundBox = new THREE.Box3().setFromObject(gr);
+    // const groundSize = groundBox.getSize(new THREE.Vector3());
+
+    root.traverse((el) => {
+
+      if (el.name.includes('ground')) {
+        const box = new THREE.Box3().setFromObject(el);
+        const size = box.getSize(new THREE.Vector3());
+        let groundBlock = el.clone();
+
+        //groundBlock.position.z = size.z / 2;
+        groundBlock.userData.mass = 0;
+        groundBlock.name = el.name;
+        addPhysicsToObject(groundBlock);
+        allObjCollision.push(groundBlock);
+        scene.add(groundBlock);
+      }
+      else if (el.name.includes('wall')) {
+        const box = new THREE.Box3().setFromObject(el);
+        const size = box.getSize(new THREE.Vector3());
+        let wallBlock = el.clone();
+        wallBlock.userData.mass = 1;
+        addPhysicsToObject(wallBlock);
+        allObjCollision.push(wallBlock);
+        scene.add(wallBlock);
+      }
+      else if (el.name.includes('area')) {
+        let areaBlock = el.clone();
+        scene.add(areaBlock);
+      }
+
+    })
+
+  });
 }
 
 // async function loadAudio() {
@@ -297,10 +336,10 @@ function loadMenu() {
 // }
 
 async function initAllData() {
-  //await init()
+  await init()
   //await loadAudio()
 
-  loadMenu();
+  //loadMenu();
 
   var overlay = document.getElementById('overlay');
   overlay.remove();
@@ -348,6 +387,8 @@ function animate() {
       camera.position.y = player.position.y + 4;
       camera.position.z = player.position.z - 4;
     }
+
+
 
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
 
@@ -400,6 +441,7 @@ function playerMove() {
   raycaster1.set(player.position, direction1);
   const intersects = raycaster1.intersectObjects(allObjCollision);
   if (intersects.length > 0) {
+    console.log(intersects[0].object.name)
     if (intersects[0].distance < 0.4) {
       player.userData.flying = false;
       if (!player.userData.onGround && !player.userData.flying) {
@@ -484,7 +526,7 @@ function onDocumentMouseDown(e) {
 
   raycaster.setFromCamera(mouse, camera);
 
-  menuItems.forEach((item) => {
+  levelItems.forEach((item) => {
     item.geometry.computeBoundingBox();
     var box1 = item.geometry.boundingBox.clone();
     box1.applyMatrix4(item.matrixWorld);
@@ -494,10 +536,11 @@ function onDocumentMouseDown(e) {
 
     if (intersects) {
 
-      console.log(item)
-      if (item.name == 'level2') {
-        init();
-      }
+
+
+
+      loadMenu(item.name.slice(-1));
+
 
     }
   })
@@ -587,14 +630,14 @@ function addPhysicsToObject(obj) {
   }
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 3, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     world.createCollider(shape, body)
     groundBody = body;
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 3, size.y / 2, size.z / 3).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
