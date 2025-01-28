@@ -145,9 +145,9 @@ async function init() {
   }, false);
 
 
-  let controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.target.set(0, 0, 0);
+  // let controls = new OrbitControls(camera, renderer.domElement);
+  // controls.enableDamping = true;
+  // controls.target.set(0, 0, 0);
 
 
   const gltfLoader = new GLTFLoader();
