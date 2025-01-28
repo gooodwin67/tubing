@@ -192,15 +192,21 @@ async function init() {
         scene.add(player);
 
 
-        const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
-        targetCube = new THREE.Mesh(geometry, material);
-        targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
+        // const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+        // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+        // targetCube = new THREE.Mesh(geometry, material);
+        // targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
+        // targetCube.userData.hPos = 0;
+
+        // scene.add(targetCube);
+
+
+      }
+      else if (el.name == 'arrow_area') {
+
+        targetCube = el.clone();
         targetCube.userData.hPos = 0;
-
         scene.add(targetCube);
-
-
       }
       else if (el.name.includes('ground')) {
         const box = new THREE.Box3().setFromObject(el);
@@ -392,6 +398,7 @@ function animate() {
 
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
 
+
     playerMove();
 
     world.step();
@@ -431,6 +438,9 @@ function playerMove() {
 
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
+  targetCube.lookAt(player.position.x, player.position.y, player.position.z)
+
+  playerBody.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
 
   playerBody.setLinvel({
     x: direction.x * -player.userData.hSpeed,
@@ -441,7 +451,6 @@ function playerMove() {
   raycaster1.set(player.position, direction1);
   const intersects = raycaster1.intersectObjects(allObjCollision);
   if (intersects.length > 0) {
-    console.log(intersects[0].object.name)
     if (intersects[0].distance < 0.4) {
       player.userData.flying = false;
       if (!player.userData.onGround && !player.userData.flying) {
@@ -613,7 +622,7 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('player')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0))
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0).setAngularDamping(2.0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
