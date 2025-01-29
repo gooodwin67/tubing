@@ -36,6 +36,36 @@ let player;
 let playerBody;
 let playerCollider;
 
+let tubesMas = [];
+let tube;
+let tubenum = 0;
+
+let chooseTubeNow = false;
+
+const tubesChars = [
+  {
+    hSpeed: 10,
+    maxHSpeed: 0.08,
+    stepSpeed: 2,
+    maxSpeed: 16,
+    resetHAngle: false
+  },
+  {
+    hSpeed: 14,
+    maxHSpeed: 0.12,
+    stepSpeed: 4,
+    maxSpeed: 20,
+    resetHAngle: false
+  },
+  {
+    hSpeed: 18,
+    maxHSpeed: 0.14,
+    stepSpeed: 4,
+    maxSpeed: 20,
+    resetHAngle: true
+  }
+]
+
 let playerParticleSystem;
 
 let soundSlide;
@@ -130,6 +160,10 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+
+
+
+
 async function init() {
 
   await RAPIER.init();
@@ -171,16 +205,18 @@ async function init() {
       if (el.name == 'player') {
 
         player = el.clone();
+        player.material.transparent = true;
+        player.material.opacity = 0.4;
         player.userData.mass = 1;
         player.userData.playerStart = false;
         player.userData.playerBraking = false;
         player.userData.hTransition = 0;
-        player.userData.hSpeed = 10;
-        player.userData.maxHSpeed = 0.08;
-        player.userData.stepSpeed = 2;
-        player.userData.maxSpeed = 16;
+        // player.userData.hSpeed = 10;
+        // player.userData.maxHSpeed = 0.08;
+        // player.userData.stepSpeed = 2;
+        // player.userData.maxSpeed = 16;
 
-        player.userData.resetHAngle = false;
+        // player.userData.resetHAngle = false;
 
         player.userData.right = false;
         player.userData.left = false;
@@ -191,16 +227,12 @@ async function init() {
         addPhysicsToObject(player)
         scene.add(player);
 
-
-        // const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-        // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
-        // targetCube = new THREE.Mesh(geometry, material);
-        // targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
-        // targetCube.userData.hPos = 0;
-
-        // scene.add(targetCube);
-
-
+      }
+      else if (el.name.includes('player-tube')) {
+        var playerTtube = el.clone();
+        playerTtube.userData.startPosition = new THREE.Vector3(playerTtube.position.x, playerTtube.position.y, playerTtube.position.z);
+        tubesMas[el.name.slice(-1) - 1] = playerTtube;
+        scene.add(playerTtube);
       }
       else if (el.name == 'arrow_area') {
 
@@ -396,6 +428,8 @@ function animate() {
 
 
 
+
+
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
 
 
@@ -403,9 +437,14 @@ function animate() {
 
     world.step();
 
-    for (let i = 0, n = dynamicBodies.length; i < n; i++) {
-      dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
-      dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
+    if (!chooseTubeNow) {
+      tubesMas[tubenum].position.copy(playerBody.translation());
+      tubesMas[tubenum].quaternion.copy(playerBody.rotation())
+
+      for (let i = 0, n = dynamicBodies.length; i < n; i++) {
+        dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
+        dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
+      }
     }
 
 
@@ -443,7 +482,7 @@ function playerMove() {
   playerBody.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
 
   playerBody.setLinvel({
-    x: direction.x * -player.userData.hSpeed,
+    x: direction.x * -tubesChars[tubenum].hSpeed,
     y: playerBody.linvel().y,
     z: playerBody.linvel().z
   });
@@ -467,19 +506,19 @@ function playerMove() {
 
 
   if (player.userData.left && player.userData.onGround) {
-    if (player.userData.hTransition < 5) player.userData.hTransition += player.userData.maxHSpeed;
+    if (player.userData.hTransition < 5) player.userData.hTransition += tubesChars[tubenum].maxHSpeed;
   }
   if (player.userData.right && player.userData.onGround) {
-    if (player.userData.hTransition > -5) player.userData.hTransition -= player.userData.maxHSpeed;
+    if (player.userData.hTransition > -5) player.userData.hTransition -= tubesChars[tubenum].maxHSpeed;
   }
 
-  if (player.userData.resetHAngle) {
+  if (tubesChars[tubenum].resetHAngle) {
     if (!player.userData.left && !player.userData.right) {
-      if (player.userData.hTransition < -player.userData.maxHSpeed) {
-        player.userData.hTransition += player.userData.maxHSpeed;
+      if (player.userData.hTransition < -tubesChars[tubenum].maxHSpeed) {
+        player.userData.hTransition += tubesChars[tubenum].maxHSpeed;
       }
-      else if (player.userData.hTransition > player.userData.maxHSpeed) {
-        player.userData.hTransition -= player.userData.maxHSpeed;
+      else if (player.userData.hTransition > tubesChars[tubenum].maxHSpeed) {
+        player.userData.hTransition -= tubesChars[tubenum].maxHSpeed;
       }
       else {
         player.userData.hTransition = 0;
@@ -508,8 +547,8 @@ function onTouchMove(e) {
     raycaster.setFromCamera(mouse, camera);
 
     if (mouse.y > 0) {
-      if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
-        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: player.userData.stepSpeed }, true);
+      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
       }
     }
     else {
@@ -542,17 +581,35 @@ function onDocumentMouseDown(e) {
 
     let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
 
+    if (intersects) {
+      loadMenu(item.name.slice(-1));
+    }
+  })
+
+  tubesMas.forEach((item) => {
+    item.geometry.computeBoundingBox();
+    var box1 = item.geometry.boundingBox.clone();
+    box1.applyMatrix4(item.matrixWorld);
+
+    let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
 
     if (intersects) {
 
+      chooseTubeNow = true;
 
+      let oldNum = tubenum;
+      tubenum = item.name.slice(-1) - 1;
+      player.position.set(tubesMas[tubenum].position.x, tubesMas[tubenum].position.y, tubesMas[tubenum].position.z)
 
-
-      loadMenu(item.name.slice(-1));
+      setTimeout(() => {
+        chooseTubeNow = false;
+      }, 400);
 
 
     }
   })
+
+
 
 
 }
@@ -566,14 +623,14 @@ function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
-      if (playerBody.linvel().z < player.userData.maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
-        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: player.userData.stepSpeed }, true);
+      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
       }
       player.userData.playerStart = true;
       break;
     case 'KeyS':
     case 'ArrowDown':
-      //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -player.userData.stepSpeed / 2 }, true);
+      //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
       break;
     case 'KeyA':
@@ -622,7 +679,7 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('player')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0).setAngularDamping(2.0))
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
