@@ -21,6 +21,10 @@ import { detectDevice } from "./functions/detectColisions";
 
 import { getParticleSystem } from "./getParticleSystem.js";
 
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { depth } from 'three/tsl';
+
 var startButton = document.getElementById('startButton');
 startButton.addEventListener('click', initAllData);
 
@@ -41,6 +45,8 @@ let tube;
 let tubenum = 0;
 
 let chooseTubeNow = false;
+
+let selectTubeWall;
 
 const tubesChars = [
   {
@@ -82,6 +88,9 @@ let mouse = new THREE.Vector3;
 let raycaster = new THREE.Raycaster;
 
 let dataLoaded = false;
+let levelLoaded = false;
+let tubeLoaded = false;
+let menuLoaded = false;
 
 let groundsMas = [];
 
@@ -234,6 +243,7 @@ async function init() {
         tubesMas[el.name.slice(-1) - 1] = playerTtube;
         scene.add(playerTtube);
       }
+
       else if (el.name == 'arrow_area') {
 
         targetCube = el.clone();
@@ -269,15 +279,75 @@ async function init() {
         scene.add(areaBlock);
         levelItems.push(el);
       }
+      if (el.name == 'select-tube-wall') {
+        selectTubeWall = el.clone();
+        scene.add(selectTubeWall);
+        camera.position.set(selectTubeWall.position.x, selectTubeWall.position.y, selectTubeWall.position.z - 7)
+        camera.lookAt(selectTubeWall.position);
+        const box = new THREE.Box3().setFromObject(selectTubeWall);
+        selectTubeWall.userData.size = box.getSize(new THREE.Vector3());
+      }
 
     })
 
   });
 
-  dataLoaded = true;
+  // const loader = new FontLoader();
+  // loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+  //   // Создаем геометрию текста
+  //   const textGeometry = new TextGeometry('Tubing1', {
+  //     font: font,
+  //     size: 0.3,
+  //     depth: 0.01,
+  //   });
+  //   const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+  //   const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+  //   textMesh.rotation.y = Math.PI
+  //   textMesh.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6, selectTubeWall.position.z - 3);
+  //   scene.add(textMesh);
 
+  //   const textGeometry2 = new TextGeometry('speed: 5', {
+  //     font: font,
+  //     size: 0.3,
+  //     depth: 0.01,
+  //   });
+  //   const textMaterial2 = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+  //   const textMesh2 = new THREE.Mesh(textGeometry2, textMaterial);
+  //   textMesh2.rotation.y = Math.PI
+  //   textMesh2.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6 - 0.5, selectTubeWall.position.z - 3);
+  //   scene.add(textMesh2);
+
+  // });
+
+
+
+  menuLoaded = true;
+  addText('Tubing №1', 0);
+  addText('Speed: 5', 0.6);
+  addText('Rotation: 2', 1.2);
+  addText('Break: 3', 1.8);
 
 }
+
+function addText(text, pos) {
+  const loader = new FontLoader();
+  loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+    // Создаем геометрию текста
+    const textGeometry = new TextGeometry(text, {
+      font: font,
+      size: 0.3,
+      depth: 0.01,
+    });
+    const textMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.rotation.y = Math.PI
+    textMesh.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6 - pos, selectTubeWall.position.z - 3);
+    scene.add(textMesh);
+
+  });
+}
+
+
 
 async function loadMenu(level) {
   const gltfLoader = new GLTFLoader();
@@ -327,6 +397,7 @@ async function loadMenu(level) {
     })
 
   });
+  levelLoaded = true;
 }
 
 // async function loadAudio() {
@@ -377,7 +448,6 @@ async function initAllData() {
   await init()
   //await loadAudio()
 
-  //loadMenu();
 
   var overlay = document.getElementById('overlay');
   overlay.remove();
@@ -404,7 +474,7 @@ async function initAllData() {
 
 function animate() {
 
-  if (dataLoaded) {
+  if (menuLoaded) {
     // if (playerBody.linvel().z > 3 && player.userData.onGround) {
     //   if (!soundSlide.isPlaying) soundSlide.play();
     // }
@@ -412,6 +482,11 @@ function animate() {
     //   if (soundSlide.isPlaying) soundSlide.stop()
     // }
 
+
+
+  }
+
+  if (menuLoaded && levelLoaded) {
 
     if (isMobile) {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
@@ -425,11 +500,6 @@ function animate() {
       camera.position.y = player.position.y + 4;
       camera.position.z = player.position.z - 4;
     }
-
-
-
-
-
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
 
 
