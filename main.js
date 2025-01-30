@@ -21,12 +21,41 @@ import { detectDevice } from "./functions/detectColisions";
 
 import { getParticleSystem } from "./getParticleSystem.js";
 
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { depth } from 'three/tsl';
+let mainLoadScreen = document.querySelector('.main_load');
+let mainMenuScreen = document.querySelector('.main_menu');
+let selectLevelScreen = document.querySelector('.select_level');
+let selectTubeScreen = document.querySelector('.select_tube');
 
-var startButton = document.getElementById('startButton');
-startButton.addEventListener('click', initAllData);
+let startButton = document.querySelector('.startButton');
+let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
+let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
+
+levelsBlock.forEach((child, index) => {
+  child.addEventListener('click', () => {
+    selectLevelScreen.classList.add("hidden_block");
+    selectTubeScreen.classList.remove("hidden_block");
+    loadMenu(index + 1);
+  });
+});
+
+tubesBlock.forEach((child, index) => {
+  child.addEventListener('click', () => {
+    selectTubeScreen.classList.add("hidden_block");
+    tubenum = index;
+    dataLoaded = true;
+  });
+});
+
+
+startButton.addEventListener('click', () => {
+  mainMenuScreen.classList.add("hidden_block");
+  selectLevelScreen.classList.remove("hidden_block");
+});
+
+
+// mainMenu
+// loadLevel
+// loadTube
 
 
 
@@ -205,9 +234,6 @@ async function init() {
       }
     });
 
-    // let gr = root.children.find((value, index, array) => value.name == "ground")
-    // const groundBox = new THREE.Box3().setFromObject(gr);
-    // const groundSize = groundBox.getSize(new THREE.Vector3());
 
     root.traverse((el) => {
 
@@ -274,78 +300,21 @@ async function init() {
         let areaBlock = el.clone();
         scene.add(areaBlock);
       }
-      else if (el.name.includes('selectlevel')) {
-        let areaBlock = el.clone();
-        scene.add(areaBlock);
-        levelItems.push(el);
-      }
-      if (el.name == 'select-tube-wall') {
-        selectTubeWall = el.clone();
-        scene.add(selectTubeWall);
-        camera.position.set(selectTubeWall.position.x, selectTubeWall.position.y, selectTubeWall.position.z - 7)
-        camera.lookAt(selectTubeWall.position);
-        const box = new THREE.Box3().setFromObject(selectTubeWall);
-        selectTubeWall.userData.size = box.getSize(new THREE.Vector3());
-      }
 
     })
 
   });
 
-  // const loader = new FontLoader();
-  // loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-  //   // Создаем геометрию текста
-  //   const textGeometry = new TextGeometry('Tubing1', {
-  //     font: font,
-  //     size: 0.3,
-  //     depth: 0.01,
-  //   });
-  //   const textMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-  //   const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-  //   textMesh.rotation.y = Math.PI
-  //   textMesh.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6, selectTubeWall.position.z - 3);
-  //   scene.add(textMesh);
 
-  //   const textGeometry2 = new TextGeometry('speed: 5', {
-  //     font: font,
-  //     size: 0.3,
-  //     depth: 0.01,
-  //   });
-  //   const textMaterial2 = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-  //   const textMesh2 = new THREE.Mesh(textGeometry2, textMaterial);
-  //   textMesh2.rotation.y = Math.PI
-  //   textMesh2.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6 - 0.5, selectTubeWall.position.z - 3);
-  //   scene.add(textMesh2);
-
-  // });
 
 
 
   menuLoaded = true;
-  addText('Tubing №1', 0);
-  addText('Speed: 5', 0.6);
-  addText('Rotation: 2', 1.2);
-  addText('Break: 3', 1.8);
+
 
 }
 
-function addText(text, pos) {
-  const loader = new FontLoader();
-  loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-    // Создаем геометрию текста
-    const textGeometry = new TextGeometry(text, {
-      font: font,
-      size: 0.3,
-      depth: 0.01,
-    });
-    const textMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.rotation.y = Math.PI
-    textMesh.position.set(selectTubeWall.position.x + selectTubeWall.userData.size.x / 4, selectTubeWall.position.y + selectTubeWall.userData.size.y / 6 - pos, selectTubeWall.position.z - 3);
-    scene.add(textMesh);
 
-  });
-}
 
 
 
@@ -444,13 +413,16 @@ async function loadMenu(level) {
 
 // }
 
+initAllData()
+
 async function initAllData() {
   await init()
   //await loadAudio()
 
 
-  var overlay = document.getElementById('overlay');
-  overlay.remove();
+  mainLoadScreen.classList.add("hidden_block");
+  mainMenuScreen.classList.remove("hidden_block");
+
 
   //soundAround.play();
 
@@ -474,6 +446,8 @@ async function initAllData() {
 
 function animate() {
 
+
+
   if (menuLoaded) {
     // if (playerBody.linvel().z > 3 && player.userData.onGround) {
     //   if (!soundSlide.isPlaying) soundSlide.play();
@@ -481,12 +455,6 @@ function animate() {
     // else {
     //   if (soundSlide.isPlaying) soundSlide.stop()
     // }
-
-
-
-  }
-
-  if (menuLoaded && levelLoaded) {
 
     if (isMobile) {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
@@ -501,24 +469,25 @@ function animate() {
       camera.position.z = player.position.z - 4;
     }
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
-
+  }
+  if (dataLoaded) {
 
     playerMove();
 
     world.step();
 
-    if (!chooseTubeNow) {
-      tubesMas[tubenum].position.copy(playerBody.translation());
-      tubesMas[tubenum].quaternion.copy(playerBody.rotation())
 
-      for (let i = 0, n = dynamicBodies.length; i < n; i++) {
-        dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
-        dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
-      }
+    tubesMas[tubenum].position.copy(playerBody.translation());
+    tubesMas[tubenum].quaternion.copy(playerBody.rotation())
+
+    for (let i = 0, n = dynamicBodies.length; i < n; i++) {
+      dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
+      dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
     }
 
 
   }
+
 
   stats.update();
 
@@ -656,28 +625,6 @@ function onDocumentMouseDown(e) {
     }
   })
 
-  tubesMas.forEach((item) => {
-    item.geometry.computeBoundingBox();
-    var box1 = item.geometry.boundingBox.clone();
-    box1.applyMatrix4(item.matrixWorld);
-
-    let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
-
-    if (intersects) {
-
-      chooseTubeNow = true;
-
-      let oldNum = tubenum;
-      tubenum = item.name.slice(-1) - 1;
-      player.position.set(tubesMas[tubenum].position.x, tubesMas[tubenum].position.y, tubesMas[tubenum].position.z)
-
-      setTimeout(() => {
-        chooseTubeNow = false;
-      }, 400);
-
-
-    }
-  })
 
 
 
