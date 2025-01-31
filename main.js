@@ -35,6 +35,7 @@ levelsBlock.forEach((child, index) => {
     selectLevelScreen.classList.add("hidden_block");
     selectTubeScreen.classList.remove("hidden_block");
     loadMenu(index + 1);
+
   });
 });
 
@@ -50,12 +51,22 @@ tubesBlock.forEach((child, index) => {
 startButton.addEventListener('click', () => {
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
+
+  isMobile = detectDevice();
+
+  if (isMobile) {
+    document.body.requestFullscreen().then(() => {
+      screen.orientation.lock("landscape");
+    })
+  }
 });
 
+// document.body.addEventListener("touchstart", function () {
+//   document.body.requestFullscreen().then(() => {
+//     screen.orientation.lock("landscape");
+//   })
 
-// mainMenu
-// loadLevel
-// loadTube
+// }, false);
 
 
 
@@ -76,6 +87,9 @@ let tubenum = 0;
 let chooseTubeNow = false;
 
 let selectTubeWall;
+
+let finishBlock;
+let playerIsFinish;
 
 const tubesChars = [
   {
@@ -207,14 +221,10 @@ async function init() {
   await RAPIER.init();
   world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
-  isMobile = detectDevice();
 
-  document.body.addEventListener("touchstart", function () {
-    this.requestFullscreen().then(() => {
-      screen.orientation.lock("landscape");
-    })
 
-  }, false);
+
+
 
 
   // let controls = new OrbitControls(camera, renderer.domElement);
@@ -319,6 +329,9 @@ async function init() {
 
 
 async function loadMenu(level) {
+
+  playerIsFinish = false;
+
   const gltfLoader = new GLTFLoader();
   const url = 'models/map' + level + '.glb';
   await gltfLoader.loadAsync(url).then((gltf) => {
@@ -361,6 +374,10 @@ async function loadMenu(level) {
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
         scene.add(areaBlock);
+      }
+      else if (el.name.includes('finish_block')) {
+        finishBlock = el.clone();
+        scene.add(finishBlock);
       }
 
     })
@@ -448,7 +465,7 @@ function animate() {
 
 
 
-  if (menuLoaded) {
+  if (menuLoaded && !playerIsFinish) {
     // if (playerBody.linvel().z > 3 && player.userData.onGround) {
     //   if (!soundSlide.isPlaying) soundSlide.play();
     // }
@@ -472,7 +489,28 @@ function animate() {
   }
   if (dataLoaded) {
 
-    playerMove();
+    if (!playerIsFinish) {
+      playerMove();
+    }
+    else {
+      // Удаление всех объектов со сцены
+      while (scene.children.length > 0) {
+        let object = scene.children[0];
+        if (object.geometry) {
+          object.geometry.dispose(); // Освобождаем геометрию
+        }
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            object.material.forEach(material => material.dispose()); // Освобождаем материалы, если их несколько
+          } else {
+            object.material.dispose(); // Освобождаем материал, если он один
+          }
+        }
+        scene.remove(object); // Удаляем объект со сцены
+      }
+      selectLevelScreen.classList.remove("hidden_block");
+      playerIsFinish = false;
+    }
 
     world.step();
 
@@ -513,6 +551,10 @@ window.addEventListener('keyup', onKeyUp);
 document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 function playerMove() {
+
+  if (player.position.z > finishBlock.position.z) {
+    playerIsFinish = true;
+  }
 
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
@@ -720,7 +762,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 3, size.y / 2, size.z / 3).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2 - 0.5, size.y / 2, size.z / 2).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
