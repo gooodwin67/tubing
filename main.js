@@ -30,11 +30,24 @@ let startButton = document.querySelector('.startButton');
 let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
+let currentTimeBlock = document.querySelector('.current_time');
+let bestTimeBlock = document.querySelector('.best_time');
+
+let speedBlock = document.querySelector('.speed_block>.speed');
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
     selectLevelScreen.classList.add("hidden_block");
     selectTubeScreen.classList.remove("hidden_block");
     loadMenu(index + 1);
+
+    isMobile = detectDevice();
+
+    if (isMobile) {
+      document.body.requestFullscreen().then(() => {
+        screen.orientation.lock("landscape");
+      })
+    }
 
   });
 });
@@ -52,13 +65,7 @@ startButton.addEventListener('click', () => {
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
 
-  isMobile = detectDevice();
 
-  if (isMobile) {
-    document.body.requestFullscreen().then(() => {
-      screen.orientation.lock("landscape");
-    })
-  }
 });
 
 // document.body.addEventListener("touchstart", function () {
@@ -67,7 +74,6 @@ startButton.addEventListener('click', () => {
 //   })
 
 // }, false);
-
 
 
 let world;
@@ -95,22 +101,22 @@ const tubesChars = [
   {
     hSpeed: 10,
     maxHSpeed: 0.08,
-    stepSpeed: 2,
-    maxSpeed: 16,
+    stepSpeed: 1,
+    maxSpeed: 26,
     resetHAngle: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
-    stepSpeed: 4,
-    maxSpeed: 20,
+    stepSpeed: 2,
+    maxSpeed: 26,
     resetHAngle: false
   },
   {
-    hSpeed: 18,
+    hSpeed: 25,
     maxHSpeed: 0.14,
-    stepSpeed: 4,
-    maxSpeed: 20,
+    stepSpeed: 3,
+    maxSpeed: 30,
     resetHAngle: true
   }
 ]
@@ -144,8 +150,12 @@ let targetCube;
 let isMobile = detectDevice();
 
 let clock = new THREE.Clock();
+let timer = new THREE.Clock();
 let delta = 0;
 let interval = 1 / 60;
+
+let bestTime = 0;
+let currentTime = 0;
 
 const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
@@ -159,7 +169,7 @@ hemiLight.color.setHSL(0.6, 1, 0.6);
 hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 hemiLight.position.set(0, 100, 0);
 
-scene.add(hemiLight);
+
 
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 //scene.add(hemiLightHelper);
@@ -170,7 +180,7 @@ dirLight.position.set(0, 1, 0);
 dirLight.position.multiplyScalar(10);
 
 dirLight.castShadow = true;
-scene.add(dirLight);
+
 
 
 
@@ -188,7 +198,7 @@ dirLight.shadow.camera.far = 350;
 dirLight.shadow.bias = - 0.001;
 
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
-scene.add(dirLightHelper);
+//scene.add(dirLightHelper);
 
 const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 //scene.add(ambientLight);
@@ -218,13 +228,20 @@ function onWindowResize() {
 
 async function init() {
 
+  timer = new THREE.Clock();
+
+  scene.add(dirLight);
+  scene.add(hemiLight);
+
+  dataLoaded = false;
+  levelLoaded = false;
+  tubeLoaded = false;
+  menuLoaded = false;
+
+  currentTime = 0;
+
   await RAPIER.init();
   world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
-
-
-
-
-
 
 
   // let controls = new OrbitControls(camera, renderer.domElement);
@@ -256,6 +273,7 @@ async function init() {
         player.userData.playerStart = false;
         player.userData.playerBraking = false;
         player.userData.hTransition = 0;
+        player.userData.currentSpeed = 0;
         // player.userData.hSpeed = 10;
         // player.userData.maxHSpeed = 0.08;
         // player.userData.stepSpeed = 2;
@@ -433,12 +451,13 @@ async function loadMenu(level) {
 initAllData()
 
 async function initAllData() {
+  mainLoadScreen.classList.remove("hidden_block");
   await init()
   //await loadAudio()
 
 
   mainLoadScreen.classList.add("hidden_block");
-  mainMenuScreen.classList.remove("hidden_block");
+  selectLevelScreen.classList.remove("hidden_block");
 
 
   //soundAround.play();
@@ -466,6 +485,7 @@ function animate() {
 
 
   if (menuLoaded && !playerIsFinish) {
+
     // if (playerBody.linvel().z > 3 && player.userData.onGround) {
     //   if (!soundSlide.isPlaying) soundSlide.play();
     // }
@@ -488,11 +508,15 @@ function animate() {
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
   }
   if (dataLoaded) {
-
     if (!playerIsFinish) {
       playerMove();
+
+      currentTime = timer.getElapsedTime().toFixed(3);
+      currentTimeBlock.textContent = currentTime;
+
     }
     else {
+      player.position.z = 0;
       // Удаление всех объектов со сцены
       while (scene.children.length > 0) {
         let object = scene.children[0];
@@ -509,6 +533,8 @@ function animate() {
         scene.remove(object); // Удаляем объект со сцены
       }
       selectLevelScreen.classList.remove("hidden_block");
+
+      initAllData();
       playerIsFinish = false;
     }
 
@@ -532,6 +558,7 @@ function animate() {
 }
 
 renderer.setAnimationLoop(() => {
+
   delta += clock.getDelta();
   if (delta > interval) {
     animate()
@@ -553,7 +580,13 @@ document.addEventListener('mousedown', onDocumentMouseDown, false);
 function playerMove() {
 
   if (player.position.z > finishBlock.position.z) {
+
     playerIsFinish = true;
+    if (currentTime < bestTime || bestTime == 0) {
+      bestTime = currentTime;
+      bestTimeBlock.textContent = bestTime;
+    }
+    player.position.z = 0;
   }
 
   targetCube.position.x += player.userData.hTransition;
@@ -586,11 +619,24 @@ function playerMove() {
   }
 
 
+
+  if (playerBody.linvel().z > 0) player.userData.currentSpeed = playerBody.linvel().z.toFixed(0);
+  else player.userData.currentSpeed = 0;
+  speedBlock.textContent = player.userData.currentSpeed;
+
+
   if (player.userData.left && player.userData.onGround) {
     if (player.userData.hTransition < 5) player.userData.hTransition += tubesChars[tubenum].maxHSpeed;
+
+    let velocity = playerBody.linvel();
+    velocity.z *= 0.9996;
+    playerBody.setLinvel(velocity, true);
   }
   if (player.userData.right && player.userData.onGround) {
     if (player.userData.hTransition > -5) player.userData.hTransition -= tubesChars[tubenum].maxHSpeed;
+    let velocity = playerBody.linvel();
+    velocity.z *= 0.9996;
+    playerBody.setLinvel(velocity, true);
   }
 
   if (tubesChars[tubenum].resetHAngle) {
