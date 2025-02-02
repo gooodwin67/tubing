@@ -19,8 +19,6 @@ import { detectCollisionCubes } from "./functions/detectColisions";
 import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 import { detectDevice } from "./functions/detectColisions";
 
-import { getParticleSystem } from "./getParticleSystem.js";
-
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
 let selectLevelScreen = document.querySelector('.select_level');
@@ -38,10 +36,11 @@ let speedBlock = document.querySelector('.speed_block>.speed');
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
     selectLevelScreen.classList.add("hidden_block");
-    selectTubeScreen.classList.remove("hidden_block");
-    loadMenu(index + 1);
+    mainLoadScreen.classList.remove("hidden_block");
+    
+    loadLevel(index + 1);
 
-    isMobile = detectDevice();
+    isMobile = detectDevice();    
 
     if (isMobile) {
       document.body.requestFullscreen().then(() => {
@@ -121,7 +120,7 @@ const tubesChars = [
   }
 ]
 
-let playerParticleSystem;
+
 
 let soundSlide;
 let soundJump;
@@ -226,7 +225,7 @@ function onWindowResize() {
 
 
 
-async function init() {
+async function initMenu() {
 
   timer = new THREE.Clock();
 
@@ -338,6 +337,8 @@ async function init() {
 
 
   menuLoaded = true;
+  mainLoadScreen.classList.add("hidden_block");
+  selectLevelScreen.classList.remove("hidden_block");
 
 
 }
@@ -346,7 +347,7 @@ async function init() {
 
 
 
-async function loadMenu(level) {
+async function loadLevel(level) {
 
   playerIsFinish = false;
 
@@ -402,6 +403,8 @@ async function loadMenu(level) {
 
   });
   levelLoaded = true;
+  mainLoadScreen.classList.add("hidden_block");
+  selectTubeScreen.classList.remove("hidden_block");
 }
 
 // async function loadAudio() {
@@ -452,27 +455,18 @@ initAllData()
 
 async function initAllData() {
   mainLoadScreen.classList.remove("hidden_block");
-  await init()
+  await initMenu()
+  
+
+
+  // mainLoadScreen.classList.add("hidden_block");
+  // selectLevelScreen.classList.remove("hidden_block");
+
+
   //await loadAudio()
-
-
-  mainLoadScreen.classList.add("hidden_block");
-  selectLevelScreen.classList.remove("hidden_block");
-
-
   //soundAround.play();
 
-  // playerParticleSystem = getParticleSystem({
-  //   camera: camera,
-  //   emitter: camera,
-  //   parent: scene,
-  //   rate: 350,
-  //   texture: "smoke.png",
-  //   maxSize: 1,
-  //   radius: 1,
-  //   maxLife: 20.7,
-  //   color: new THREE.Color(0xffffff),
-  // });
+
 
 
 
@@ -654,7 +648,7 @@ function playerMove() {
     }
   }
 
-  // playerParticleSystem.update(0.16);
+  
 
 
 }
@@ -709,7 +703,7 @@ function onDocumentMouseDown(e) {
     let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
 
     if (intersects) {
-      loadMenu(item.name.slice(-1));
+      loadLevel(item.name.slice(-1));
     }
   })
 
