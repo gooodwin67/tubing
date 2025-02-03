@@ -23,13 +23,18 @@ let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
 let selectLevelScreen = document.querySelector('.select_level');
 let selectTubeScreen = document.querySelector('.select_tube');
+let finishScreen = document.querySelector('.finish_window');
 
 let startButton = document.querySelector('.startButton');
 let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
+
 let currentTimeBlock = document.querySelector('.current_time');
 let bestTimeBlock = document.querySelector('.best_time');
+
+let finishAgainButton = document.querySelector('.finish_again');
+let finishInMenuButton = document.querySelector('.finish_in_menu');
 
 let speedBlock = document.querySelector('.speed_block>.speed');
 
@@ -37,10 +42,10 @@ levelsBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
     selectLevelScreen.classList.add("hidden_block");
     mainLoadScreen.classList.remove("hidden_block");
-    
-    loadLevel(index + 1);
+    currentLevel = index + 1;
+    loadLevel();
 
-    isMobile = detectDevice();    
+    isMobile = detectDevice();
 
     if (isMobile) {
       document.body.requestFullscreen().then(() => {
@@ -63,9 +68,15 @@ tubesBlock.forEach((child, index) => {
 startButton.addEventListener('click', () => {
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
-
-
 });
+
+finishAgainButton.addEventListener('click', async () => {
+  await resetAllMap();
+  await initMenu();
+  await loadLevel();
+  finishScreen.classList.add("hidden_block");
+});
+
 
 // document.body.addEventListener("touchstart", function () {
 //   document.body.requestFullscreen().then(() => {
@@ -80,6 +91,8 @@ let world;
 let plane;
 
 let levelItems = [];
+
+let currentLevel = 0;
 
 let player;
 let playerBody;
@@ -107,8 +120,8 @@ const tubesChars = [
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
-    stepSpeed: 2,
-    maxSpeed: 26,
+    stepSpeed: 10,
+    maxSpeed: 80,
     resetHAngle: false
   },
   {
@@ -286,6 +299,8 @@ async function initMenu() {
         player.userData.onGround = false;
         player.userData.flying = false;
 
+        player.userData.origPosition = player.position;
+
         addPhysicsToObject(player)
         scene.add(player);
 
@@ -347,12 +362,12 @@ async function initMenu() {
 
 
 
-async function loadLevel(level) {
+async function loadLevel() {
 
   playerIsFinish = false;
 
   const gltfLoader = new GLTFLoader();
-  const url = 'models/map' + level + '.glb';
+  const url = 'models/map' + currentLevel + '.glb';
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
@@ -456,7 +471,7 @@ initAllData()
 async function initAllData() {
   mainLoadScreen.classList.remove("hidden_block");
   await initMenu()
-  
+
 
 
   // mainLoadScreen.classList.add("hidden_block");
@@ -472,7 +487,25 @@ async function initAllData() {
 
 }
 
-
+function resetAllMap() {
+  player.position.z = 0;
+  // Удаление всех объектов со сцены
+  while (scene.children.length > 0) {
+    let object = scene.children[0];
+    if (object.geometry) {
+      object.geometry.dispose(); // Освобождаем геометрию
+    }
+    if (object.material) {
+      if (Array.isArray(object.material)) {
+        object.material.forEach(material => material.dispose()); // Освобождаем материалы, если их несколько
+      } else {
+        object.material.dispose(); // Освобождаем материал, если он один
+      }
+    }
+    scene.remove(object); // Удаляем объект со сцены
+  }
+  playerIsFinish = false;
+}
 
 function animate() {
 
@@ -510,26 +543,11 @@ function animate() {
 
     }
     else {
-      player.position.z = 0;
-      // Удаление всех объектов со сцены
-      while (scene.children.length > 0) {
-        let object = scene.children[0];
-        if (object.geometry) {
-          object.geometry.dispose(); // Освобождаем геометрию
-        }
-        if (object.material) {
-          if (Array.isArray(object.material)) {
-            object.material.forEach(material => material.dispose()); // Освобождаем материалы, если их несколько
-          } else {
-            object.material.dispose(); // Освобождаем материал, если он один
-          }
-        }
-        scene.remove(object); // Удаляем объект со сцены
-      }
-      selectLevelScreen.classList.remove("hidden_block");
 
-      initAllData();
-      playerIsFinish = false;
+      finishScreen.classList.remove("hidden_block");
+
+      //initAllData();
+
     }
 
     world.step();
@@ -570,6 +588,7 @@ window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
+
 
 function playerMove() {
 
@@ -648,7 +667,7 @@ function playerMove() {
     }
   }
 
-  
+
 
 
 }
@@ -667,7 +686,7 @@ function onTouchMove(e) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    if (mouse.y > 0) {
+    if (mouse.y > 0 && !playerIsFinish) {
       if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
         playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
       }
@@ -684,7 +703,6 @@ function onTouchMove(e) {
     }
   }
 }
-
 
 function onDocumentMouseDown(e) {
   e.preventDefault();
@@ -703,7 +721,7 @@ function onDocumentMouseDown(e) {
     let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
 
     if (intersects) {
-      loadLevel(item.name.slice(-1));
+
     }
   })
 
@@ -722,7 +740,7 @@ function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
-      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
         playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
       }
       player.userData.playerStart = true;

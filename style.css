@@ -2,6 +2,7 @@ body {
  margin: 0;
  background: #1C1D21;
  user-select: none;
+ font-family: "Roboto", sans-serif;
 }
 
 
@@ -73,6 +74,61 @@ body {
  padding: 20px 30px;
  margin: 0 10px;
 }
+
+
+
+.finish_window>div {
+ padding: 30px 40px;
+ border: 2px solid #ccc;
+ border-radius: 18px;
+ position: relative;
+ background-color: #4c4660e0;
+ box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
+}
+
+.finish_head {
+ font-size: 50px;
+ margin-bottom: 30px;
+}
+
+.finish_you_time {
+ margin-bottom: 30px;
+}
+
+.load_finish_wrap {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ position: absolute;
+ bottom: 0;
+ transform: translateY(50%);
+ left: 0;
+ width: 100%;
+}
+
+.load_finish_wrap>div {
+ border: 2px solid #fff;
+ color: #fff;
+ text-decoration: none;
+ text-transform: uppercase;
+ font-weight: 900;
+ letter-spacing: -1px;
+ font-size: 20px;
+ padding: 8px 24px;
+ border-radius: 22px;
+ margin: 6px 6px;
+ display: inline-block;
+ cursor: pointer;
+}
+
+.finish_again {
+ background: #FF4571;
+}
+
+.finish_in_menu {
+ background: #44BFA3;
+}
+
 
 .times {
  position: absolute;
