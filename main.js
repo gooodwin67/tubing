@@ -25,9 +25,13 @@ let selectLevelScreen = document.querySelector('.select_level');
 let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
 
+let allOverlies = document.querySelectorAll('body>.overlay');
+console.log(allOverlies)
+
 let startButton = document.querySelector('.startButton');
 let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
+
 
 
 let currentTimeBlock = document.querySelector('.current_time');
@@ -39,12 +43,11 @@ let finishInMenuButton = document.querySelector('.finish_in_menu');
 let speedBlock = document.querySelector('.speed_block>.speed');
 
 levelsBlock.forEach((child, index) => {
-  child.addEventListener('click', () => {
-    selectLevelScreen.classList.add("hidden_block");
-    mainLoadScreen.classList.remove("hidden_block");
+  child.addEventListener('click', async () => {
     currentLevel = index + 1;
-    loadLevel();
-
+    hiddenBlock(mainLoadScreen);
+    await initAllData(false, true)
+    hiddenBlock(selectTubeScreen);
     isMobile = detectDevice();
 
     if (isMobile) {
@@ -58,24 +61,40 @@ levelsBlock.forEach((child, index) => {
 
 tubesBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
-    selectTubeScreen.classList.add("hidden_block");
     tubenum = index;
+    hiddenBlock(0);
     dataLoaded = true;
   });
 });
 
 
-startButton.addEventListener('click', () => {
-  mainMenuScreen.classList.add("hidden_block");
-  selectLevelScreen.classList.remove("hidden_block");
-});
+// startButton.addEventListener('click', () => {
+//   mainMenuScreen.classList.add("hidden_block");
+//   selectLevelScreen.classList.remove("hidden_block");
+// });
+
+function hiddenBlock(block) {
+  allOverlies.forEach((el) => {
+    el.classList.add('hidden_block')
+  })
+  if (block != 0) block.classList.remove('hidden_block')
+}
 
 finishAgainButton.addEventListener('click', async () => {
+  hiddenBlock(mainLoadScreen);
   await resetAllMap();
-  await initMenu();
-  await loadLevel();
-  finishScreen.classList.add("hidden_block");
+  await initAllData(true, true);
+  hiddenBlock(0);
+  dataLoaded = true;
 });
+
+finishInMenuButton.addEventListener('click', async () => {
+  hiddenBlock(mainLoadScreen);
+  await resetAllMap();
+  await init();
+});
+
+
 
 
 // document.body.addEventListener("touchstart", function () {
@@ -150,7 +169,6 @@ let raycaster = new THREE.Raycaster;
 
 let dataLoaded = false;
 let levelLoaded = false;
-let tubeLoaded = false;
 let menuLoaded = false;
 
 let groundsMas = [];
@@ -187,9 +205,9 @@ const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 //scene.add(hemiLightHelper);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 3);
-dirLight.color.setHSL(0.1, 1, 0.95);
-dirLight.position.set(0, 1, 0);
-dirLight.position.multiplyScalar(10);
+//dirLight.color.setHSL(0.1, 1, 0.95);
+dirLight.position.set(1, 2, 0.2);
+dirLight.position.multiplyScalar(120);
 
 dirLight.castShadow = true;
 
@@ -199,14 +217,14 @@ dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = 2048;
 dirLight.shadow.mapSize.height = 2048;
 
-const d = 500;
+const d = 1000;
 
 dirLight.shadow.camera.left = - d;
 dirLight.shadow.camera.right = d;
 dirLight.shadow.camera.top = d;
 dirLight.shadow.camera.bottom = - d;
 
-dirLight.shadow.camera.far = 350;
+dirLight.shadow.camera.far = 3500;
 dirLight.shadow.bias = - 0.001;
 
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
@@ -238,17 +256,14 @@ function onWindowResize() {
 
 
 
-async function initMenu() {
+async function loadMenu() {
 
   timer = new THREE.Clock();
 
   scene.add(dirLight);
   scene.add(hemiLight);
 
-  dataLoaded = false;
-  levelLoaded = false;
-  tubeLoaded = false;
-  menuLoaded = false;
+
 
   currentTime = 0;
 
@@ -266,12 +281,7 @@ async function initMenu() {
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
-    root.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
+
 
 
     root.traverse((el) => {
@@ -279,6 +289,8 @@ async function initMenu() {
       if (el.name == 'player') {
 
         player = el.clone();
+        player.castShadow = true;
+        player.receiveShadow = true;
         player.material.transparent = true;
         player.material.opacity = 0.4;
         player.userData.mass = 1;
@@ -323,6 +335,8 @@ async function initMenu() {
         const size = box.getSize(new THREE.Vector3());
         let groundBlock = el.clone();
 
+        groundBlock.receiveShadow = true;
+
         //groundBlock.position.z = size.z / 2;
         groundBlock.userData.mass = 0;
         addPhysicsToObject(groundBlock);
@@ -333,6 +347,8 @@ async function initMenu() {
         const box = new THREE.Box3().setFromObject(el);
         const size = box.getSize(new THREE.Vector3());
         let wallBlock = el.clone();
+        wallBlock.castShadow = true;
+        wallBlock.receiveShadow = true;
         wallBlock.userData.mass = 1;
         addPhysicsToObject(wallBlock);
         allObjCollision.push(wallBlock);
@@ -340,6 +356,7 @@ async function initMenu() {
       }
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
+        areaBlock.castShadow = true;
         scene.add(areaBlock);
       }
 
@@ -347,14 +364,7 @@ async function initMenu() {
 
   });
 
-
-
-
-
   menuLoaded = true;
-  mainLoadScreen.classList.add("hidden_block");
-  selectLevelScreen.classList.remove("hidden_block");
-
 
 }
 
@@ -371,13 +381,6 @@ async function loadLevel() {
   await gltfLoader.loadAsync(url).then((gltf) => {
     const root = gltf.scene;
 
-    root.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-
     // let gr = root.children.find((value, index, array) => value.name == "ground")
     // const groundBox = new THREE.Box3().setFromObject(gr);
     // const groundSize = groundBox.getSize(new THREE.Vector3());
@@ -388,6 +391,7 @@ async function loadLevel() {
         const box = new THREE.Box3().setFromObject(el);
         const size = box.getSize(new THREE.Vector3());
         let groundBlock = el.clone();
+        groundBlock.receiveShadow = true;
 
         //groundBlock.position.z = size.z / 2;
         groundBlock.userData.mass = 0;
@@ -407,6 +411,8 @@ async function loadLevel() {
       }
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
+        areaBlock.castShadow = true;
+        areaBlock.receiveShadow = true;
         scene.add(areaBlock);
       }
       else if (el.name.includes('finish_block')) {
@@ -418,8 +424,6 @@ async function loadLevel() {
 
   });
   levelLoaded = true;
-  mainLoadScreen.classList.add("hidden_block");
-  selectTubeScreen.classList.remove("hidden_block");
 }
 
 // async function loadAudio() {
@@ -465,12 +469,19 @@ async function loadLevel() {
 //   // });
 
 // }
+async function init() {
+  await initAllData(true, false)
+  hiddenBlock(selectLevelScreen);
+}
+init();
 
-initAllData()
-
-async function initAllData() {
-  mainLoadScreen.classList.remove("hidden_block");
-  await initMenu()
+async function initAllData(needMenu, needLevel) {
+  if (needMenu) {
+    await loadMenu();
+  }
+  if (needLevel) {
+    await loadLevel();
+  }
 
 
 
@@ -487,8 +498,10 @@ async function initAllData() {
 
 }
 
-function resetAllMap() {
-  player.position.z = 0;
+async function resetAllMap() {
+  dataLoaded = false;
+  levelLoaded = false;
+  menuLoaded = false;
   // Удаление всех объектов со сцены
   while (scene.children.length > 0) {
     let object = scene.children[0];
@@ -508,7 +521,6 @@ function resetAllMap() {
 }
 
 function animate() {
-
 
 
   if (menuLoaded && !playerIsFinish) {
@@ -544,9 +556,9 @@ function animate() {
     }
     else {
 
-      finishScreen.classList.remove("hidden_block");
+      hiddenBlock(finishScreen);
 
-      //initAllData();
+
 
     }
 
