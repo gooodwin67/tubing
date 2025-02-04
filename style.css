@@ -5,7 +5,13 @@ body {
  font-family: "Roboto", sans-serif;
 }
 
-
+.shadow-map {
+    position: absolute;
+    left: 0;
+    top: 100px;
+    background: #ccc;
+    padding: 5px;
+}
 
 .overlay {
  position: absolute;

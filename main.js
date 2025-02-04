@@ -42,6 +42,8 @@ let finishInMenuButton = document.querySelector('.finish_in_menu');
 
 let speedBlock = document.querySelector('.speed_block>.speed');
 
+let shadowCheck = document.querySelector('.shadow_check');
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
     currentLevel = index + 1;
@@ -93,6 +95,18 @@ finishInMenuButton.addEventListener('click', async () => {
   await resetAllMap();
   await init();
 });
+
+
+shadowCheck.onchange = function() {
+  if (this.checked) {
+    //renderer.shadowMap.enabled = true 
+  }
+  else {
+    //renderer.shadowMap.enabled = false;
+//    renderer.clearTarget( dirLight.shadow.map );
+  }
+
+};
 
 
 
@@ -363,7 +377,11 @@ async function loadMenu() {
     })
 
   });
-
+  scene.traverse(function (child) {
+    if (child.material) {
+      child.material.needsUpdate = true
+    }
+  })
   menuLoaded = true;
 
 }
