@@ -2,80 +2,96 @@
 <html lang="en">
 
 <head>
- <meta charset="utf-8">
- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
- <title>My first three.js app</title>
- <link href="style.css" rel="stylesheet" />
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+   <title>My first three.js app</title>
+   <link href="style.css" rel="stylesheet" />
 </head>
 
 <body>
- <script type="module" src="/main.js"></script>
+   <script type="module" src="/main.js"></script>
 
- <div class="overlay main_load">
-  <div>
+   <div class="overlay main_load">
+      <div>
 
-   <p>ЗАГРУЗКА...</p>
+         <p>ЗАГРУЗКА...</p>
 
-  </div>
- </div>
-
- <div class="overlay main_menu hidden_block">
-  <div>
-   <button class="startButton">Начать игру</button>
-
-  </div>
- </div>
-
- <div class="overlay select_level hidden_block">
-  <div>
-   <h2>Выбрать уровень</h2>
-   <div class='load_level_wrap'>
-    <div><img src="menu/level1.jpg" alt=""></div>
-    <div><img src="menu/level2.jpg" alt=""></div>
-    <div><img src="menu/level3.jpg" alt=""></div>
+      </div>
    </div>
-  </div>
- </div>
 
- <div class="overlay select_tube hidden_block">
-  <div>
-   <h2>Выбрать тюбинг</h2>
-   <div class='load_tubes_wrap'>
-    <div>1</div>
-    <div>2</div>
-    <div>3</div>
+   <div class="overlay main_menu hidden_block">
+      <div>
+         <button class="startButton">Начать игру</button>
+
+      </div>
    </div>
-  </div>
- </div>
 
- <div class="overlay finish_window hidden_block">
-  <div>
-   <h2 class='finish_head'>Вы приехали</h2>
-   <div class='finish_you_time'>Ваше время:<span>25.47</span></div>
-   <div class='load_finish_wrap'>
-    <div class='finish_again'>Еще раз</div>
-    <div class='finish_in_menu'>В меню</div>
+   <div class="overlay select_level hidden_block">
+      <div>
+         <h2>Выбрать уровень</h2>
+         <div class='load_level_wrap'>
+            <div>
+               <img src="menu/level1.jpg" alt="">
+               <div class='level_shadow'></div>
+               <div class='level_text'>
+                  <h2>Level 1</h2>
+                  <div>Время: 24:564 <span>✔</span></div>
+               </div>
+            </div>
+            <div>
+               <img src="menu/level1.jpg" alt="">
+            </div>
+            <div>
+               <img src="menu/level1.jpg" alt="">
+            </div>
+            <div>
+               <img src="menu/level1.jpg" alt="">
+            </div>
+            <div><img src="menu/level2.jpg" alt=""></div>
+            <div><img src="menu/level3.jpg" alt=""></div>
+         </div>
+      </div>
    </div>
-  </div>
- </div>
 
- <div class="times">
-  <div class="current_time_block">
-   <div class='current_time'>0</div>
-  </div>
-  <div class="best_time_block">
-   <div class='best_time'>0</div>
-  </div>
- </div>
+   <div class="overlay select_tube hidden_block">
+      <div>
+         <h2>Выбрать тюбинг</h2>
+         <div class='load_tubes_wrap'>
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+         </div>
+      </div>
+   </div>
 
- <div class="speed_block">
-  <div class='speed'>0</div>
- </div>
+   <div class="overlay finish_window hidden_block">
+      <div>
+         <h2 class='finish_head'>Вы приехали</h2>
+         <div class='finish_you_time'>Ваше время:<span>25.47</span></div>
+         <div class='load_finish_wrap'>
+            <div class='finish_again'>Еще раз</div>
+            <div class='finish_in_menu'>В меню</div>
+         </div>
+      </div>
+   </div>
 
- <div class="shadow-map">
-    <input type="checkbox" name="shadow" class = 'shadow_check' checked>
-    <span>Тени</span>
- </div>
+   <div class="times">
+      <div class="current_time_block">
+         <div class='current_time'>0</div>
+      </div>
+      <div class="best_time_block">
+         <div class='best_time'>0</div>
+      </div>
+   </div>
+
+   <div class="speed_block">
+      <div class='speed'>0</div>
+   </div>
+
+   <div class="shadow-map">
+      <input type="checkbox" name="shadow" class='shadow_check' checked>
+      <span>Тени</span>
+   </div>
 
 </body>
 

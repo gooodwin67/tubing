@@ -97,13 +97,13 @@ finishInMenuButton.addEventListener('click', async () => {
 });
 
 
-shadowCheck.onchange = function() {
+shadowCheck.onchange = function () {
   if (this.checked) {
     //renderer.shadowMap.enabled = true 
   }
   else {
     //renderer.shadowMap.enabled = false;
-//    renderer.clearTarget( dirLight.shadow.map );
+    //    renderer.clearTarget( dirLight.shadow.map );
   }
 
 };
@@ -154,7 +154,7 @@ const tubesChars = [
     hSpeed: 14,
     maxHSpeed: 0.12,
     stepSpeed: 10,
-    maxSpeed: 80,
+    maxSpeed: 180,
     resetHAngle: false
   },
   {
