@@ -26,7 +26,7 @@ let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
 
 let allOverlies = document.querySelectorAll('body>.overlay');
-console.log(allOverlies)
+
 
 let startButton = document.querySelector('.startButton');
 let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
@@ -50,13 +50,7 @@ levelsBlock.forEach((child, index) => {
     hiddenBlock(mainLoadScreen);
     await initAllData(false, true)
     hiddenBlock(selectTubeScreen);
-    isMobile = detectDevice();
 
-    if (isMobile) {
-      document.body.requestFullscreen().then(() => {
-        screen.orientation.lock("landscape");
-      })
-    }
 
   });
 });
@@ -70,10 +64,17 @@ tubesBlock.forEach((child, index) => {
 });
 
 
-// startButton.addEventListener('click', () => {
-//   mainMenuScreen.classList.add("hidden_block");
-//   selectLevelScreen.classList.remove("hidden_block");
-// });
+startButton.addEventListener('click', () => {
+  isMobile = detectDevice();
+
+  if (isMobile) {
+    document.body.requestFullscreen().then(() => {
+      screen.orientation.lock("landscape");
+    })
+  }
+  mainMenuScreen.classList.add("hidden_block");
+  selectLevelScreen.classList.remove("hidden_block");
+});
 
 function hiddenBlock(block) {
   allOverlies.forEach((el) => {
@@ -138,6 +139,8 @@ let tubenum = 0;
 let chooseTubeNow = false;
 
 let selectTubeWall;
+
+let stars = [];
 
 let finishBlock;
 let playerIsFinish;
@@ -432,6 +435,9 @@ async function loadLevel() {
         areaBlock.castShadow = true;
         areaBlock.receiveShadow = true;
         scene.add(areaBlock);
+        if (el.name.includes('star_area')) {
+          stars.push(areaBlock);
+        }
       }
       else if (el.name.includes('finish_block')) {
         finishBlock = el.clone();
@@ -489,7 +495,7 @@ async function loadLevel() {
 // }
 async function init() {
   await initAllData(true, false)
-  hiddenBlock(selectLevelScreen);
+  hiddenBlock(mainMenuScreen);
 }
 init();
 
@@ -567,6 +573,13 @@ function animate() {
   if (dataLoaded) {
     if (!playerIsFinish) {
       playerMove();
+      stars.forEach((value, index, array) => {
+        value.rotation.z += 0.05;
+      })
+      if (detectCollisionCubeAndArray(player, stars)) {
+        console.log(detectCollisionCubeAndArray(player, stars))
+        scene.remove(detectCollisionCubeAndArray(player, stars))
+      };
 
       currentTime = timer.getElapsedTime().toFixed(3);
       currentTimeBlock.textContent = currentTime;

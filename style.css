@@ -21,12 +21,12 @@ body {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     opacity: 1;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
-    overflow: hidden;
+    overflow: auto;
     box-shadow: 0 0 200px rgba(0, 0, 0, 0.8) inset;
 }
 
@@ -59,6 +59,14 @@ body {
 
 canvas {
     position: fixed;
+}
+
+.main_menu {
+    align-items: center;
+}
+
+.main_load {
+    align-items: center;
 }
 
 .load_level_wrap {
@@ -120,15 +128,62 @@ canvas {
 .load_tubes_wrap {
     display: flex;
     margin-top: 30px;
+    flex-wrap: wrap;
+    max-width: 1300px;
+    justify-content: center;
 }
 
 .load_tubes_wrap>div {
-    border: 1px solid #ccc;
-    padding: 20px 30px;
-    margin: 0 10px;
+    max-width: 25%;
+    margin: 10px;
+    border: 2px solid #ccc;
+    border-radius: 18px;
+    position: relative;
+    background-color: #4c4660e0;
+    box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    cursor: pointer;
 }
 
+.load_tubes_wrap>div>img {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+}
 
+.load_tubes_wrap>div>.level_shadow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 -80px 200px rgba(0, 0, 0, 0.8) inset;
+}
+
+.load_tubes_wrap>div>.level_text {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.load_tubes_wrap>div>.level_text h2 {
+    margin-bottom: 5px;
+}
+
+.load_tubes_wrap>div>.level_text span {
+    color: rgb(82, 228, 82);
+    font-size: 30px;
+}
+
+.finish_window {
+    align-items: center;
+}
 
 .finish_window>div {
     padding: 30px 40px;
@@ -189,6 +244,7 @@ canvas {
     right: 10px;
     display: flex;
     color: #fff;
+    z-index: 9;
 }
 
 .current_time {
@@ -201,4 +257,9 @@ canvas {
     right: 50%;
     color: #ff0000;
     font-size: 25px;
+    z-index: 9;
+}
+
+.shadow-map {
+    z-index: 9;
 }
