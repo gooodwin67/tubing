@@ -161,11 +161,11 @@ const tubesChars = [
     resetHAngle: false
   },
   {
-    hSpeed: 25,
-    maxHSpeed: 0.14,
+    hSpeed: 14,
+    maxHSpeed: 0.12,
     stepSpeed: 3,
     maxSpeed: 30,
-    resetHAngle: true
+    resetHAngle: false
   }
 ]
 
@@ -863,7 +863,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2 - 0.5, size.y / 2, size.z / 2).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 2, size.z / 2).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
