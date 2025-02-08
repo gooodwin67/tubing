@@ -306,10 +306,14 @@ async function loadMenu() {
       if (el.name == 'player') {
 
         player = el.clone();
+
+        player.userData.vertices = player.geometry.attributes.position.array;
+        player.userData.indices = player.geometry.index.array;
+
         player.castShadow = true;
         player.receiveShadow = true;
         player.material.transparent = true;
-        player.material.opacity = 0.4;
+        player.material.opacity = 1;
         player.userData.mass = 1;
         player.userData.playerStart = false;
         player.userData.playerBraking = false;
@@ -564,7 +568,7 @@ function animate() {
     }
     else {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
-
+      //camera.position.x = player.position.x;
       camera.position.y = player.position.y + 4;
       camera.position.z = player.position.z - 4;
     }
@@ -839,8 +843,8 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('player')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false, false).setLinearDamping(0).setAngularDamping(2.0))
+    shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
     // shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
@@ -863,7 +867,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 4, size.y / 2, size.z / 2).setMass(obj.userData.mass * 20).setRestitution(0).setFriction(4);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(40);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
