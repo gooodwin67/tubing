@@ -190,6 +190,14 @@ let menuLoaded = false;
 
 let groundsMas = [];
 
+let groundBlock;
+let wallLeft;
+let wallRight;
+
+let itsMen;
+let itsMenBody;
+let itsMenLeftHand;
+
 let allObjCollision = [];
 
 let targetCube;
@@ -259,8 +267,8 @@ document.body.appendChild(stats.dom);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled =false;
+//renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
@@ -354,7 +362,7 @@ async function loadMenu() {
       else if (el.name.includes('ground')) {
         const box = new THREE.Box3().setFromObject(el);
         const size = box.getSize(new THREE.Vector3());
-        let groundBlock = el.clone();
+        groundBlock = el.clone();
 
         groundBlock.receiveShadow = true;
 
@@ -363,6 +371,13 @@ async function loadMenu() {
         addPhysicsToObject(groundBlock);
         allObjCollision.push(groundBlock);
         scene.add(groundBlock);
+        
+        if (el.name == 'left_ground_wall') {
+          wallLeft = el.position;
+        }
+        else if (el.name == 'right_ground_wall') {
+          wallRight = el.position;
+        }
       }
       else if (el.name.includes('wall')) {
         const box = new THREE.Box3().setFromObject(el);
@@ -380,6 +395,16 @@ async function loadMenu() {
         areaBlock.castShadow = true;
         scene.add(areaBlock);
       }
+      else if (el.name.includes('itsmen_body')) {
+        itsMenBody = el.clone();
+        scene.add(itsMenBody);
+        addPhysicsToObject(itsMenBody);
+      }
+      else if (el.name.includes('itsmen_left_hand')) {
+        itsMenLeftHand = el.clone();
+        scene.add(itsMenLeftHand);
+        addPhysicsToObject(itsMenLeftHand);
+      }
 
     })
 
@@ -389,6 +414,13 @@ async function loadMenu() {
       child.material.needsUpdate = true
     }
   })
+
+  //let params = RAPIER.JointData.revolute({ x: 0.5, y: 0.5, z: 0.0 }, { x: 0.0, y: 0.0, z: 0.0 }, new RAPIER.Vector3(0, 1, 0));
+  let params = RAPIER.JointData.spherical({ x: 0.3, y: 0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
+  let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
+
+  itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 50, z: 0}, true);
+
   menuLoaded = true;
 
 }
@@ -568,7 +600,7 @@ function animate() {
     }
     else {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
-      //camera.position.x = player.position.x;
+      camera.position.x = player.position.x;
       camera.position.y = player.position.y + 4;
       camera.position.z = player.position.z - 4;
     }
@@ -595,6 +627,26 @@ function animate() {
 
 
 
+    }
+
+    // let shape = playerCollider;
+    // let shapePos = playerCollider.translation();
+    // let shapeRot = playerCollider.rotation();
+    
+    
+    // world.intersectionsWithShape(shapePos, shapeRot, shape, (handle) => {
+    //     console.log("The collider", handle, "intersects our shape.");
+    //     //return true; // Return `false` instead if we want to stop searching for other colliders that contain this point.
+    // });
+    //console.log(player.userData.size)
+    if (player.position.x > wallLeft.x - player.userData.size.x/1.3) {
+      targetCube.position.x = player.position.x;
+      player.userData.hTransition = -0.1;
+    }
+    
+    if (player.position.x < wallRight.x + player.userData.size.x/1.3) {
+      targetCube.position.x = player.position.x;
+      player.userData.hTransition = +0.1;
     }
 
     world.step();
@@ -804,6 +856,7 @@ function onKeyDown(event) {
     case 'KeyD':
     case 'ArrowRight':
       player.userData.right = true
+      itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 5, z: 0}, true);
       break;
   }
 }
@@ -843,8 +896,12 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('player')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false, false).setLinearDamping(0).setAngularDamping(2.0))
-    shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    player.userData.size = size;
+    player.userData.orgRotation = originalRotation;
+
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0));
+    shape = RAPIER.ColliderDesc.cuboid(size.x/3, size.y/2, size.z/3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
     // shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
@@ -866,7 +923,7 @@ function addPhysicsToObject(obj) {
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true).setLinearDamping(0))
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(40);
 
     world.createCollider(shape, body)
@@ -878,6 +935,32 @@ function addPhysicsToObject(obj) {
     // cube.position.set(obj.position.x, obj.position.y, obj.position.z)
     // cube.rotation.copy(originalRotation);
     //scene.add(cube);
+  }
+
+
+  if (obj.name.includes('itsmen_body')) {
+
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true).setLinearDamping(0.1).setAngularDamping(0.1));
+    shape = RAPIER.ColliderDesc.cuboid(size.x/2, size.y/2, size.z/2).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
+
+    itsMenBody.userData.body = body;
+    itsMenBody.userData.collider = shape;
+
+    world.createCollider(shape, body)
+    dynamicBodies.push([obj, body, obj.id])
+
+  }
+  if (obj.name.includes('itsmen_left_hand')) {
+
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(10).setAngularDamping(10));
+    shape = RAPIER.ColliderDesc.capsule(size.z/2, size.x/10).setMass(0).setRestitution(0).setFriction(0).setDensity(0.0);
+
+    itsMenLeftHand.userData.body = body;
+    itsMenLeftHand.userData.collider = shape;
+
+    world.createCollider(shape, body)
+    dynamicBodies.push([obj, body, obj.id])
+
   }
 
 
