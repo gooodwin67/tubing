@@ -100,11 +100,13 @@ finishInMenuButton.addEventListener('click', async () => {
 
 shadowCheck.onchange = function () {
   if (this.checked) {
-    //renderer.shadowMap.enabled = true 
+    renderer.shadowMap.enabled = true
   }
   else {
-    //renderer.shadowMap.enabled = false;
-    //    renderer.clearTarget( dirLight.shadow.map );
+    renderer.shadowMap.enabled = false;
+    scene.traverse((child) => { if (child.material) child.material.needsUpdate = true })
+
+    console.log(1)
   }
 
 };
@@ -267,8 +269,8 @@ document.body.appendChild(stats.dom);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-renderer.shadowMap.enabled =false;
-//renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
@@ -371,7 +373,7 @@ async function loadMenu() {
         addPhysicsToObject(groundBlock);
         allObjCollision.push(groundBlock);
         scene.add(groundBlock);
-        
+
         if (el.name == 'left_ground_wall') {
           wallLeft = el.position;
         }
@@ -419,7 +421,7 @@ async function loadMenu() {
   let params = RAPIER.JointData.spherical({ x: 0.3, y: 0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
-  itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 50, z: 0}, true);
+  itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 50, z: 0 }, true);
 
   menuLoaded = true;
 
@@ -632,19 +634,19 @@ function animate() {
     // let shape = playerCollider;
     // let shapePos = playerCollider.translation();
     // let shapeRot = playerCollider.rotation();
-    
-    
+
+
     // world.intersectionsWithShape(shapePos, shapeRot, shape, (handle) => {
     //     console.log("The collider", handle, "intersects our shape.");
     //     //return true; // Return `false` instead if we want to stop searching for other colliders that contain this point.
     // });
     //console.log(player.userData.size)
-    if (player.position.x > wallLeft.x - player.userData.size.x/1.3) {
+    if (player.position.x > wallLeft.x - player.userData.size.x / 1.3) {
       targetCube.position.x = player.position.x;
       player.userData.hTransition = -0.1;
     }
-    
-    if (player.position.x < wallRight.x + player.userData.size.x/1.3) {
+
+    if (player.position.x < wallRight.x + player.userData.size.x / 1.3) {
       targetCube.position.x = player.position.x;
       player.userData.hTransition = +0.1;
     }
@@ -856,7 +858,7 @@ function onKeyDown(event) {
     case 'KeyD':
     case 'ArrowRight':
       player.userData.right = true
-      itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 5, z: 0}, true);
+      itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 5, z: 0 }, true);
       break;
   }
 }
@@ -900,7 +902,7 @@ function addPhysicsToObject(obj) {
     player.userData.orgRotation = originalRotation;
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0));
-    shape = RAPIER.ColliderDesc.cuboid(size.x/3, size.y/2, size.z/3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 3, size.y / 2, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
@@ -941,7 +943,7 @@ function addPhysicsToObject(obj) {
   if (obj.name.includes('itsmen_body')) {
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true).setLinearDamping(0.1).setAngularDamping(0.1));
-    shape = RAPIER.ColliderDesc.cuboid(size.x/2, size.y/2, size.z/2).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
 
     itsMenBody.userData.body = body;
     itsMenBody.userData.collider = shape;
@@ -953,7 +955,7 @@ function addPhysicsToObject(obj) {
   if (obj.name.includes('itsmen_left_hand')) {
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(10).setAngularDamping(10));
-    shape = RAPIER.ColliderDesc.capsule(size.z/2, size.x/10).setMass(0).setRestitution(0).setFriction(0).setDensity(0.0);
+    shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(0).setRestitution(0).setFriction(0).setDensity(0.0);
 
     itsMenLeftHand.userData.body = body;
     itsMenLeftHand.userData.collider = shape;
