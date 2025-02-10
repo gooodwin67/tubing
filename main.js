@@ -100,13 +100,12 @@ finishInMenuButton.addEventListener('click', async () => {
 
 shadowCheck.onchange = function () {
   if (this.checked) {
-    renderer.shadowMap.enabled = true
+    renderer.shadowMap.enabled = true;
+    scene.traverse((child) => { if (child.material) child.material.needsUpdate = true })
   }
   else {
     renderer.shadowMap.enabled = false;
     scene.traverse((child) => { if (child.material) child.material.needsUpdate = true })
-
-    console.log(1)
   }
 
 };
