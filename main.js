@@ -44,6 +44,8 @@ let speedBlock = document.querySelector('.speed_block>.speed');
 
 let shadowCheck = document.querySelector('.shadow_check');
 
+let loadPercent = document.querySelector('.load_percent');
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
     currentLevel = index + 1;
@@ -304,8 +306,12 @@ async function loadMenu() {
 
   const gltfLoader = new GLTFLoader();
   const url = 'models/map-menu.glb';
-  await gltfLoader.loadAsync(url).then((gltf) => {
+  await gltfLoader.loadAsync(url, onprogress=(e)=>
+  {
+    loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+  }).then((gltf) => {
     const root = gltf.scene;
+    loadPercent.textContent = '0';
 
 
 
@@ -436,8 +442,12 @@ async function loadLevel() {
 
   const gltfLoader = new GLTFLoader();
   const url = 'models/map' + currentLevel + '.glb';
-  await gltfLoader.loadAsync(url).then((gltf) => {
+  await gltfLoader.loadAsync(url, onprogress=(e)=>
+  {
+    loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+  }).then((gltf) => {
     const root = gltf.scene;
+    loadPercent.textContent = '0';
 
     // let gr = root.children.find((value, index, array) => value.name == "ground")
     // const groundBox = new THREE.Box3().setFromObject(gr);
