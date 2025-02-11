@@ -885,12 +885,14 @@ function onTouchMove(e) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    if (mouse.y > 0 && !playerIsFinish) {
-      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5) {
+    if (mouse.y > 0 && player.userData.canBoostStep && dataLoaded && player.userData.onStartArea) {
+      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
         playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
       }
     }
-    else {
+    player.userData.canBoostStep = false;
+
+    if (mouse.y < 0) {
       if (mouse.x > 0) {
         player.userData.left = false
         player.userData.right = true
@@ -933,6 +935,7 @@ function onDocumentMouseDown(e) {
 function onTouchEnd(e) {
   player.userData.right = false;
   player.userData.left = false;
+  player.userData.canBoostStep = true;
 }
 
 function onKeyDown(event) {
