@@ -46,6 +46,10 @@ let shadowCheck = document.querySelector('.shadow_check');
 
 let loadPercent = document.querySelector('.load_percent');
 
+let pauseButton = document.querySelector('.pause_button');
+let resetButton = document.querySelector('.reset_button');
+let inmenuButton = document.querySelector('.inmenu_button');
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
     currentLevel = index + 1;
@@ -93,11 +97,39 @@ finishAgainButton.addEventListener('click', async () => {
   dataLoaded = true;
 });
 
+resetButton.addEventListener('click', async () => {
+
+  await resetAllMap();
+  await initAllData(true, true);
+  hiddenBlock(0);
+  dataLoaded = true;
+});
+
 finishInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
   await resetAllMap();
   await init();
 });
+
+inmenuButton.addEventListener('click', async () => {
+  hiddenBlock(mainLoadScreen);
+  await resetAllMap();
+  await init();
+});
+
+pauseButton.addEventListener('click', () => {
+  if (pause) {
+    timer.start();
+    timer.elapsedTime = player.userData.time;
+    pause = false;
+  }
+  else {
+    player.userData.time = timer.getElapsedTime();
+    timer.stop();
+    pause = true;
+  }
+});
+
 
 
 shadowCheck.onchange = function () {
@@ -130,6 +162,8 @@ let plane;
 let levelItems = [];
 
 let currentLevel = 0;
+
+let pause = false;
 
 let player;
 let playerBody;
@@ -210,6 +244,7 @@ let isMobile = detectDevice();
 let clock = new THREE.Clock();
 let timer = new THREE.Clock();
 let delta = 0;
+let deltaTime;
 let interval = 1 / 60;
 
 let bestTime = 0;
@@ -306,8 +341,7 @@ async function loadMenu() {
 
   const gltfLoader = new GLTFLoader();
   const url = 'models/map-menu.glb';
-  await gltfLoader.loadAsync(url, onprogress=(e)=>
-  {
+  await gltfLoader.loadAsync(url, onprogress = (e) => {
     loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
   }).then((gltf) => {
     const root = gltf.scene;
@@ -328,7 +362,7 @@ async function loadMenu() {
         player.castShadow = true;
         player.receiveShadow = true;
         player.material.transparent = true;
-        player.material.opacity = 1;
+        player.material.opacity = 0;
         player.userData.mass = 1;
         player.userData.playerStart = false;
         player.userData.playerBraking = false;
@@ -340,6 +374,8 @@ async function loadMenu() {
         // player.userData.maxSpeed = 16;
 
         // player.userData.resetHAngle = false;
+
+        player.userData.time = 0;
 
         player.userData.right = false;
         player.userData.left = false;
@@ -442,8 +478,7 @@ async function loadLevel() {
 
   const gltfLoader = new GLTFLoader();
   const url = 'models/map' + currentLevel + '.glb';
-  await gltfLoader.loadAsync(url, onprogress=(e)=>
-  {
+  await gltfLoader.loadAsync(url, onprogress = (e) => {
     loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
   }).then((gltf) => {
     const root = gltf.scene;
@@ -573,6 +608,7 @@ async function resetAllMap() {
   dataLoaded = false;
   levelLoaded = false;
   menuLoaded = false;
+  currentTime = 0;
   // Удаление всех объектов со сцены
   while (scene.children.length > 0) {
     let object = scene.children[0];
@@ -611,7 +647,7 @@ function animate() {
     }
     else {
       camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
-      camera.position.x = player.position.x;
+      //camera.position.x = player.position.x;
       camera.position.y = player.position.y + 4;
       camera.position.z = player.position.z - 4;
     }
@@ -619,6 +655,8 @@ function animate() {
   }
   if (dataLoaded) {
     if (!playerIsFinish) {
+      currentTime = timer.getElapsedTime().toFixed(3);
+      currentTimeBlock.textContent = currentTime;
       playerMove();
       stars.forEach((value, index, array) => {
         value.rotation.z += 0.05;
@@ -628,8 +666,8 @@ function animate() {
         scene.remove(detectCollisionCubeAndArray(player, stars))
       };
 
-      currentTime = timer.getElapsedTime().toFixed(3);
-      currentTimeBlock.textContent = currentTime;
+
+
 
     }
     else {
@@ -675,6 +713,7 @@ function animate() {
   }
 
 
+
   stats.update();
 
 }
@@ -682,7 +721,8 @@ function animate() {
 renderer.setAnimationLoop(() => {
 
   delta += clock.getDelta();
-  if (delta > interval) {
+
+  if (delta > interval && !pause) {
     animate()
     renderer.render(scene, camera);
     delta = delta % interval;
@@ -703,6 +743,9 @@ document.addEventListener('mousedown', onDocumentMouseDown, false);
 function playerMove() {
 
   if (player.position.z > finishBlock.position.z) {
+
+    currentTime = timer.getElapsedTime().toFixed(3);
+    currentTimeBlock.textContent = currentTime;
 
     playerIsFinish = true;
     if (currentTime < bestTime || bestTime == 0) {
@@ -740,7 +783,6 @@ function playerMove() {
       player.userData.flying = true;
     }
   }
-
 
 
   if (playerBody.linvel().z > 0) player.userData.currentSpeed = playerBody.linvel().z.toFixed(0);
@@ -847,6 +889,7 @@ function onTouchEnd(e) {
 }
 
 function onKeyDown(event) {
+
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
@@ -859,6 +902,7 @@ function onKeyDown(event) {
     case 'ArrowDown':
       //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
+
       break;
     case 'KeyA':
     case 'ArrowLeft':
@@ -911,7 +955,7 @@ function addPhysicsToObject(obj) {
     player.userData.orgRotation = originalRotation;
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0));
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 3, size.y / 2, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 5, size.y / 1.5, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerCollider = shape;
@@ -935,7 +979,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('wall')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0))
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(40);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass * 10).setRestitution(0).setFriction(40);
 
     world.createCollider(shape, body)
     dynamicBodies.push([obj, body, obj.id])
@@ -980,6 +1024,24 @@ function addPhysicsToObject(obj) {
 
 
 
+
+
+
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === 'visible') {
+
+    if (!playerIsFinish && dataLoaded) {
+      timer.start();
+      timer.elapsedTime = player.userData.time;
+    }
+
+  } else {
+    if (!playerIsFinish && dataLoaded) {
+      player.userData.time = timer.getElapsedTime();
+      timer.stop();
+    }
+  }
+});
 
 
 /*///////////////////////////////////////////////////////////////////////////////////////////////////////*/
