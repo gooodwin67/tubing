@@ -50,6 +50,9 @@ let pauseButton = document.querySelector('.pause_button');
 let resetButton = document.querySelector('.reset_button');
 let inmenuButton = document.querySelector('.inmenu_button');
 
+let startTimeBlock = document.querySelector('.start_time');
+let startTimeWrap = document.querySelector('.start_time_wrap');
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
     currentLevel = index + 1;
@@ -65,9 +68,32 @@ tubesBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
     tubenum = index;
     hiddenBlock(0);
-    dataLoaded = true;
+    startRace();
   });
 });
+
+function startRace() {
+  tubesMas[tubenum].position.copy(playerBody.translation());
+  let iter = 0;
+  let interval = setInterval((e) => {
+    startTimeWrap.classList.remove("hidden_block");
+    iter++;
+
+    if (iter == 4) {
+      startTimeBlock.textContent = 'GO';
+      dataLoaded = true;
+      clearInterval(interval);
+      setTimeout(() => {
+        startTimeWrap.classList.add("hidden_block");
+      }, 800);
+    }
+    else {
+      startTimeBlock.textContent = 4 - iter;
+    }
+
+
+  }, 1000)
+}
 
 
 startButton.addEventListener('click', () => {
@@ -94,7 +120,7 @@ finishAgainButton.addEventListener('click', async () => {
   await resetAllMap();
   await initAllData(true, true);
   hiddenBlock(0);
-  dataLoaded = true;
+  startRace();
 });
 
 resetButton.addEventListener('click', async () => {
@@ -102,7 +128,7 @@ resetButton.addEventListener('click', async () => {
   await resetAllMap();
   await initAllData(true, true);
   hiddenBlock(0);
-  dataLoaded = true;
+  startRace();
 });
 
 finishInMenuButton.addEventListener('click', async () => {
@@ -177,6 +203,8 @@ let chooseTubeNow = false;
 
 let selectTubeWall;
 
+let startFlag;
+
 let stars = [];
 
 let finishBlock;
@@ -202,7 +230,7 @@ const tubesChars = [
     maxHSpeed: 0.12,
     stepSpeed: 3,
     maxSpeed: 30,
-    resetHAngle: false
+    resetHAngle: true
   }
 ]
 
@@ -364,10 +392,13 @@ async function loadMenu() {
         player.material.transparent = true;
         player.material.opacity = 0;
         player.userData.mass = 1;
-        player.userData.playerStart = false;
         player.userData.playerBraking = false;
         player.userData.hTransition = 0;
         player.userData.currentSpeed = 0;
+
+        player.userData.onStartArea = true;
+
+        player.userData.canBoostStep = true;
         // player.userData.hSpeed = 10;
         // player.userData.maxHSpeed = 0.08;
         // player.userData.stepSpeed = 2;
@@ -438,6 +469,10 @@ async function loadMenu() {
         areaBlock.castShadow = true;
         scene.add(areaBlock);
       }
+      else if (el.name.includes('start_flag')) {
+        startFlag = el.clone();
+        scene.add(startFlag);
+      }
       else if (el.name.includes('itsmen_body')) {
         itsMenBody = el.clone();
         scene.add(itsMenBody);
@@ -458,11 +493,14 @@ async function loadMenu() {
     }
   })
 
-  //let params = RAPIER.JointData.revolute({ x: 0.5, y: 0.5, z: 0.0 }, { x: 0.0, y: 0.0, z: 0.0 }, new RAPIER.Vector3(0, 1, 0));
+
   let params = RAPIER.JointData.spherical({ x: 0.3, y: 0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
-  itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 50, z: 0 }, true);
+  // let params2 = RAPIER.JointData.spherical({ x: 0.3, y: 0.4, z: 0.0 }, { x: 0.0, y: 0.4, z: 0.0 });
+  // let joint2 = world.createImpulseJoint(params2, playerBody, itsMenLeftHand.userData.body, true);
+
+  //itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 50, z: 0 }, true);
 
   menuLoaded = true;
 
@@ -609,6 +647,10 @@ async function resetAllMap() {
   levelLoaded = false;
   menuLoaded = false;
   currentTime = 0;
+  player.userData.currentSpeed = 0;
+  speedBlock.textContent = player.userData.currentSpeed;
+  currentTime = 0;
+  currentTimeBlock.textContent = currentTime;
   // Удаление всех объектов со сцены
   while (scene.children.length > 0) {
     let object = scene.children[0];
@@ -690,12 +732,12 @@ function animate() {
     //console.log(player.userData.size)
     if (player.position.x > wallLeft.x - player.userData.size.x / 1.3) {
       targetCube.position.x = player.position.x;
-      player.userData.hTransition = -0.1;
+      player.userData.hTransition = -0.4;
     }
 
     if (player.position.x < wallRight.x + player.userData.size.x / 1.3) {
       targetCube.position.x = player.position.x;
-      player.userData.hTransition = +0.1;
+      player.userData.hTransition = +0.4;
     }
 
     world.step();
@@ -819,7 +861,12 @@ function playerMove() {
     }
   }
 
-
+  if (player.position.z > startFlag.position.z) {
+    player.userData.onStartArea = false;
+  }
+  else {
+    player.userData.onStartArea = true;
+  }
 
 
 }
@@ -893,10 +940,13 @@ function onKeyDown(event) {
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
-      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
-        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+      if (player.userData.canBoostStep && dataLoaded && player.userData.onStartArea) {
+        if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
+          playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+        }
       }
-      player.userData.playerStart = true;
+      player.userData.canBoostStep = false;
+
       break;
     case 'KeyS':
     case 'ArrowDown':
@@ -919,6 +969,7 @@ function onKeyUp(event) {
   switch (event.code) {
     case 'KeyW':
     case 'ArrowUp':
+      player.userData.canBoostStep = true;
       break;
     case 'KeyS':
     case 'ArrowDown':
@@ -995,8 +1046,8 @@ function addPhysicsToObject(obj) {
 
   if (obj.name.includes('itsmen_body')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true).setLinearDamping(0.1).setAngularDamping(0.1));
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true).setLinearDamping(0).setAngularDamping(0));
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(1).setRestitution(0).setFriction(0).setDensity(2.0);
 
     itsMenBody.userData.body = body;
     itsMenBody.userData.collider = shape;
@@ -1007,8 +1058,8 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('itsmen_left_hand')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(10).setAngularDamping(10));
-    shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(0).setRestitution(0).setFriction(0).setDensity(0.0);
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0).setAngularDamping(0));
+    shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
 
     itsMenLeftHand.userData.body = body;
     itsMenLeftHand.userData.collider = shape;

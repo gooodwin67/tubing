@@ -338,3 +338,13 @@ canvas {
         transform: rotate(360deg);
     }
 }
+
+.start_time_wrap {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+    font-size: 180px;
+    color: red;
+}
