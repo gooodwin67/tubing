@@ -959,7 +959,7 @@ function onKeyDown(event) {
       break;
     case 'KeyA':
     case 'ArrowLeft':
-      player.userData.left = true
+      player.userData.left = true;
       break;
     case 'KeyD':
     case 'ArrowRight':
@@ -1050,7 +1050,7 @@ function addPhysicsToObject(obj) {
   if (obj.name.includes('itsmen_body')) {
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true).setLinearDamping(0).setAngularDamping(0));
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(1).setRestitution(0).setFriction(0).setDensity(2.0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(0).setRestitution(0).setFriction(0).setDensity(2.0);
 
     itsMenBody.userData.body = body;
     itsMenBody.userData.collider = shape;
@@ -1062,7 +1062,7 @@ function addPhysicsToObject(obj) {
   if (obj.name.includes('itsmen_left_hand')) {
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, false).setLinearDamping(0).setAngularDamping(0));
-    shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(1).setRestitution(0).setFriction(0).setDensity(20.0);
+    shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(0).setRestitution(0).setFriction(0).setDensity(2.0);
 
     itsMenLeftHand.userData.body = body;
     itsMenLeftHand.userData.collider = shape;
