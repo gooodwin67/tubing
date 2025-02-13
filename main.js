@@ -25,12 +25,15 @@ let mainMenuScreen = document.querySelector('.main_menu');
 let selectLevelScreen = document.querySelector('.select_level');
 let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
+let finishScreenTime = document.querySelector('.finish_you_time span');
 
 let allOverlies = document.querySelectorAll('body>.overlay');
 
 
 let startButton = document.querySelector('.startButton');
 let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
+let levelsTimesBlock = document.querySelectorAll('.load_level_wrap .level_time');
+
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
 
@@ -293,6 +296,8 @@ let interval = 1 / 60;
 let bestTime = 0;
 let currentTime = 0;
 
+let playerData;
+
 const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
@@ -359,7 +364,36 @@ function onWindowResize() {
 }
 
 
+async function loadStorageData() {
 
+  if (!localStorage.getItem('playerData')) {
+    playerData = {
+      levelsTimes: {
+        // time1: 10.222,
+      },
+    }
+    localStorage.setItem('playerData', JSON.stringify(playerData));
+  }
+  else {
+    playerData = JSON.parse(localStorage.getItem('playerData'))
+  }
+
+
+  let aaa = JSON.stringify(playerData);
+
+  console.log(JSON.parse(aaa))
+
+
+  levelsTimesBlock.forEach((value, index, array) => {
+    if (playerData.levelsTimes['time' + (index + 1)] != undefined) {
+      value.childNodes[1].textContent = playerData.levelsTimes['time' + (index + 1)]
+    }
+    else {
+      value.childNodes[1].textContent = 0;
+    }
+
+  })
+}
 
 
 async function loadMenu() {
@@ -509,6 +543,10 @@ async function loadMenu() {
   })
 
 
+
+  await loadStorageData();
+
+
   let params = RAPIER.JointData.spherical({ x: 0.3, y: 0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
@@ -582,6 +620,7 @@ async function loadLevel() {
     })
 
   });
+  bestTimeBlock.textContent = playerData.levelsTimes['time' + (currentLevel)];
   levelLoaded = true;
 }
 
@@ -824,10 +863,21 @@ function playerMove() {
     currentTimeBlock.textContent = currentTime;
 
     playerIsFinish = true;
+    finishScreenTime.textContent = currentTime;
+    if (playerData.levelsTimes['time' + (currentLevel)] != undefined) {
+      bestTime = playerData.levelsTimes['time' + (currentLevel)];
+    }
+    else {
+      bestTime = 0;
+    }
+
     if (currentTime < bestTime || bestTime == 0) {
       bestTime = currentTime;
       bestTimeBlock.textContent = bestTime;
+      playerData.levelsTimes['time' + (currentLevel)] = bestTime;
+      localStorage.setItem('playerData', JSON.stringify(playerData));
     }
+
     player.position.z = 0;
   }
 
