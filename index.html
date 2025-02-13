@@ -5,10 +5,10 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
    <title>My first three.js app</title>
-  <script type="module" crossorigin src="./assets/index-xEVEhEUB.js"></script>
+  <script type="module" crossorigin src="./assets/index-BSCNGPxg.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three-C4_QSHiD.js">
   <link rel="modulepreload" crossorigin href="./assets/@dimforge-D3Mqfikn.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-Bu4x_GDE.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-BPinnLXP.css">
 </head>
 
 <body>
@@ -31,8 +31,18 @@
 
    <div class="overlay main_menu hidden_block">
       <div>
-         <button class="startButton">Начать игру</button>
+         <img src="./images/title.png" alt="title">
+         <button class="startButton btn">Начать игру</button>
 
+      </div>
+   </div>
+
+   <div class="overlay menu_in_game_wrap hidden_block">
+      <div>
+         <div class='menu_in_game_wrap_head'>Пауза</div>
+         <button class="close_pause_button btn">Продолжить игру</button>
+         <button class="reset_button btn">Начать заново</button>
+         <button class="inmenu_button btn">Выйти</button>
       </div>
    </div>
 
@@ -45,7 +55,7 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 1</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
             <div>
@@ -53,7 +63,7 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 2</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
             <div>
@@ -61,7 +71,7 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 3</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
             <div>
@@ -69,7 +79,7 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 4</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
             <div>
@@ -77,7 +87,7 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 5</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
             <div>
@@ -85,7 +95,15 @@
                <div class='level_shadow'></div>
                <div class='level_text'>
                   <h2>Level 6</h2>
-                  <div>Время: 24:564 <span>✔</span></div>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
+               </div>
+            </div>
+            <div>
+               <img src="./assets/level3-jivvjJRR.jpg" alt="">
+               <div class='level_shadow'></div>
+               <div class='level_text'>
+                  <h2>Level 7</h2>
+                  <div class='level_time'>Время: <span class='time'>24:564</span> <span>✔</span></div>
                </div>
             </div>
 
@@ -128,7 +146,7 @@
    <div class="overlay finish_window hidden_block">
       <div>
          <h2 class='finish_head'>Вы приехали</h2>
-         <div class='finish_you_time'>Ваше время:<span>25.47</span></div>
+         <div class='finish_you_time'>Ваше время: <span>25.47</span></div>
          <div class='load_finish_wrap'>
             <div class='finish_again'>Еще раз</div>
             <div class='finish_in_menu'>В меню</div>
@@ -157,13 +175,7 @@
       <span>Тени</span>
    </div>
    <div class="pause_button_wrap">
-      <button class="pause_button">Пауза</button>
-   </div>
-   <div class="reset_button_wrap">
-      <button class="reset_button">Сброс</button>
-   </div>
-   <div class="inmenu_button_wrap">
-      <button class="inmenu_button">В меню</button>
+      <button class="pause_button btn hidden_block">Пауза</button>
    </div>
 
 </body>
