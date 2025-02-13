@@ -18,6 +18,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls";
 import { detectCollisionCubes } from "./functions/detectColisions";
 import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 import { detectDevice } from "./functions/detectColisions";
+import { remove } from 'three/examples/jsm/libs/tween.module.js';
 
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
@@ -47,8 +48,12 @@ let shadowCheck = document.querySelector('.shadow_check');
 let loadPercent = document.querySelector('.load_percent');
 
 let pauseButton = document.querySelector('.pause_button');
+let closePauseButton = document.querySelector('.close_pause_button');
 let resetButton = document.querySelector('.reset_button');
 let inmenuButton = document.querySelector('.inmenu_button');
+
+
+let menuInGameWrap = document.querySelector('.menu_in_game_wrap');
 
 let startTimeBlock = document.querySelector('.start_time');
 let startTimeWrap = document.querySelector('.start_time_wrap');
@@ -75,17 +80,20 @@ tubesBlock.forEach((child, index) => {
 function startRace() {
   tubesMas[tubenum].position.copy(playerBody.translation());
   let iter = 0;
+  naStartTimer = true;
   let interval = setInterval((e) => {
     startTimeWrap.classList.remove("hidden_block");
     iter++;
 
     if (iter == 4) {
+      naStartTimer = false;
       startTimeBlock.textContent = 'GO';
       dataLoaded = true;
+      pauseButton.classList.remove('hidden_block');
       clearInterval(interval);
       setTimeout(() => {
         startTimeWrap.classList.add("hidden_block");
-      }, 800);
+      }, 600);
     }
     else {
       startTimeBlock.textContent = 4 - iter;
@@ -144,17 +152,20 @@ inmenuButton.addEventListener('click', async () => {
 });
 
 pauseButton.addEventListener('click', () => {
-  if (pause) {
-    timer.start();
-    timer.elapsedTime = player.userData.time;
-    pause = false;
-  }
-  else {
+  if (naStartTimer == false && dataLoaded && !playerIsFinish) {
+    hiddenBlock(menuInGameWrap);
     player.userData.time = timer.getElapsedTime();
     timer.stop();
     pause = true;
   }
 });
+
+closePauseButton.addEventListener('click', () => {
+  hiddenBlock(0);
+  timer.start();
+  timer.elapsedTime = player.userData.time;
+  pause = false;
+})
 
 
 
@@ -185,6 +196,8 @@ let world;
 
 let plane;
 
+let frames = 0, prevTime = performance.now();
+
 let levelItems = [];
 
 let currentLevel = 0;
@@ -194,6 +207,8 @@ let pause = false;
 let player;
 let playerBody;
 let playerCollider;
+
+let naStartTimer = false;
 
 let tubesMas = [];
 let tube;
@@ -647,6 +662,14 @@ async function resetAllMap() {
   levelLoaded = false;
   menuLoaded = false;
   currentTime = 0;
+  player.userData.time = 0;
+
+  pauseButton.classList.add('hidden_block');
+
+  timer.start();
+  timer.elapsedTime = player.userData.time;
+  pause = false;
+
   player.userData.currentSpeed = 0;
   speedBlock.textContent = player.userData.currentSpeed;
   currentTime = 0;
@@ -671,6 +694,17 @@ async function resetAllMap() {
 
 function animate() {
 
+  frames++;
+  const time = performance.now();
+
+  if (time >= prevTime + 1000) {
+
+    //console.log(Math.round((frames * 1000) / (time - prevTime)));
+
+    frames = 0;
+    prevTime = time;
+
+  }
 
   if (menuLoaded && !playerIsFinish) {
 
@@ -1085,14 +1119,18 @@ document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
 
     if (!playerIsFinish && dataLoaded) {
-      timer.start();
-      timer.elapsedTime = player.userData.time;
+      if (pause == false) {
+        timer.start();
+        timer.elapsedTime = player.userData.time;
+      }
     }
 
   } else {
-    if (!playerIsFinish && dataLoaded) {
-      player.userData.time = timer.getElapsedTime();
-      timer.stop();
+    if (pause == false) {
+      if (!playerIsFinish && dataLoaded) {
+        player.userData.time = timer.getElapsedTime();
+        timer.stop();
+      }
     }
   }
 });

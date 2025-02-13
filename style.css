@@ -1,8 +1,21 @@
+@font-face {
+    font-display: swap;
+    font-family: 'ObelixPro';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/ObelixPro.ttf') format('truetype'),
+        /* Safari, Android, iOS */
+}
+
+* {
+    font-family: "ObelixPro", Verdana;
+}
+
 body {
     margin: 0;
     background: #1C1D21;
     user-select: none;
-    font-family: "Roboto", sans-serif;
+
 }
 
 .shadow-map {
@@ -18,24 +31,6 @@ body {
     position: absolute;
     left: 0;
     top: 150px;
-    color: red;
-    padding: 5px;
-    z-index: 9;
-}
-
-.reset_button_wrap {
-    position: absolute;
-    left: 0;
-    top: 200px;
-    color: red;
-    padding: 5px;
-    z-index: 9;
-}
-
-.inmenu_button_wrap {
-    position: absolute;
-    left: 0;
-    top: 250px;
     color: red;
     padding: 5px;
     z-index: 9;
@@ -91,7 +86,28 @@ canvas {
 }
 
 .main_menu {
+
+    height: 100%;
+}
+
+.main_menu>div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.main_menu>div img {
+    width: 90%;
+    margin-bottom: 50px;
+}
+
+.main_menu button {
+    align-self: center;
+    justify-self: center;
 }
 
 .main_load {
@@ -266,6 +282,56 @@ canvas {
     background: #44BFA3;
 }
 
+.menu_in_game_wrap {
+    align-items: center;
+}
+
+.menu_in_game_wrap>div {
+    padding: 30px 40px;
+    min-width: 300px;
+    border: 2px solid #ccc;
+    border-radius: 18px;
+    position: relative;
+    background-color: #4c4660e0;
+    box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.menu_in_game_wrap .menu_in_game_wrap_head {
+    font-size: 50px;
+    margin-bottom: 30px;
+}
+
+.menu_in_game_wrap button {
+    margin-bottom: 15px;
+}
+
+.btn {
+    background: transparent;
+    box-shadow: none;
+    border: 2px solid rgb(190, 190, 190);
+    outline: 1px solid rgb(204, 204, 204);
+    outline-offset: -6px;
+    padding: 20px 20px;
+    color: #fff;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.5s;
+}
+
+.btn:hover {
+    background: rgb(190, 190, 190);
+    box-shadow: none;
+    border: 2px solid rgb(190, 190, 190);
+    outline: 1px solid rgb(204, 204, 204);
+    outline-offset: -6px;
+    padding: 20px 20px;
+    color: #4c4660e0;
+    text-transform: uppercase;
+    cursor: pointer;
+}
 
 .times {
     position: absolute;
@@ -343,8 +409,12 @@ canvas {
     position: absolute;
     left: 50%;
     top: 20%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0);
     z-index: 9;
+}
+
+.start_time {
     font-size: 180px;
-    color: red;
+    color: rgb(53, 25, 214);
+    text-shadow: 5px 5px 4px rgba(0, 0, 0, 0.8);
 }
