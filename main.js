@@ -381,8 +381,6 @@ async function loadStorageData() {
 
   let aaa = JSON.stringify(playerData);
 
-  console.log(JSON.parse(aaa))
-
 
   levelsTimesBlock.forEach((value, index, array) => {
     if (playerData.levelsTimes['time' + (index + 1)] != undefined) {
@@ -419,7 +417,7 @@ async function loadMenu() {
   const gltfLoader = new GLTFLoader();
   const url = 'models/map-menu.glb';
   await gltfLoader.loadAsync(url, onprogress = (e) => {
-    loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+    loadPercent.textContent = Math.round((e.loaded / e.total * 100)) + '%';
   }).then((gltf) => {
     const root = gltf.scene;
     loadPercent.textContent = '0';
@@ -732,6 +730,7 @@ async function resetAllMap() {
 }
 
 function animate() {
+  //console.log(renderer.info.render);
 
   frames++;
   const time = performance.now();
