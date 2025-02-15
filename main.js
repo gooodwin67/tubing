@@ -209,13 +209,17 @@ let pause = false;
 
 let player;
 let playerBody;
+let playerShape;
 let playerCollider;
+let groundCollider;
 
 let naStartTimer = false;
 
 let tubesMas = [];
 let tube;
 let tubenum = 0;
+
+let playerTtube;
 
 let chooseTubeNow = false;
 
@@ -304,6 +308,7 @@ let bestTime = 0;
 let currentTime = 0;
 
 let playerData;
+
 
 const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
@@ -449,6 +454,7 @@ async function loadMenu() {
         player.userData.playerBraking = false;
         player.userData.hTransition = 0;
         player.userData.currentSpeed = 0;
+        player.userData.boom = false;
 
         player.userData.onStartArea = true;
 
@@ -475,7 +481,7 @@ async function loadMenu() {
 
       }
       else if (el.name.includes('player-tube')) {
-        var playerTtube = el.clone();
+        playerTtube = el.clone();
         playerTtube.userData.startPosition = new THREE.Vector3(playerTtube.position.x, playerTtube.position.y, playerTtube.position.z);
         tubesMas[el.name.slice(-1) - 1] = playerTtube;
         scene.add(playerTtube);
@@ -740,6 +746,7 @@ async function resetAllMap() {
   menuLoaded = false;
   currentTime = 0;
   player.userData.time = 0;
+  player.userData.boom = false;
 
   pauseButton.classList.add('hidden_block');
 
@@ -794,16 +801,27 @@ function animate() {
     // }
 
     if (isMobile) {
-      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
-      //camera.position.x = player.position.x;
-      camera.position.y = player.position.y + 5;
-      camera.position.z = player.position.z - 3;
+      if (!player.userData.boom) {
+        camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
+        //camera.position.x = player.position.x;
+        camera.position.y = player.position.y + 5;
+        camera.position.z = player.position.z - 3;
+      }
+      else {
+        camera.lookAt(itsMenBody.position);
+      }
     }
     else {
-      camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
-      //camera.position.x = player.position.x;
-      camera.position.y = player.position.y + 4;
-      camera.position.z = player.position.z - 4;
+      if (!player.userData.boom) {
+        camera.lookAt(new THREE.Vector3(camera.position.x, player.position.y, player.position.z + 5));
+        //camera.position.x = player.position.x;
+        camera.position.y = player.position.y + 4;
+        camera.position.z = player.position.z - 4;
+      }
+      else {
+        if (playerTtube.position.y > 0)
+          camera.lookAt(itsMenBody.position);
+      }
     }
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
   }
@@ -856,7 +874,8 @@ function animate() {
       player.userData.hTransition = +0.4;
     }
 
-    world.step();
+    let eventQueue = new RAPIER.EventQueue(true);
+    world.step(eventQueue);
 
 
     tubesMas[tubenum].position.copy(playerBody.translation());
@@ -866,6 +885,31 @@ function animate() {
       dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
       dynamicBodies[i][0].quaternion.copy(dynamicBodies[i][1].rotation())
     }
+
+
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      allWallBodyCollision.forEach((value, index) => {
+        if (playerBody.handle == handle1 && value.handle == handle2) {
+          console.log(playerBody.linvel().z)
+          if (playerBody.linvel().z < 15) {
+            if (player.userData.boom == false) {
+              world.removeImpulseJoint(jointMenTube);
+              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 10 }, true);
+              itsMenBody.userData.body.setEnabledRotations(true);
+              playerShape.setFriction(20)
+              player.userData.boom = true;
+            }
+            //camera.position.set(playerTtube.position); /////
+          }
+        }
+      })
+    });
+
+
+
+
+
+
 
 
   }
@@ -1082,9 +1126,6 @@ function onKeyDown(event) {
     case 'ArrowDown':
       //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
-      world.removeImpulseJoint(jointMenTube);
-      itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 10 }, true);
-      itsMenBody.userData.body.setEnabledRotations(true);
 
       break;
     case 'KeyA':
@@ -1141,9 +1182,10 @@ function addPhysicsToObject(obj) {
     shape = RAPIER.ColliderDesc.cuboid(size.x / 5, size.y / 1.5, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
-    playerCollider = shape;
-    // shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
+    playerShape = shape;
+    shape.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
     playerCollider = world.createCollider(shape, body)
+    player.userData.handle = playerBody.handle;
     dynamicBodies.push([obj, body, obj.id])
     // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
     // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 });
@@ -1156,8 +1198,9 @@ function addPhysicsToObject(obj) {
   else if (obj.name.includes('ground')) {
     body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true))
     shape = RAPIER.ColliderDesc.cuboid(size.x / 2, size.y / 2, size.z / 2).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
-    world.createCollider(shape, body)
+    groundCollider = world.createCollider(shape, body)
     groundBody = body;
+    groundBlock.userData.handle = groundBody.handle;
     dynamicBodies.push([obj, body, obj.id])
   }
   if (obj.name.includes('wall')) {
