@@ -1305,6 +1305,7 @@ function addPhysicsToObject(obj) {
     // cube.position.set(obj.position.x, obj.position.y, obj.position.z)
     // cube.rotation.copy(originalRotation);
     //scene.add(cube);
+    //
   }
 
   
