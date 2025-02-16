@@ -912,7 +912,7 @@ function animate() {
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
       allWallBodyCollision.forEach((value, index) => {
         if (playerBody.handle == handle1 && value.handle == handle2) {
-          console.log(playerBody.linvel().z)
+          
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
               world.removeImpulseJoint(jointMenTube);
