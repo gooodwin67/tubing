@@ -425,9 +425,9 @@ async function loadMenu() {
   world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
 
 
-  let controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.target.set(0, 0, 0);
+  // let controls = new OrbitControls(camera, renderer.domElement);
+  // controls.enableDamping = true;
+  // controls.target.set(0, 0, 0);
 
 
   const gltfLoader = new GLTFLoader();
