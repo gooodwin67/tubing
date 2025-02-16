@@ -38,7 +38,6 @@ let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
 let movingBlocks = [];
 let movingBlocksBody = [];
-let movingBlocksCollider;
 
 
 
@@ -926,12 +925,6 @@ function animate() {
         }
       })
     });
-
-
-
-
-
-
 
 
   }
