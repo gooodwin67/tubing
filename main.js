@@ -36,6 +36,10 @@ let levelsTimesBlock = document.querySelectorAll('.load_level_wrap .level_time')
 
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
+let movingBlocks = [];
+let movingBlocksBody = [];
+let movingBlocksCollider;
+
 
 
 let currentTimeBlock = document.querySelector('.current_time');
@@ -356,23 +360,24 @@ const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 //scene.add(ambientLight);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, document.body.offsetWidth / document.body.offsetHeight, 0.1, 1000);
 camera.position.set(0, 4, -10);
 
 let stats = new Stats();
 document.body.appendChild(stats.dom);
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
 document.body.appendChild(renderer.domElement);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
 }
 
 
@@ -647,6 +652,22 @@ async function loadLevel() {
         allWallCollision.push(wallBlock);
         scene.add(wallBlock);
       }
+      else if (el.name.includes('moving_block')) {
+        const box = new THREE.Box3().setFromObject(el);
+        const size = box.getSize(new THREE.Vector3());
+        let movingBlock = el.clone();
+        movingBlock.userData.size = size;
+        movingBlock.userData.mass = 1;
+        movingBlock.userData.raycaster = new THREE.Raycaster();
+        movingBlock.userData.speed = -el.name.substr(el.name.indexOf("speed") + 6);
+        movingBlock.userData.direction = new THREE.Vector3(movingBlock.userData.speed, 0, 0);
+        movingBlocks.push(movingBlock);
+        
+        addPhysicsToObject(movingBlock);
+        //allObjCollision.push(movingBlock);
+        allWallCollision.push(movingBlock);
+        scene.add(movingBlock);
+      }
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
         areaBlock.castShadow = true;
@@ -830,6 +851,7 @@ function animate() {
       currentTime = timer.getElapsedTime().toFixed(3);
       currentTimeBlock.textContent = currentTime;
       playerMove();
+      blocksMove();
       stars.forEach((value, index, array) => {
         value.rotation.z += 0.05;
       })
@@ -941,6 +963,56 @@ window.addEventListener('keyup', onKeyUp);
 
 document.addEventListener('mousedown', onDocumentMouseDown, false);
 
+function blocksMove() {
+
+  movingBlocks.forEach((value, index)=>{
+
+    let movingBlock = value;
+    let movingBlockBody = movingBlocksBody[index];
+
+    movingBlockBody.setLinvel(movingBlock.userData.direction, true);
+    movingBlockBody.setAngvel({
+      x: movingBlock.userData.direction.z, 
+      y: movingBlock.userData.direction.y, 
+      z: -movingBlock.userData.direction.x, 
+    }, true);
+    const direction = movingBlock.userData.direction;
+    movingBlock.userData.raycaster.set(new THREE.Vector3(movingBlock.position.x, 0.4, movingBlock.position.z), direction.clone().normalize());
+    
+    const intersects = movingBlock.userData.raycaster.intersectObjects(allObjCollision);
+
+    
+    if (intersects.length>0) {
+      if (intersects[0].distance < movingBlock.userData.size.x/2) {
+        movingBlock.userData.direction.x = movingBlock.userData.direction.x * -1;
+      }
+      // let endPoint;
+
+      // const material = new THREE.LineBasicMaterial({
+      //   color: 0x0000ff
+      // });
+
+      // if (intersects.length>0) {
+      //   endPoint = intersects[0].point
+      // }
+      // else {
+      //   endPoint = movingBlock.position.clone().add(direction.clone().multiplyScalar(100))
+      // }
+      
+      // const points = [new THREE.Vector3(movingBlock.position.x, 0.4, movingBlock.position.z), endPoint];
+      
+      
+      // const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      
+      // const line = new THREE.Line( geometry, material );
+      // scene.add( line );
+    }
+
+  })
+
+
+  
+}
 
 function playerMove() {
 
@@ -1124,7 +1196,7 @@ function onKeyDown(event) {
       break;
     case 'KeyS':
     case 'ArrowDown':
-      //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
+      playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
       player.userData.playerBraking = true;
 
       break;
@@ -1218,6 +1290,24 @@ function addPhysicsToObject(obj) {
     // cube.rotation.copy(originalRotation);
     //scene.add(cube);
   }
+  if (obj.name.includes('moving_block')) {
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, true, true, true).setLinearDamping(0))
+    shape = RAPIER.ColliderDesc.ball(size.x / 2).setMass(obj.userData.mass * 10).setRestitution(0).setFriction(20);
+    let movingBlockBody = body;
+    movingBlocksBody.push(movingBlockBody)
+    let movingBlockCollider = world.createCollider(shape, body)
+    allWallBodyCollision.push(movingBlockCollider);
+    dynamicBodies.push([obj, body, obj.id])
+
+    // const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.4 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // cube.position.set(obj.position.x, obj.position.y, obj.position.z)
+    // cube.rotation.copy(originalRotation);
+    //scene.add(cube);
+  }
+
+  
 
 
   if (obj.name.includes('itsmen_body')) {
