@@ -945,6 +945,7 @@ function animate() {
               itsMenBody.userData.body.setEnabledRotations(true);
               playerShape.setFriction(20);
               setTimeout(() => {
+                dataLoaded = false;
                 hiddenBlock(BoomScreen);
               }, 2000);
               player.userData.boom = true;
@@ -961,6 +962,7 @@ function animate() {
               playerShape.setFriction(20);
               player.userData.boom = true;
               setTimeout(() => {
+                dataLoaded = false;
                 hiddenBlock(BoomScreen);
               }, 2000);
             }

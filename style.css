@@ -3,12 +3,13 @@
     font-family: 'ObelixPro';
     font-style: normal;
     font-weight: 400;
-    src: url('/fonts/ObelixPro.ttf') format('truetype'),
+    src: url('/fonts/Moderustic-Regular.ttf') format('truetype'),
         /* Safari, Android, iOS */
 }
 
 * {
     font-family: "ObelixPro", Verdana;
+    font-weight: 100;
 }
 
 html {
