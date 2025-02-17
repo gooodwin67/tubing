@@ -27,6 +27,8 @@ let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
 let finishScreenTime = document.querySelector('.finish_you_time span');
 
+let BoomScreen = document.querySelector('.boom_window');
+
 let allOverlies = document.querySelectorAll('body>.overlay');
 
 
@@ -44,8 +46,11 @@ let movingBlocksBody = [];
 let currentTimeBlock = document.querySelector('.current_time');
 let bestTimeBlock = document.querySelector('.best_time');
 
-let finishAgainButton = document.querySelector('.finish_again');
-let finishInMenuButton = document.querySelector('.finish_in_menu');
+let finishAgainButton = document.querySelector('.finish_window .finish_again');
+let finishInMenuButton = document.querySelector('.finish_window .finish_in_menu');
+
+let boomAgainButton = document.querySelector('.boom_window .finish_again');
+let boomInMenuButton = document.querySelector('.boom_window .finish_in_menu');
 
 let speedBlock = document.querySelector('.speed_block>.speed');
 
@@ -137,6 +142,14 @@ finishAgainButton.addEventListener('click', async () => {
   startRace();
 });
 
+boomAgainButton.addEventListener('click', async () => {
+  hiddenBlock(mainLoadScreen);
+  await resetAllMap();
+  await initAllData(true, true);
+  hiddenBlock(0);
+  startRace();
+});
+
 resetButton.addEventListener('click', async () => {
 
   await resetAllMap();
@@ -146,6 +159,11 @@ resetButton.addEventListener('click', async () => {
 });
 
 finishInMenuButton.addEventListener('click', async () => {
+  hiddenBlock(mainLoadScreen);
+  await resetAllMap();
+  await init();
+});
+boomInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
   await resetAllMap();
   await init();
@@ -661,9 +679,10 @@ async function loadLevel() {
         movingBlock.userData.speed = -el.name.substr(el.name.indexOf("speed") + 6);
         movingBlock.userData.direction = new THREE.Vector3(movingBlock.userData.speed, 0, 0);
         movingBlocks.push(movingBlock);
-        
+
         addPhysicsToObject(movingBlock);
         //allObjCollision.push(movingBlock);
+
         allWallCollision.push(movingBlock);
         scene.add(movingBlock);
       }
@@ -909,24 +928,41 @@ function animate() {
 
 
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+
       allWallBodyCollision.forEach((value, index) => {
         if (playerBody.handle == handle1 && value.handle == handle2) {
-          
+
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
               world.removeImpulseJoint(jointMenTube);
-              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 10 }, true);
+              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
-              playerShape.setFriction(20)
+              playerShape.setFriction(20);
+              setTimeout(() => {
+                hiddenBlock(BoomScreen);
+              }, 2000);
               player.userData.boom = true;
+            }
+            //camera.position.set(playerTtube.position); /////
+          }
+        }
+        else if (playerBody.handle == handle1) {
+          if (playerBody.linvel().z < 15 && player.position.y < 5) {
+            if (player.userData.boom == false) {
+              world.removeImpulseJoint(jointMenTube);
+              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 5 }, true);
+              itsMenBody.userData.body.setEnabledRotations(true);
+              playerShape.setFriction(20);
+              player.userData.boom = true;
+              setTimeout(() => {
+                hiddenBlock(BoomScreen);
+              }, 2000);
             }
             //camera.position.set(playerTtube.position); /////
           }
         }
       })
     });
-
-
   }
 
 
@@ -958,25 +994,25 @@ document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 function blocksMove() {
 
-  movingBlocks.forEach((value, index)=>{
+  movingBlocks.forEach((value, index) => {
 
     let movingBlock = value;
     let movingBlockBody = movingBlocksBody[index];
 
     movingBlockBody.setLinvel(movingBlock.userData.direction, true);
     movingBlockBody.setAngvel({
-      x: movingBlock.userData.direction.z, 
-      y: movingBlock.userData.direction.y, 
-      z: -movingBlock.userData.direction.x, 
+      x: movingBlock.userData.direction.z,
+      y: movingBlock.userData.direction.y,
+      z: -movingBlock.userData.direction.x,
     }, true);
     const direction = movingBlock.userData.direction;
     movingBlock.userData.raycaster.set(new THREE.Vector3(movingBlock.position.x, 0.4, movingBlock.position.z), direction.clone().normalize());
-    
+
     const intersects = movingBlock.userData.raycaster.intersectObjects(allObjCollision);
 
-    
-    if (intersects.length>0) {
-      if (intersects[0].distance < movingBlock.userData.size.x/2) {
+
+    if (intersects.length > 0) {
+      if (intersects[0].distance < movingBlock.userData.size.x / 2) {
         movingBlock.userData.direction.x = movingBlock.userData.direction.x * -1;
       }
       // let endPoint;
@@ -991,12 +1027,12 @@ function blocksMove() {
       // else {
       //   endPoint = movingBlock.position.clone().add(direction.clone().multiplyScalar(100))
       // }
-      
+
       // const points = [new THREE.Vector3(movingBlock.position.x, 0.4, movingBlock.position.z), endPoint];
-      
-      
+
+
       // const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      
+
       // const line = new THREE.Line( geometry, material );
       // scene.add( line );
     }
@@ -1004,7 +1040,7 @@ function blocksMove() {
   })
 
 
-  
+
 }
 
 function playerMove() {
@@ -1301,7 +1337,7 @@ function addPhysicsToObject(obj) {
     //
   }
 
-  
+
 
 
   if (obj.name.includes('itsmen_body')) {

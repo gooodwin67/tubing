@@ -10,10 +10,13 @@
 * {
     font-family: "ObelixPro", Verdana;
 }
+
 html {
     width: 100%;
     height: 100%;
+    background: url('/images/back.jpg');
 }
+
 body {
     margin: 0;
     background: #1C1D21;
@@ -65,8 +68,8 @@ body {
     color: #ffffff;
     overflow: auto;
     box-shadow: 0 0 200px rgba(0, 0, 0, 0.8) inset;
-    
-    
+
+
 }
 
 .hidden_block {
@@ -246,6 +249,19 @@ canvas {
 }
 
 .finish_window>div {
+    padding: 30px 40px;
+    border: 2px solid #ccc;
+    border-radius: 18px;
+    position: relative;
+    background-color: #4c4660e0;
+    box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
+}
+
+.boom_window {
+    align-items: center;
+}
+
+.boom_window>div {
     padding: 30px 40px;
     border: 2px solid #ccc;
     border-radius: 18px;
