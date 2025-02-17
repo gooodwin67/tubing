@@ -257,7 +257,7 @@ const tubesChars = [
   {
     hSpeed: 10,
     maxHSpeed: 0.08,
-    stepSpeed: 1,
+    stepSpeed: 1.5,
     maxSpeed: 26,
     resetHAngle: false
   },
@@ -787,6 +787,12 @@ async function resetAllMap() {
   player.userData.time = 0;
   player.userData.boom = false;
 
+  allObjCollision = []
+  allWallCollision = []
+  stars = [];
+  dynamicBodies = [];
+  groundsMas = [];
+
   pauseButton.classList.add('hidden_block');
 
   timer.start();
@@ -930,7 +936,7 @@ function animate() {
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
 
       allWallBodyCollision.forEach((value, index) => {
-        if (playerBody.handle == handle1 && value.handle == handle2) {
+        if (playerBody.handle == handle1 && value.handle == handle2 && !playerIsFinish) {
 
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
@@ -946,7 +952,7 @@ function animate() {
             //camera.position.set(playerTtube.position); /////
           }
         }
-        else if (playerBody.handle == handle1) {
+        else if (playerBody.handle == handle1 && !playerIsFinish) {
           if (playerBody.linvel().z < 15 && player.position.y < 5) {
             if (player.userData.boom == false) {
               world.removeImpulseJoint(jointMenTube);
@@ -964,7 +970,6 @@ function animate() {
       })
     });
   }
-
 
 
   stats.update();
