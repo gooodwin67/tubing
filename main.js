@@ -377,7 +377,7 @@ const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 //scene.add(ambientLight);
 
-const camera = new THREE.PerspectiveCamera(75, document.body.offsetWidth / document.body.offsetHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(85, document.body.offsetWidth / document.body.offsetHeight, 0.1, 600);
 camera.position.set(0, 4, -10);
 
 let stats = new Stats();
@@ -1081,6 +1081,7 @@ function playerMove() {
   targetCube.lookAt(player.position.x, player.position.y, player.position.z)
 
   playerBody.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
+  itsMenBody.userData.body.setRotation({ w: targetCube.quaternion.w, x: itsMenBody.userData.body.rotation().x, y: itsMenBody.userData.body.rotation().z, z: targetCube.quaternion.y });
 
   playerBody.setLinvel({
     x: direction.x * -tubesChars[tubenum].hSpeed,
