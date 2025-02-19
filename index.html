@@ -41,6 +41,10 @@
          <button class="close_pause_button btn">Продолжить игру</button>
          <button class="reset_button btn">Начать заново</button>
          <button class="inmenu_button btn">Выйти</button>
+         <div class="shadow-map">
+            <input type="checkbox" name="shadow" class='shadow_check' checked>
+            <span>Тени</span>
+         </div>
       </div>
    </div>
 
@@ -159,26 +163,28 @@
       <span class='start_time'>3</span>
    </div>
 
-   <div class="times">
+   <div class="times hidden_block">
       <div class="current_time_block">
-         <div class='current_time'>0</div>
+         <div class='time_label'>Время</div>
+         <div class='current_time time_data'>0</div>
       </div>
       <div class="best_time_block">
-         <div class='best_time'>0</div>
+         <div class='time_label'>Лучшее время</div>
+         <div class='best_time time_data'>0</div>
       </div>
    </div>
 
-   <div class="speed_block">
+   <div class="speed_block hidden_block">
       <div class='speed'>0</div>
+      <div class='speed_title'>КМ/Ч</div>
    </div>
 
-   <div class="shadow-map">
-      <input type="checkbox" name="shadow" class='shadow_check' checked>
-      <span>Тени</span>
-   </div>
-   <div class="pause_button_wrap">
-      <button class="pause_button btn hidden_block">Пауза</button>
-   </div>
+
+   <div class="pause_button_wrap hidden_block">
+      <div class="pause_button ">
+         <img src="/images/menu.png" alt="">
+         </button>
+      </div>
 
 </body>
 

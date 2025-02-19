@@ -42,7 +42,7 @@ let movingBlocks = [];
 let movingBlocksBody = [];
 
 
-
+let timesBlock = document.querySelector('.times');
 let currentTimeBlock = document.querySelector('.current_time');
 let bestTimeBlock = document.querySelector('.best_time');
 
@@ -52,19 +52,21 @@ let finishInMenuButton = document.querySelector('.finish_window .finish_in_menu'
 let boomAgainButton = document.querySelector('.boom_window .finish_again');
 let boomInMenuButton = document.querySelector('.boom_window .finish_in_menu');
 
+let speedBlockWrap = document.querySelector('.speed_block');
 let speedBlock = document.querySelector('.speed_block>.speed');
 
 let shadowCheck = document.querySelector('.shadow_check');
 
 let loadPercent = document.querySelector('.load_percent');
 
-let pauseButton = document.querySelector('.pause_button');
+let pauseButton = document.querySelector('.pause_button_wrap');
 let closePauseButton = document.querySelector('.close_pause_button');
 let resetButton = document.querySelector('.reset_button');
 let inmenuButton = document.querySelector('.inmenu_button');
 
 
 let menuInGameWrap = document.querySelector('.menu_in_game_wrap');
+
 
 let startTimeBlock = document.querySelector('.start_time');
 let startTimeWrap = document.querySelector('.start_time_wrap');
@@ -89,6 +91,8 @@ tubesBlock.forEach((child, index) => {
 });
 
 function startRace() {
+  timesBlock.classList.remove('hidden_block');
+  speedBlockWrap.classList.remove('hidden_block');
   tubesMas[tubenum].position.copy(playerBody.translation());
   let iter = 3; //0
   naStartTimer = true;
@@ -218,7 +222,7 @@ shadowCheck.onchange = function () {
 
 let world;
 
-let plane;
+let firststart = true;
 
 let frames = 0, prevTime = performance.now();
 
@@ -381,7 +385,7 @@ const camera = new THREE.PerspectiveCamera(85, document.body.offsetWidth / docum
 camera.position.set(0, 4, -10);
 
 let stats = new Stats();
-document.body.appendChild(stats.dom);
+//document.body.appendChild(stats.dom);
 
 const renderer = new THREE.WebGLRenderer();
 
@@ -752,9 +756,17 @@ async function loadLevel() {
 // }
 async function init() {
   await initAllData(true, false)
-  hiddenBlock(mainMenuScreen);
+  if (firststart) {
+    hiddenBlock(mainMenuScreen);
+    firststart = false;
+  }
+  else {
+    hiddenBlock(selectLevelScreen);
+  }
+
 }
 init();
+
 
 async function initAllData(needMenu, needLevel) {
   if (needMenu) {
@@ -794,6 +806,8 @@ async function resetAllMap() {
   groundsMas = [];
 
   pauseButton.classList.add('hidden_block');
+  timesBlock.classList.add('hidden_block');
+  speedBlockWrap.classList.add('hidden_block');
 
   timer.start();
   timer.elapsedTime = player.userData.time;
