@@ -5,10 +5,10 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
    <title>My first three.js app</title>
-  <script type="module" crossorigin src="./assets/index-C94NqEld.js"></script>
+  <script type="module" crossorigin src="./assets/index-CuuLMYO8.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three-C4_QSHiD.js">
   <link rel="modulepreload" crossorigin href="./assets/@dimforge-D3Mqfikn.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-DX43dFD0.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-oVeIXIJa.css">
 </head>
 
 <body>
@@ -43,6 +43,10 @@
          <button class="close_pause_button btn">Продолжить игру</button>
          <button class="reset_button btn">Начать заново</button>
          <button class="inmenu_button btn">Выйти</button>
+         <div class="shadow-map">
+            <input type="checkbox" name="shadow" class='shadow_check' checked>
+            <span>Тени</span>
+         </div>
       </div>
    </div>
 
@@ -161,26 +165,28 @@
       <span class='start_time'>3</span>
    </div>
 
-   <div class="times">
+   <div class="times hidden_block">
       <div class="current_time_block">
-         <div class='current_time'>0</div>
+         <div class='time_label'>Время</div>
+         <div class='current_time time_data'>0</div>
       </div>
       <div class="best_time_block">
-         <div class='best_time'>0</div>
+         <div class='time_label'>Лучшее время</div>
+         <div class='best_time time_data'>0</div>
       </div>
    </div>
 
-   <div class="speed_block">
+   <div class="speed_block hidden_block">
       <div class='speed'>0</div>
+      <div class='speed_title'>КМ/Ч</div>
    </div>
 
-   <div class="shadow-map">
-      <input type="checkbox" name="shadow" class='shadow_check' checked>
-      <span>Тени</span>
-   </div>
-   <div class="pause_button_wrap">
-      <button class="pause_button btn hidden_block">Пауза</button>
-   </div>
+
+   <div class="pause_button_wrap hidden_block">
+      <div class="pause_button ">
+         <img src="./images/menu.png" alt="">
+         </button>
+      </div>
 
 </body>
 
