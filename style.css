@@ -211,14 +211,13 @@ canvas {
 
 .load_tubes_wrap {
     display: flex;
-    margin-top: 30px;
     flex-wrap: wrap;
     max-width: 1300px;
     justify-content: center;
 }
 
 .load_tubes_wrap>div {
-    max-width: 25%;
+    max-width: 28%;
     margin: 10px;
     border: 2px solid #ccc;
     border-radius: 18px;
@@ -227,27 +226,28 @@ canvas {
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
 .load_tubes_wrap>div>img {
     width: 100%;
-    height: 100%;
-    border-radius: 18px;
+    height: 150px;
+
 }
 
-.load_tubes_wrap>div>.level_shadow {
+.disabledTube .level_shadow {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    box-shadow: 0 -80px 200px rgba(0, 0, 0, 0.8) inset;
+    box-shadow: 0 -0px 200px rgba(0, 0, 0, 0.8) inset;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 555;
 }
 
 .load_tubes_wrap>div>.level_text {
-    position: absolute;
-    bottom: 15px;
-    left: 0;
     width: 100%;
     height: 100%;
     display: flex;
@@ -257,13 +257,28 @@ canvas {
 }
 
 .load_tubes_wrap>div>.level_text h2 {
-    margin-bottom: 5px;
+    margin-bottom: 1px;
+    margin-top: 0
 }
 
 .load_tubes_wrap>div>.level_text span {
     color: rgb(82, 228, 82);
-    font-size: 30px;
+    font-size: 17px;
 }
+
+.tubes_chars {
+    width: 100%;
+    padding: 10px 10px;
+}
+
+.tubes_char {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 15px;
+    box-sizing: border-box;
+}
+
 
 .finish_window {
     align-items: center;

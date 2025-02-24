@@ -71,9 +71,25 @@ let menuInGameWrap = document.querySelector('.menu_in_game_wrap');
 let startTimeBlock = document.querySelector('.start_time');
 let startTimeWrap = document.querySelector('.start_time_wrap');
 
+
+let clearRec = document.querySelector('.clear_rec');
+clearRec.addEventListener('click', () => {
+  localStorage.clear();
+})
+
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
     currentLevel = index + 1;
+    tubesBlock.forEach((child, index) => {
+      if (tubesChars[index].levels.includes(currentLevel)) {
+        child.classList.remove('disabledTube');
+        tubesChars[index].canInLevel = true;
+      }
+      else {
+        child.classList.add('disabledTube')
+        tubesChars[index].canInLevel = false;
+      }
+    })
     hiddenBlock(mainLoadScreen);
     await initAllData(false, true)
     hiddenBlock(selectTubeScreen);
@@ -84,9 +100,11 @@ levelsBlock.forEach((child, index) => {
 
 tubesBlock.forEach((child, index) => {
   child.addEventListener('click', () => {
-    tubenum = index;
-    hiddenBlock(0);
-    startRace();
+    if (tubesChars[index].canInLevel) {
+      tubenum = index;
+      hiddenBlock(0);
+      startRace();
+    }
   });
 });
 
@@ -243,6 +261,7 @@ let naStartTimer = false;
 let tubesMas = [];
 let tube;
 let tubenum = 0;
+let tubingEnabledNum;
 
 let playerTtube;
 
@@ -263,21 +282,27 @@ const tubesChars = [
     maxHSpeed: 0.08,
     stepSpeed: 1.5,
     maxSpeed: 26,
-    resetHAngle: false
+    resetHAngle: false,
+    levels: [1, 2, 3, 4, 5, 6],
+    canInLevel: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
     stepSpeed: 10,
     maxSpeed: 180,
-    resetHAngle: false
+    resetHAngle: false,
+    levels: [4, 5, 6],
+    canInLevel: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
     stepSpeed: 3,
     maxSpeed: 30,
-    resetHAngle: true
+    resetHAngle: true,
+    levels: [5, 6],
+    canInLevel: false
   }
 ]
 
@@ -649,7 +674,7 @@ async function loadMenu() {
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
-  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0, z: 0.0 }, { x: 0.0, y: 0.4, z: 0.0 });
+  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.5, z: 0.0 });
   jointMenTube = world.createImpulseJoint(params0, itsMenBody.userData.body, playerBody, true);
 
 
