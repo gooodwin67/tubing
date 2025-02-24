@@ -313,6 +313,12 @@ let itsMenRightHand;
 let itsMenLeftLeg;
 let itsMenRightLeg;
 
+let menBody;
+let menLeftHand;
+let menRightHand;
+let menLeftLeg;
+let menRightLeg;
+
 let jointMenTube;
 
 let allObjCollision = [];
@@ -562,28 +568,58 @@ async function loadMenu() {
       }
       else if (el.name.includes('itsmen_body')) {
         itsMenBody = el.clone();
+        itsMenBody.material.transparent = true;
+        itsMenBody.material.opacity = 0.0;
         scene.add(itsMenBody);
         addPhysicsToObject(itsMenBody);
       }
       else if (el.name.includes('itsmen_left_hand')) {
         itsMenLeftHand = el.clone();
+        itsMenLeftHand.material.transparent = true;
+        itsMenLeftHand.material.opacity = 0.0;
         scene.add(itsMenLeftHand);
         addPhysicsToObject(itsMenLeftHand);
       }
       else if (el.name.includes('itsmen_right_hand')) {
         itsMenRightHand = el.clone();
+        itsMenRightHand.material.transparent = true;
+        itsMenRightHand.material.opacity = 0.0;
         scene.add(itsMenRightHand);
         addPhysicsToObject(itsMenRightHand);
       }
       else if (el.name.includes('itsmen_left_leg')) {
         itsMenLeftLeg = el.clone();
+        itsMenLeftLeg.material.transparent = true;
+        itsMenLeftLeg.material.opacity = 0.0;
         scene.add(itsMenLeftLeg);
         addPhysicsToObject(itsMenLeftLeg);
       }
       else if (el.name.includes('itsmen_right_leg')) {
         itsMenRightLeg = el.clone();
+        itsMenRightLeg.material.transparent = true;
+        itsMenRightLeg.material.opacity = 0.0;
         scene.add(itsMenRightLeg);
         addPhysicsToObject(itsMenRightLeg);
+      }
+      else if (el.name.includes('qmen_body')) {
+        menBody = el.clone();
+        scene.add(menBody);
+      }
+      else if (el.name.includes('qmen_left_hand')) {
+        menLeftHand = el.clone();
+        scene.add(menLeftHand);
+      }
+      else if (el.name.includes('qmen_right_hand')) {
+        menRightHand = el.clone();
+        scene.add(menRightHand);
+      }
+      else if (el.name.includes('qmen_left_leg')) {
+        menLeftLeg = el.clone();
+        scene.add(menLeftLeg);
+      }
+      else if (el.name.includes('qmen_right_leg')) {
+        menRightLeg = el.clone();
+        scene.add(menRightLeg);
       }
 
     })
@@ -600,16 +636,16 @@ async function loadMenu() {
   await loadStorageData();
 
 
-  let params = RAPIER.JointData.spherical({ x: 0.3, y: -0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
+  let params = RAPIER.JointData.spherical({ x: 0.2, y: 0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
-  let params2 = RAPIER.JointData.spherical({ x: -0.3, y: -0.4, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
+  let params2 = RAPIER.JointData.spherical({ x: -0.2, y: 0.0, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
 
-  let params3 = RAPIER.JointData.spherical({ x: 0.2, y: 0.5, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
+  let params3 = RAPIER.JointData.spherical({ x: 0.22, y: 0.0, z: 0.5 }, { x: 0.0, y: 0.0, z: -0.5 });
   let joint3 = world.createImpulseJoint(params3, itsMenBody.userData.body, itsMenLeftLeg.userData.body, true);
 
-  let params4 = RAPIER.JointData.spherical({ x: -0.2, y: 0.5, z: 0.0 }, { x: 0.0, y: -0.4, z: 0.0 });
+  let params4 = RAPIER.JointData.spherical({ x: -0.22, y: 0.0, z: 0.5 }, { x: 0.0, y: 0.0, z: -0.5 });
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
@@ -955,7 +991,7 @@ function animate() {
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
               world.removeImpulseJoint(jointMenTube);
-              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 5 }, true);
+              itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
               playerShape.setFriction(20);
               setTimeout(() => {
@@ -971,7 +1007,7 @@ function animate() {
           if (playerBody.linvel().z < 15 && player.position.y < 5) {
             if (player.userData.boom == false) {
               world.removeImpulseJoint(jointMenTube);
-              itsMenBody.userData.body.applyImpulse({ x: 0.0, y: 4, z: 5 }, true);
+              itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
               playerShape.setFriction(20);
               player.userData.boom = true;
@@ -1066,6 +1102,28 @@ function blocksMove() {
 
 function playerMove() {
 
+
+
+  menBody.position.copy(itsMenBody.position);
+  menBody.rotation.copy(itsMenBody.rotation);
+
+  menLeftHand.position.copy(itsMenLeftHand.position);
+  menLeftHand.rotation.copy(itsMenLeftHand.rotation);
+
+  menRightHand.position.copy(itsMenRightHand.position);
+  menRightHand.rotation.copy(itsMenRightHand.rotation);
+
+  menLeftLeg.position.copy(itsMenLeftLeg.position);
+  menLeftLeg.rotation.copy(itsMenLeftLeg.rotation);
+
+  menRightLeg.position.copy(itsMenRightLeg.position);
+  menRightLeg.rotation.copy(itsMenRightLeg.rotation);
+
+
+
+
+
+
   if (player.position.z > finishBlock.position.z) {
 
     currentTime = timer.getElapsedTime().toFixed(3);
@@ -1092,10 +1150,25 @@ function playerMove() {
 
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
-  targetCube.lookAt(player.position.x, player.position.y, player.position.z)
+  targetCube.lookAt(targetCube.position.x - (player.position.x - targetCube.position.x), targetCube.position.y - (player.position.y - targetCube.position.y), targetCube.position.z - (player.position.z - targetCube.position.z))
 
   playerBody.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
-  itsMenBody.userData.body.setRotation({ w: targetCube.quaternion.w, x: itsMenBody.userData.body.rotation().x, y: itsMenBody.userData.body.rotation().z, z: targetCube.quaternion.y });
+  itsMenBody.userData.body.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
+
+  if (menLeftLeg.rotation.y > 0 || menLeftLeg.rotation.y < 0) {
+    itsMenLeftLeg.userData.body.setRotation({ w: itsMenLeftLeg.userData.body.rotation().w, x: itsMenLeftLeg.userData.body.rotation().x, y: 0, z: itsMenLeftLeg.userData.body.rotation().z });
+  }
+
+  if (menRightLeg.rotation.y > 0 || menRightLeg.rotation.y < 0) {
+    itsMenRightLeg.userData.body.setRotation({ w: itsMenRightLeg.userData.body.rotation().w, x: itsMenRightLeg.userData.body.rotation().x, y: 0, z: itsMenRightLeg.userData.body.rotation().z });
+  }
+
+
+
+  //console.log(menBody.rotation.y)
+
+
+
 
   playerBody.setLinvel({
     x: direction.x * -tubesChars[tubenum].hSpeed,
@@ -1376,7 +1449,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('itsmen_left_hand')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(false, false, false).setLinearDamping(0).setAngularDamping(0));
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(false, true, false).setLinearDamping(0).setAngularDamping(0));
     shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(0).setRestitution(0).setFriction(0).setDensity(2.0);
     itsMenLeftHand.userData.body = body;
     itsMenLeftHand.userData.collider = shape;
@@ -1396,7 +1469,7 @@ function addPhysicsToObject(obj) {
   }
   if (obj.name.includes('itsmen_left_leg')) {
 
-    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(false, false, false).setLinearDamping(0).setAngularDamping(0));
+    body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(false, true, false).setLinearDamping(0).setAngularDamping(0));
     shape = RAPIER.ColliderDesc.capsule(size.z / 2, size.x / 10).setMass(0).setRestitution(0).setFriction(0).setDensity(2.0);
     itsMenLeftLeg.userData.body = body;
     itsMenLeftLeg.userData.collider = shape;
