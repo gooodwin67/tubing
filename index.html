@@ -5,10 +5,10 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
    <title>My first three.js app</title>
-  <script type="module" crossorigin src="./assets/index-CuuLMYO8.js"></script>
+  <script type="module" crossorigin src="./assets/index-C5gfZ44k.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three-C4_QSHiD.js">
   <link rel="modulepreload" crossorigin href="./assets/@dimforge-D3Mqfikn.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-oVeIXIJa.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-C9szWQHH.css">
 </head>
 
 <body>
@@ -33,6 +33,7 @@
       <div>
          <img src="./images/title.png" alt="title">
          <button class="startButton btn">Начать игру</button>
+         <button class="clear_rec btn">Удалить рекорды</button>
 
       </div>
    </div>
@@ -112,31 +113,59 @@
       <div>
          <h2>Выбрать тюбинг</h2>
          <div class='load_tubes_wrap'>
-            <div>
+            <div class='tube disabledTube'>
                <img src="./assets/tube1-wfwDSJc7.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Tube 1</h2>
-                  <div>Текст</div>
+                  <h2>Тюбинг №1</h2>
+                  <div class='tubes_chars'>
+                     <div class="tubes_char char_speed">
+                        <span>Скорость: </span>
+                        <div class='chars'><span>I </span><span>I </span></div>
+                     </div>
+                     <div class="tubes_char char_move">
+                        <span>Управление: </span>
+                        <div class='chars'><span>I </span><span>I </span></div>
+                     </div>
+                  </div>
                </div>
             </div>
-            <div>
+            <div class='tube disabledTube'>
                <img src="./assets/tube1-wfwDSJc7.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Tube 2</h2>
-                  <div>Текст</div>
+                  <h2>Тюбинг №2</h2>
+                  <div class='tubes_chars'>
+                     <div class="tubes_char char_speed">
+                        <span>Скорость: </span>
+                        <div class='chars'><span>I </span><span>I </span><span>I </span></div>
+                     </div>
+                     <div class="tubes_char char_move">
+                        <span>Управление: </span>
+                        <div class='chars'><span>I </span><span>I </span><span>I </span></div>
+                     </div>
+                  </div>
                </div>
             </div>
-            <div>
+            <div class='tube disabledTube'>
                <img src="./assets/tube1-wfwDSJc7.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Tube 3</h2>
-                  <div>Текст</div>
+                  <h2>Тюбинг №3</h2>
+                  <div class='tubes_chars'>
+                     <div class="tubes_char char_speed">
+                        <span>Скорость: </span>
+                        <div class='chars'><span>I </span><span>I </span><span>I </span><span>I </span><span>I </span></div>
+                     </div>
+                     <div class="tubes_char char_move">
+                        <span>Управление: </span>
+                        <div class='chars'><span>I </span><span>I </span><span>I </span><span>I </span></div>
+                     </div>
+                  </div>
                </div>
             </div>
          </div>
+         <p>Проходите уровни, чтобы разблокировать тюбинги</p>
       </div>
    </div>
 
