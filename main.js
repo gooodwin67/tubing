@@ -280,28 +280,31 @@ const tubesChars = [
   {
     hSpeed: 10,
     maxHSpeed: 0.08,
-    stepSpeed: 1.5,
+    stepSpeed: 2,
+    nowSpeed: 0,
     maxSpeed: 26,
     resetHAngle: false,
-    levels: [1, 2, 3, 4, 5, 6],
+    levels: [1, 2, 3, 4, 5, 6, 7],
     canInLevel: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
     stepSpeed: 10,
+    nowSpeed: 0,
     maxSpeed: 180,
     resetHAngle: false,
-    levels: [4, 5, 6],
+    levels: [4, 5, 6, 7],
     canInLevel: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
     stepSpeed: 3,
+    nowSpeed: 0,
     maxSpeed: 30,
     resetHAngle: true,
-    levels: [5, 6],
+    levels: [5, 6, 7],
     canInLevel: false
   }
 ]
@@ -860,6 +863,10 @@ async function resetAllMap() {
   player.userData.time = 0;
   player.userData.boom = false;
 
+  tubesChars.forEach((tube) => {
+    tube.nowSpeed = 0;
+  })
+
   allObjCollision = []
   allWallCollision = []
   stars = [];
@@ -1175,6 +1182,23 @@ function playerMove() {
 
   targetCube.position.x += player.userData.hTransition;
   const direction = new THREE.Vector3().subVectors(playerBody.translation(), targetCube.position).normalize();
+  const currentVelocity = playerBody.linvel();
+  const newVelocity = new THREE.Vector3(
+    direction.x * -tubesChars[tubenum].hSpeed, // Устанавливаем скорость по X
+    currentVelocity.y,    // Сохраняем текущую скорость по Y
+    direction.z * -tubesChars[tubenum].nowSpeed  // Устанавливаем скорость по Z
+  );
+
+
+
+  if (playerBody.translation().y < 68 && playerBody.translation().y > 10) {
+    tubesChars[tubenum].nowSpeed += 0.05;
+    if (playerBody.rotation().x < 0.04) {
+      playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
+    }
+  }
+
+  playerBody.setLinvel(newVelocity, true);
   targetCube.lookAt(targetCube.position.x - (player.position.x - targetCube.position.x), targetCube.position.y - (player.position.y - targetCube.position.y), targetCube.position.z - (player.position.z - targetCube.position.z))
 
   playerBody.setRotation({ w: targetCube.quaternion.w, x: playerBody.rotation().x, y: targetCube.quaternion.y, z: playerBody.rotation().z });
@@ -1190,16 +1214,19 @@ function playerMove() {
 
 
 
+
+
+
   //console.log(menBody.rotation.y)
 
 
 
 
-  playerBody.setLinvel({
-    x: direction.x * -tubesChars[tubenum].hSpeed,
-    y: playerBody.linvel().y,
-    z: playerBody.linvel().z
-  });
+  // playerBody.setLinvel({
+  //   x: direction.x * -tubesChars[tubenum].hSpeed,
+  //   y: playerBody.linvel().y,
+  //   z: playerBody.linvel().z
+  // });
 
   raycaster1.set(player.position, direction1);
   const intersects = raycaster1.intersectObjects(allObjCollision);
@@ -1226,16 +1253,15 @@ function playerMove() {
 
   if (player.userData.left && player.userData.onGround) {
     if (player.userData.hTransition < 5) player.userData.hTransition += tubesChars[tubenum].maxHSpeed;
-
     let velocity = playerBody.linvel();
-    velocity.z *= 0.9996;
-    playerBody.setLinvel(velocity, true);
+    //velocity.z *= 0.9996;
+    //playerBody.setLinvel(velocity, true);
   }
   if (player.userData.right && player.userData.onGround) {
     if (player.userData.hTransition > -5) player.userData.hTransition -= tubesChars[tubenum].maxHSpeed;
     let velocity = playerBody.linvel();
-    velocity.z *= 0.9996;
-    playerBody.setLinvel(velocity, true);
+    //velocity.z *= 0.9996;
+    //playerBody.setLinvel(velocity, true);
   }
 
   if (tubesChars[tubenum].resetHAngle) {
@@ -1336,8 +1362,9 @@ function onKeyDown(event) {
     case 'KeyW':
     case 'ArrowUp':
       if (player.userData.canBoostStep && dataLoaded && player.userData.onStartArea) {
-        if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
-          playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+        if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish && tubesChars[tubenum].nowSpeed < tubesChars[tubenum].maxSpeed) {
+          //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+          tubesChars[tubenum].nowSpeed += tubesChars[tubenum].stepSpeed;
         }
       }
       player.userData.canBoostStep = false;
