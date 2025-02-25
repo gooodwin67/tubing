@@ -667,7 +667,6 @@ async function loadMenu() {
   let params = RAPIER.JointData.spherical({ x: 0.2, y: 0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
-  joint.configureMotorVelocity(1.0, 0.5);
 
   let params2 = RAPIER.JointData.spherical({ x: -0.2, y: 0.0, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
