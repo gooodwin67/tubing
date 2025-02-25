@@ -280,7 +280,7 @@ const tubesChars = [
   {
     hSpeed: 10,
     maxHSpeed: 0.08,
-    stepSpeed: 2,
+    stepSpeed: 1,
     nowSpeed: 0,
     maxSpeed: 26,
     resetHAngle: false,
@@ -288,13 +288,13 @@ const tubesChars = [
     canInLevel: false
   },
   {
-    hSpeed: 14,
-    maxHSpeed: 0.12,
-    stepSpeed: 10,
+    hSpeed: 12,
+    maxHSpeed: 0.10,
+    stepSpeed: 2.5,
     nowSpeed: 0,
-    maxSpeed: 180,
+    maxSpeed: 34,
     resetHAngle: false,
-    levels: [4, 5, 6, 7],
+    levels: [5, 6, 7],
     canInLevel: false
   },
   {
@@ -302,9 +302,9 @@ const tubesChars = [
     maxHSpeed: 0.12,
     stepSpeed: 3,
     nowSpeed: 0,
-    maxSpeed: 30,
+    maxSpeed: 40,
     resetHAngle: true,
-    levels: [5, 6, 7],
+    levels: [6, 7],
     canInLevel: false
   }
 ]
@@ -667,6 +667,8 @@ async function loadMenu() {
   let params = RAPIER.JointData.spherical({ x: 0.2, y: 0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
+  joint.configureMotorVelocity(1.0, 0.5);
+
   let params2 = RAPIER.JointData.spherical({ x: -0.2, y: 0.0, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
 
@@ -677,7 +679,7 @@ async function loadMenu() {
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
-  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.5, z: 0.0 });
+  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.3, z: 0.0 });
   jointMenTube = world.createImpulseJoint(params0, itsMenBody.userData.body, playerBody, true);
 
 
@@ -1156,7 +1158,7 @@ function playerMove() {
 
 
 
-  if (player.position.z > finishBlock.position.z) {
+  if (player.position.z > finishBlock.position.z && !player.userData.boom) {
 
     currentTime = timer.getElapsedTime().toFixed(3);
     currentTimeBlock.textContent = currentTime;
@@ -1251,17 +1253,13 @@ function playerMove() {
   speedBlock.textContent = player.userData.currentSpeed;
 
 
-  if (player.userData.left && player.userData.onGround) {
+  if (player.userData.left && player.userData.onGround && !player.userData.onStartArea) {
     if (player.userData.hTransition < 5) player.userData.hTransition += tubesChars[tubenum].maxHSpeed;
-    let velocity = playerBody.linvel();
-    //velocity.z *= 0.9996;
-    //playerBody.setLinvel(velocity, true);
+    tubesChars[tubenum].nowSpeed -= 0.009;
   }
-  if (player.userData.right && player.userData.onGround) {
+  if (player.userData.right && player.userData.onGround && !player.userData.onStartArea) {
     if (player.userData.hTransition > -5) player.userData.hTransition -= tubesChars[tubenum].maxHSpeed;
-    let velocity = playerBody.linvel();
-    //velocity.z *= 0.9996;
-    //playerBody.setLinvel(velocity, true);
+    tubesChars[tubenum].nowSpeed -= 0.009;
   }
 
   if (tubesChars[tubenum].resetHAngle) {
@@ -1304,8 +1302,9 @@ function onTouchMove(e) {
     raycaster.setFromCamera(mouse, camera);
 
     if (mouse.y > 0 && player.userData.canBoostStep && dataLoaded && player.userData.onStartArea) {
-      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish) {
-        playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+      if (playerBody.linvel().z < tubesChars[tubenum].maxSpeed && playerBody.linvel().y < 5 && playerBody.linvel().y > -5 && !playerIsFinish && tubesChars[tubenum].nowSpeed < tubesChars[tubenum].maxSpeed) {
+        //playerBody.applyImpulse({ x: 0.0, y: 0.0, z: tubesChars[tubenum].stepSpeed }, true);
+        tubesChars[tubenum].nowSpeed += tubesChars[tubenum].stepSpeed;
       }
     }
     player.userData.canBoostStep = false;
