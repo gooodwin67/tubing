@@ -539,6 +539,7 @@ canvas {
     height: 100%;
     align-items: center;
     flex-direction: column;
+    justify-content: flex-start;
     position: static;
 }
 
@@ -553,6 +554,7 @@ canvas {
     flex-direction: column;
     max-width: 460px;
     text-align: left !important;
+    margin-top: 20vh;
 
 
 }
@@ -616,13 +618,19 @@ canvas {
 }
 
 .mobile_instr>img {
-    max-width: 60%;
+    max-width: 50%;
+    margin-top: 5px
+}
+
+.mobile_instr h2 {
+    margin: 0px 0;
 }
 
 .mobile_instr>span {
     display: inline-block;
-    margin-bottom: 10px;
-    font-size: 15px;
+    margin-bottom: 0px;
+    font-size: 13px;
+    margin-top: 10px;
 }
 
 .mobile_instr span>span {
@@ -630,6 +638,9 @@ canvas {
     color: yellow;
 }
 
+.mobile_instr~.btn {
+    margin: 10px 0
+}
 
 
 

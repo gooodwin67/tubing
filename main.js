@@ -324,9 +324,9 @@ const tubesChars = [
   {
     hSpeed: 12,
     maxHSpeed: 0.10,
-    stepSpeed: 2.5,
+    stepSpeed: 20.5, //2.5
     nowSpeed: 0,
-    maxSpeed: 34,
+    maxSpeed: 340, //34
     resetHAngle: false,
     levels: [5, 6, 7],
     canInLevel: false
@@ -464,9 +464,19 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
-  camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+  if (isMobile) {
+    document.body.requestFullscreen().then(() => {
+      screen.orientation.lock("landscape");
+      camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+    })
+  }
+  else {
+    camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+  }
 }
 
 
@@ -628,7 +638,7 @@ async function loadMenu() {
       }
       else if (el.name.includes('start_flag')) {
         startFlag = el.clone();
-        scene.add(startFlag);
+        scene.add(startFlag); 9
       }
       else if (el.name.includes('itsmen_body')) {
         itsMenBody = el.clone();
@@ -995,6 +1005,7 @@ function animate() {
       currentTimeBlock.textContent = currentTime;
       playerMove();
       blocksMove();
+
       stars.forEach((value, index, array) => {
         value.rotation.z += 0.05;
       })
@@ -1012,11 +1023,7 @@ function animate() {
 
     }
     else {
-
       hiddenBlock(finishScreen);
-
-
-
     }
 
     // let shape = playerCollider;
@@ -1044,7 +1051,22 @@ function animate() {
 
 
     tubesMas[tubenum].position.copy(playerBody.translation());
-    tubesMas[tubenum].quaternion.copy(playerBody.rotation())
+    tubesMas[tubenum].quaternion.copy(playerBody.rotation());
+
+    menBody.position.copy(itsMenBody.position);
+    menBody.rotation.copy(itsMenBody.rotation);
+
+    menLeftHand.position.copy(itsMenLeftHand.position);
+    menLeftHand.rotation.copy(itsMenLeftHand.rotation);
+
+    menRightHand.position.copy(itsMenRightHand.position);
+    menRightHand.rotation.copy(itsMenRightHand.rotation);
+
+    menLeftLeg.position.copy(itsMenLeftLeg.position);
+    menLeftLeg.rotation.copy(itsMenLeftLeg.rotation);
+
+    menRightLeg.position.copy(itsMenRightLeg.position);
+    menRightLeg.rotation.copy(itsMenRightLeg.rotation);
 
     for (let i = 0, n = dynamicBodies.length; i < n; i++) {
       dynamicBodies[i][0].position.copy(dynamicBodies[i][1].translation())
@@ -1173,20 +1195,6 @@ function playerMove() {
 
 
 
-  menBody.position.copy(itsMenBody.position);
-  menBody.rotation.copy(itsMenBody.rotation);
-
-  menLeftHand.position.copy(itsMenLeftHand.position);
-  menLeftHand.rotation.copy(itsMenLeftHand.rotation);
-
-  menRightHand.position.copy(itsMenRightHand.position);
-  menRightHand.rotation.copy(itsMenRightHand.rotation);
-
-  menLeftLeg.position.copy(itsMenLeftLeg.position);
-  menLeftLeg.rotation.copy(itsMenLeftLeg.rotation);
-
-  menRightLeg.position.copy(itsMenRightLeg.position);
-  menRightLeg.rotation.copy(itsMenRightLeg.rotation);
 
 
 
