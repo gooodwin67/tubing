@@ -161,7 +161,7 @@ instructionStartBtn.addEventListener('click', () => {
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
 
-  soundAround.play();
+  // soundAround.play();
 
   if (isMobile) {
     document.body.requestFullscreen().then(() => {
@@ -527,7 +527,9 @@ async function loadMenu() {
   const gltfLoader = new GLTFLoader();
   const url = 'models/map-menu.glb';
   await gltfLoader.loadAsync(url, onprogress = (e) => {
-    loadPercent.textContent = Math.round((e.loaded / e.total * 100)) + '%';
+    console.log(`Loaded: ${e.loaded}, Total: ${e.total}`);
+    let percent = Math.min(Math.round((e.loaded / e.total) * 100), 100);
+    loadPercent.textContent = percent + '%';
   }).then((gltf) => {
     const root = gltf.scene;
     loadPercent.textContent = '0';
@@ -819,7 +821,7 @@ async function loadAudio() {
   player.add(listener);
 
 
-  const audioLoader = new THREE.AudioLoader();
+  // const audioLoader = new THREE.AudioLoader();
   // await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
   //   soundSlide = new THREE.PositionalAudio(listener);
   //   soundSlide.setBuffer(buffer);
@@ -829,23 +831,23 @@ async function loadAudio() {
   //   player.add(soundSlide);
   // });
 
-  await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
-    soundJump = new THREE.PositionalAudio(listener);
-    soundJump.setBuffer(buffer);
-    soundJump.setLoop(false);
-    soundJump.setRefDistance(40);
-    soundJump.setVolume(0.4);
-    player.add(soundJump);
-  });
+  // await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
+  //   soundJump = new THREE.PositionalAudio(listener);
+  //   soundJump.setBuffer(buffer);
+  //   soundJump.setLoop(false);
+  //   soundJump.setRefDistance(40);
+  //   soundJump.setVolume(0.4);
+  //   player.add(soundJump);
+  // });
 
-  await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
-    soundAround = new THREE.PositionalAudio(listener);
-    soundAround.setBuffer(buffer);
-    soundAround.setLoop(true);
-    soundAround.setRefDistance(40);
-    soundAround.setVolume(1);
-    player.add(soundAround);
-  });
+  // await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
+  //   soundAround = new THREE.PositionalAudio(listener);
+  //   soundAround.setBuffer(buffer);
+  //   soundAround.setLoop(true);
+  //   soundAround.setRefDistance(40);
+  //   soundAround.setVolume(1);
+  //   player.add(soundAround);
+  // });
 
   // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
   //   soundMusic = new THREE.PositionalAudio(listener);
