@@ -56,6 +56,7 @@ let speedBlockWrap = document.querySelector('.speed_block');
 let speedBlock = document.querySelector('.speed_block>.speed');
 
 let shadowCheck = document.querySelector('.shadow_check');
+let instrCheck = document.querySelector('.instr_check');
 
 let loadPercent = document.querySelector('.load_percent');
 
@@ -63,6 +64,10 @@ let pauseButton = document.querySelector('.pause_button_wrap');
 let closePauseButton = document.querySelector('.close_pause_button');
 let resetButton = document.querySelector('.reset_button');
 let inmenuButton = document.querySelector('.inmenu_button');
+
+
+let beforeStartWrap = document.querySelector('.before_start');
+let instructionStartBtn = document.querySelector('.instruction_start_btn');
 
 
 let menuInGameWrap = document.querySelector('.menu_in_game_wrap');
@@ -109,32 +114,48 @@ tubesBlock.forEach((child, index) => {
 });
 
 function startRace() {
-  timesBlock.classList.remove('hidden_block');
-  speedBlockWrap.classList.remove('hidden_block');
-  tubesMas[tubenum].position.copy(playerBody.translation());
-  let iter = 3; //0
-  naStartTimer = true;
-  let interval = setInterval((e) => {
-    startTimeWrap.classList.remove("hidden_block");
-    iter++;
-
-    if (iter == 4) {
-      naStartTimer = false;
-      startTimeBlock.textContent = 'GO';
-      dataLoaded = true;
-      pauseButton.classList.remove('hidden_block');
-      clearInterval(interval);
-      setTimeout(() => {
-        startTimeWrap.classList.add("hidden_block");
-      }, 600);
-    }
-    else {
-      startTimeBlock.textContent = 4 - iter;
-    }
 
 
-  }, 1000)
+
+  if (!playerData.canStart) {
+    hiddenBlock(beforeStartWrap);
+    if (isMobile) document.querySelector('.mobile_instr').classList.remove('hidden_instr');
+    else document.querySelector('.desktop_instr').classList.remove('hidden_instr');
+  }
+  else {
+
+    timesBlock.classList.remove('hidden_block');
+    speedBlockWrap.classList.remove('hidden_block');
+    tubesMas[tubenum].position.copy(playerBody.translation());
+    let iter = 3; //0
+    naStartTimer = true;
+    let interval = setInterval((e) => {
+      startTimeWrap.classList.remove("hidden_block");
+      iter++;
+
+      if (iter == 4) {
+        naStartTimer = false;
+        startTimeBlock.textContent = 'GO';
+        dataLoaded = true;
+        pauseButton.classList.remove('hidden_block');
+        clearInterval(interval);
+        setTimeout(() => {
+          startTimeWrap.classList.add("hidden_block");
+        }, 600);
+      }
+      else {
+        startTimeBlock.textContent = 4 - iter;
+      }
+
+
+    }, 1000)
+  }
 }
+instructionStartBtn.addEventListener('click', () => {
+  playerData.canStart = true;
+  hiddenBlock(0);
+  startRace();
+})
 
 
 startButton.addEventListener('click', () => {
@@ -227,6 +248,18 @@ shadowCheck.onchange = function () {
 
 };
 
+instrCheck.onchange = function () {
+  if (this.checked) {
+    playerData.canStart = true;
+    localStorage.setItem('playerData', JSON.stringify(playerData));
+  }
+  else {
+    playerData.canStart = false;
+    localStorage.setItem('playerData', JSON.stringify(playerData));
+  }
+
+};
+
 
 
 
@@ -249,6 +282,7 @@ let levelItems = [];
 let currentLevel = 0;
 
 let pause = false;
+
 
 let player;
 let playerBody;
@@ -443,6 +477,7 @@ async function loadStorageData() {
       levelsTimes: {
         // time1: 10.222,
       },
+      canStart: false
     }
     localStorage.setItem('playerData', JSON.stringify(playerData));
   }
@@ -452,6 +487,7 @@ async function loadStorageData() {
 
 
   let aaa = JSON.stringify(playerData);
+
 
 
   levelsTimesBlock.forEach((value, index, array) => {
@@ -1192,10 +1228,17 @@ function playerMove() {
 
 
 
-  if (playerBody.translation().y < 68 && playerBody.translation().y > 10) {
+  if (playerBody.translation().y < 68 && playerBody.translation().y >= 10) {
     tubesChars[tubenum].nowSpeed += 0.05;
     if (playerBody.rotation().x < 0.04) {
       playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
+    }
+  }
+
+  if (playerBody.translation().y < 10 && playerBody.translation().y > 1) {
+    if (playerBody.rotation().x < 0.04) {
+      //playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
+      playerBody.lockRotations(true, true, true);
     }
   }
 
