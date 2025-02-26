@@ -744,7 +744,8 @@ async function loadLevel() {
   const gltfLoader = new GLTFLoader();
   const url = 'models/map' + currentLevel + '.glb';
   await gltfLoader.loadAsync(url, onprogress = (e) => {
-    loadPercent.textContent = Math.round((e.loaded / e.total) * 100) + '%';
+    let percent = Math.min(Math.round((e.loaded / e.total) * 100), 100);
+    loadPercent.textContent = percent + '%';
   }).then((gltf) => {
     const root = gltf.scene;
     loadPercent.textContent = '0';
