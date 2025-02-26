@@ -820,14 +820,14 @@ async function loadAudio() {
 
 
   const audioLoader = new THREE.AudioLoader();
-  await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
-    soundSlide = new THREE.PositionalAudio(listener);
-    soundSlide.setBuffer(buffer);
-    soundSlide.setLoop(true);
-    soundSlide.setRefDistance(40);
-    soundSlide.setVolume(1);
-    player.add(soundSlide);
-  });
+  // await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
+  //   soundSlide = new THREE.PositionalAudio(listener);
+  //   soundSlide.setBuffer(buffer);
+  //   soundSlide.setLoop(true);
+  //   soundSlide.setRefDistance(40);
+  //   soundSlide.setVolume(1);
+  //   player.add(soundSlide);
+  // });
 
   await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
     soundJump = new THREE.PositionalAudio(listener);
