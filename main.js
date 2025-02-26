@@ -161,6 +161,8 @@ instructionStartBtn.addEventListener('click', () => {
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
 
+  soundAround.play();
+
   if (isMobile) {
     document.body.requestFullscreen().then(() => {
       screen.orientation.lock("landscape");
@@ -464,19 +466,9 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
-  if (isMobile) {
-    document.body.requestFullscreen().then(() => {
-      screen.orientation.lock("landscape");
-      camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
-    })
-  }
-  else {
-    camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
-  }
+  camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
 }
 
 
@@ -822,49 +814,49 @@ async function loadLevel() {
   levelLoaded = true;
 }
 
-// async function loadAudio() {
-//   const listener = new THREE.AudioListener();
-//   player.add(listener);
+async function loadAudio() {
+  const listener = new THREE.AudioListener();
+  player.add(listener);
 
 
-//   const audioLoader = new THREE.AudioLoader();
-//   await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
-//     soundSlide = new THREE.PositionalAudio(listener);
-//     soundSlide.setBuffer(buffer);
-//     soundSlide.setLoop(true);
-//     soundSlide.setRefDistance(40);
-//     soundSlide.setVolume(1);
-//     player.add(soundSlide);
-//   });
+  const audioLoader = new THREE.AudioLoader();
+  await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
+    soundSlide = new THREE.PositionalAudio(listener);
+    soundSlide.setBuffer(buffer);
+    soundSlide.setLoop(true);
+    soundSlide.setRefDistance(40);
+    soundSlide.setVolume(1);
+    player.add(soundSlide);
+  });
 
-//   await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
-//     soundJump = new THREE.PositionalAudio(listener);
-//     soundJump.setBuffer(buffer);
-//     soundJump.setLoop(false);
-//     soundJump.setRefDistance(40);
-//     soundJump.setVolume(0.4);
-//     player.add(soundJump);
-//   });
+  await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
+    soundJump = new THREE.PositionalAudio(listener);
+    soundJump.setBuffer(buffer);
+    soundJump.setLoop(false);
+    soundJump.setRefDistance(40);
+    soundJump.setVolume(0.4);
+    player.add(soundJump);
+  });
 
-//   await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
-//     soundAround = new THREE.PositionalAudio(listener);
-//     soundAround.setBuffer(buffer);
-//     soundAround.setLoop(true);
-//     soundAround.setRefDistance(40);
-//     soundAround.setVolume(1);
-//     player.add(soundAround);
-//   });
+  await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
+    soundAround = new THREE.PositionalAudio(listener);
+    soundAround.setBuffer(buffer);
+    soundAround.setLoop(true);
+    soundAround.setRefDistance(40);
+    soundAround.setVolume(1);
+    player.add(soundAround);
+  });
 
-//   // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
-//   //   soundMusic = new THREE.PositionalAudio(listener);
-//   //   soundMusic.setBuffer(buffer);
-//   //   soundMusic.setLoop(true);
-//   //   soundMusic.setRefDistance(40);
-//   //   soundMusic.setVolume(0.4);
-//   //   player.add(soundMusic);
-//   // });
+  // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
+  //   soundMusic = new THREE.PositionalAudio(listener);
+  //   soundMusic.setBuffer(buffer);
+  //   soundMusic.setLoop(true);
+  //   soundMusic.setRefDistance(40);
+  //   soundMusic.setVolume(0.4);
+  //   player.add(soundMusic);
+  // });
 
-// }
+}
 async function init() {
   await initAllData(true, false)
   if (firststart) {
@@ -893,8 +885,8 @@ async function initAllData(needMenu, needLevel) {
   // selectLevelScreen.classList.remove("hidden_block");
 
 
-  //await loadAudio()
-  //soundAround.play();
+  await loadAudio()
+
 
 
 
