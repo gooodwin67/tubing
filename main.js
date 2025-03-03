@@ -23,6 +23,8 @@ import { remove } from 'three/examples/jsm/libs/tween.module.js';
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
 let selectLevelScreen = document.querySelector('.select_level');
+let levelShadow = document.querySelectorAll('.select_level .level_shadow');
+
 let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
 let finishScreenTime = document.querySelector('.finish_you_time span');
@@ -30,6 +32,7 @@ let finishScreenTime = document.querySelector('.finish_you_time span');
 let BoomScreen = document.querySelector('.boom_window');
 
 let allOverlies = document.querySelectorAll('body>.overlay');
+
 
 
 let startButton = document.querySelector('.startButton');
@@ -84,20 +87,22 @@ clearRec.addEventListener('click', () => {
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
-    currentLevel = index + 1;
-    tubesBlock.forEach((child, index) => {
-      if (tubesChars[index].levels.includes(currentLevel)) {
-        child.classList.remove('disabledTube');
-        tubesChars[index].canInLevel = true;
-      }
-      else {
-        child.classList.add('disabledTube')
-        tubesChars[index].canInLevel = false;
-      }
-    })
-    hiddenBlock(mainLoadScreen);
-    await initAllData(false, true)
-    hiddenBlock(selectTubeScreen);
+    if (index + 1 <= openLevels) {
+      currentLevel = index + 1;
+      tubesBlock.forEach((child, index) => {
+        if (tubesChars[index].levels.includes(currentLevel)) {
+          child.classList.remove('disabledTube');
+          tubesChars[index].canInLevel = true;
+        }
+        else {
+          child.classList.add('disabledTube')
+          tubesChars[index].canInLevel = false;
+        }
+      })
+      hiddenBlock(mainLoadScreen);
+      await initAllData(false, true)
+      hiddenBlock(selectTubeScreen);
+    }
 
 
   });
@@ -171,6 +176,7 @@ startButton.addEventListener('click', () => {
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
 });
+
 
 function hiddenBlock(block) {
   allOverlies.forEach((el) => {
@@ -326,9 +332,9 @@ const tubesChars = [
   {
     hSpeed: 12,
     maxHSpeed: 0.10,
-    stepSpeed: 20.5, //2.5
+    stepSpeed: 2.0, //2.5
     nowSpeed: 0,
-    maxSpeed: 340, //34
+    maxSpeed: 38, //38
     resetHAngle: false,
     levels: [5, 6, 7],
     canInLevel: false
@@ -338,7 +344,7 @@ const tubesChars = [
     maxHSpeed: 0.12,
     stepSpeed: 3,
     nowSpeed: 0,
-    maxSpeed: 40,
+    maxSpeed: 44,
     resetHAngle: true,
     levels: [6, 7],
     canInLevel: false
@@ -401,6 +407,8 @@ let interval = 1 / 60;
 
 let bestTime = 0;
 let currentTime = 0;
+
+let openLevels = 2;
 
 let playerData;
 
@@ -466,6 +474,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
+
   camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
@@ -490,14 +499,22 @@ async function loadStorageData() {
 
   let aaa = JSON.stringify(playerData);
 
+  //levelShadow
+  openLevels = 0;
 
+  levelShadow.forEach((el, index) => {
+    if (index < Object.keys(playerData.levelsTimes).length + 2) {
+      openLevels++;
+      el.classList.remove('level_disabled');
+    }
+  })
 
   levelsTimesBlock.forEach((value, index, array) => {
     if (playerData.levelsTimes['time' + (index + 1)] != undefined) {
       value.childNodes[1].textContent = playerData.levelsTimes['time' + (index + 1)]
     }
     else {
-      value.childNodes[1].textContent = 0;
+      value.childNodes[1].textContent = '00.000';
     }
 
   })

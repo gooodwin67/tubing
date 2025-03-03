@@ -73,7 +73,11 @@ body {
 }
 
 .pause_button_wrap .pause_button {
-    padding: 10px;
+    padding: 0px;
+}
+
+.pause_button_wrap {
+    border-radius: 6px;
 }
 
 .pause_button_wrap img {
@@ -195,6 +199,14 @@ canvas {
     box-shadow: 0 -80px 200px rgba(0, 0, 0, 0.8) inset;
 }
 
+.level_shadow.level_disabled {
+
+    background: url(/images/zamok.png) no-repeat center;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9;
+    cursor: auto;
+}
+
 .load_level_wrap>div>.level_text {
     position: absolute;
     bottom: 15px;
@@ -203,17 +215,17 @@ canvas {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
 }
 
 .load_level_wrap>div>.level_text h2 {
-    margin-bottom: 5px;
+    margin-top: 25px;
 }
 
 .load_level_wrap>div>.level_text span {
     color: rgb(82, 228, 82);
-    font-size: 30px;
+    font-size: 15px;
 }
 
 .load_tubes_wrap {
@@ -431,12 +443,14 @@ canvas {
     color: #aaa;
     font-style: italic;
     margin-bottom: 3px;
+    text-shadow: 0 0 0px rgba(0, 0, 0, 0.8)
 }
 
 .time_data {
     font-size: 1.2em;
     color: #eee;
     font-style: italic;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8)
 }
 
 .current_time {
@@ -451,6 +465,10 @@ canvas {
     font-size: 2em;
     z-index: 9;
     text-align: right;
+}
+
+.speed_block>div {
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8)
 }
 
 .sci-fi-loader {
