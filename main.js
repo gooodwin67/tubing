@@ -132,7 +132,7 @@ function startRace() {
     timesBlock.classList.remove('hidden_block');
     speedBlockWrap.classList.remove('hidden_block');
     tubesMas[tubenum].position.copy(playerBody.translation());
-    let iter = 3; //0
+    let iter = 2; //0
     naStartTimer = true;
     let interval = setInterval((e) => {
       startTimeWrap.classList.remove("hidden_block");
@@ -332,7 +332,7 @@ const tubesChars = [
   {
     hSpeed: 12,
     maxHSpeed: 0.10,
-    stepSpeed: 2.0, //2.5
+    stepSpeed: 2.0, //2.0
     nowSpeed: 0,
     maxSpeed: 38, //38
     resetHAngle: false,
