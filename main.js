@@ -87,7 +87,7 @@ clearRec.addEventListener('click', () => {
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
-    if (index + 1 <= openLevels) {
+    if (index + 1 <= openLevels + 10) {
       currentLevel = index + 1;
       tubesBlock.forEach((child, index) => {
         if (tubesChars[index].levels.includes(currentLevel)) {
@@ -313,7 +313,6 @@ let selectTubeWall;
 
 let startFlag;
 
-let stars = [];
 
 let finishBlock;
 let playerIsFinish;
@@ -818,9 +817,6 @@ async function loadLevel() {
         areaBlock.castShadow = true;
         areaBlock.receiveShadow = true;
         scene.add(areaBlock);
-        if (el.name.includes('star_area')) {
-          stars.push(areaBlock);
-        }
       }
       else if (el.name.includes('finish_block')) {
         finishBlock = el.clone();
@@ -928,7 +924,6 @@ async function resetAllMap() {
 
   allObjCollision = []
   allWallCollision = []
-  stars = [];
   dynamicBodies = [];
   groundsMas = [];
 
@@ -1018,17 +1013,7 @@ function animate() {
       playerMove();
       blocksMove();
 
-      stars.forEach((value, index, array) => {
-        value.rotation.z += 0.05;
-      })
-      if (detectCollisionCubeAndArray(player, stars)) {
-        console.log(detectCollisionCubeAndArray(player, stars))
-        scene.remove(detectCollisionCubeAndArray(player, stars))
-      };
 
-      // if (detectCollisionCubeAndArray(tubesMas[tubenum], allWallCollision)) {
-      //   console.log('boom')
-      // }
 
 
 

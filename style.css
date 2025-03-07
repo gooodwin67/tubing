@@ -264,6 +264,10 @@ canvas {
     box-shadow: 0 -0px 200px rgba(0, 0, 0, 0.8) inset;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 555;
+    background: url(/images/zamok.png) no-repeat center;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9;
+    cursor: auto;
 }
 
 .load_tubes_wrap>div>.level_text {
