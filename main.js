@@ -325,7 +325,7 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 26,
     resetHAngle: false,
-    levels: [1, 2, 3, 4, 5, 6, 7],
+    levels: [1, 2, 3, 4, 5, 6, 7, 8],
     canInLevel: false
   },
   {
@@ -335,7 +335,7 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 38, //38
     resetHAngle: false,
-    levels: [5, 6, 7],
+    levels: [5, 6, 7, 8],
     canInLevel: false
   },
   {
@@ -345,7 +345,7 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 44,
     resetHAngle: true,
-    levels: [6, 7],
+    levels: [6, 7, 8],
     canInLevel: false
   }
 ]
