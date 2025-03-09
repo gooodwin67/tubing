@@ -150,8 +150,8 @@ canvas {
     max-width: 1000px;
 }
 
-.main_menu>div img {
-    width: 90%;
+.title_game {
+    max-width: 90%;
     margin-bottom: 50px;
 }
 
@@ -223,7 +223,7 @@ canvas {
     margin-top: 25px;
 }
 
-.load_level_wrap>div>.level_text span {
+.load_level_wrap>div>.level_time span {
     color: rgb(82, 228, 82);
     font-size: 15px;
 }
@@ -284,7 +284,7 @@ canvas {
     margin-top: 0
 }
 
-.load_tubes_wrap>div>.level_text span {
+.level_text .time {
     color: rgb(82, 228, 82);
     font-size: 17px;
 }
@@ -670,6 +670,32 @@ canvas {
     display: none;
 }
 
+
+.language_wrap {
+    margin-top: 20px;
+}
+.language_title {
+    font-size: 20px;
+}
+.language_block {
+    display: flex;
+}
+.language_block img {
+    width: 80px;
+    margin-top: 10px;
+    opacity: 0.4;
+    padding: 5px;
+    border: 2px solid transparent;
+}
+.language_block img.selected {
+    opacity: 1;
+    border: 2px solid #ffffff;
+}
+.language_block .ru_image {
+}
+
+
+
 @media (max-width: 960px) {
     .times {
         top: 65px;
@@ -696,4 +722,15 @@ canvas {
         top: 10px;
         right: 20px;
     }
+    .title_game {
+        margin-bottom: 10px;
+        margin-top: 40px;
+        max-width: 70%;
+    }
+}
+
+.clear_rec {
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }

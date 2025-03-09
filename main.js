@@ -27,7 +27,7 @@ let levelShadow = document.querySelectorAll('.select_level .level_shadow');
 
 let selectTubeScreen = document.querySelector('.select_tube');
 let finishScreen = document.querySelector('.finish_window');
-let finishScreenTime = document.querySelector('.finish_you_time span');
+let finishScreenTime = document.querySelector('.finish_you_time .finish_you_time_time');
 
 let BoomScreen = document.querySelector('.boom_window');
 
@@ -40,6 +40,9 @@ let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
 let levelsTimesBlock = document.querySelectorAll('.load_level_wrap .level_time');
 
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
+
+
+let languagesBtns = document.querySelectorAll('.language_block>img');
 
 let movingBlocks = [];
 let movingBlocksBody = [];
@@ -84,6 +87,138 @@ let clearRec = document.querySelector('.clear_rec');
 clearRec.addEventListener('click', () => {
   localStorage.clear();
 })
+
+languagesBtns.forEach((child, index) => {
+  child.addEventListener('click', () => {
+    if (playerData.language != index) {
+      languagesBtns.forEach((el)=>{
+        el.classList.remove('selected');
+      })
+      child.classList.add('selected');
+      playerData.language = index;
+      
+      localStorage.setItem('playerData', JSON.stringify(playerData));
+      changeLanguage(playerData.language);
+    }
+    
+  });
+})
+
+function changeLanguage(language) {
+  if (language == 0) {
+    document.querySelector('.title_game').src="/images/title.png";
+    document.querySelector('.startgame_title').textContent = 'начать игру'
+    document.querySelector('.language_title').textContent = 'Язык:'
+    document.querySelectorAll('.level_text h2>span').forEach((el)=>{
+      el.textContent = 'Уровень'
+    })
+    document.querySelectorAll('.leveltime_title').forEach((el)=>{
+      el.textContent = 'Время: '
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el)=>{
+      el.textContent = 'Тюбинг'
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el)=>{
+      el.textContent = 'Скорость: '
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el)=>{
+      el.textContent = 'Управление: '
+    })
+    document.querySelector('.selecttubedesc_title').textContent = 'Проходите уровни, чтобы разблокировать тюбинги'
+
+    document.querySelector('.menu_in_game_wrap_head').textContent = 'Пауза'
+    document.querySelector('.close_pause_button').textContent = 'Продолжить игру'
+    document.querySelector('.reset_button').textContent = 'Начать заново'
+    document.querySelector('.inmenu_button').textContent = 'Выйти'
+    
+    document.querySelector('.finish_you_time_title').textContent = 'Ваше время: '
+    document.querySelector('.crash_title').textContent = 'Вы врезались'
+    document.querySelector('.finish_title').textContent = 'Вы приехали'
+    
+    document.querySelectorAll('.finish_again').forEach((el)=>{
+      el.textContent = 'Еще раз'
+    })
+    document.querySelectorAll('.finish_in_menu').forEach((el)=>{
+      el.textContent = 'В меню'
+    })
+
+    document.querySelector('.current_time_title').textContent = 'Время'
+    document.querySelector('.best_time_title').textContent = 'Лучшее время'
+
+    document.querySelector('.speed_title').textContent = 'КМ/Ч'
+
+    document.querySelector('.instruction_start_btn').textContent = 'СТАРТ'
+    document.querySelector('.instr-disabled span').textContent = 'Больше не показывать'
+
+    document.querySelector('.desktop_instr').innerHTML = `<h2>Управление</h2>
+    <span>Быстро нажимайте <span class='button_active'>W</span> или <span class='button_active'>↑</span> чтобы разогнаться до стартовой отметки</span>
+    <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте тюбингом</span>
+    <span>Цель - доехать до финиша за кратчайшее время</span>`;
+
+    document.querySelector('.mobile_instr').innerHTML = `<span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
+    <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>
+    <img src="/images/instr-mobile.png" alt="">`
+
+
+    
+
+  }
+  else {
+    document.querySelector('.title_game').src="/images/title-en.png";
+    document.querySelector('.startgame_title').textContent = 'start game'
+    document.querySelector('.language_title').textContent = 'Language:'
+    document.querySelectorAll('.level_text h2>span').forEach((el)=>{
+      el.textContent = 'Level'
+    })
+    document.querySelectorAll('.leveltime_title').forEach((el)=>{
+      el.textContent = 'Time: '
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el)=>{
+      el.textContent = 'Tubing'
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el)=>{
+      el.textContent = 'Speed: '
+    })
+    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el)=>{
+      el.textContent = 'Control: '
+    })
+    document.querySelector('.selecttubedesc_title').textContent = 'Complete the levels to unlock the tubings'
+
+    document.querySelector('.menu_in_game_wrap_head').textContent = 'Pause'
+    document.querySelector('.close_pause_button').textContent = 'Continue'
+    document.querySelector('.reset_button').textContent = 'Start again'
+    document.querySelector('.inmenu_button').textContent = 'Exit to levels'
+
+    document.querySelector('.finish_you_time_title').textContent = 'You time: '
+    document.querySelector('.crash_title').textContent = 'You crashed'
+    document.querySelector('.finish_title').textContent = 'You finished'
+    
+    document.querySelectorAll('.finish_again').forEach((el)=>{
+      el.textContent = 'Again'
+    })
+    document.querySelectorAll('.finish_in_menu').forEach((el)=>{
+      el.textContent = 'In Menu'
+    })
+
+    document.querySelector('.current_time_title').textContent = 'Time'
+    document.querySelector('.best_time_title').textContent = 'Best time'
+
+    document.querySelector('.speed_title').textContent = 'KM/H'
+
+    document.querySelector('.instruction_start_btn').textContent = 'START'
+    document.querySelector('.instr-disabled span').textContent = "Don't show again"
+
+    document.querySelector('.desktop_instr').innerHTML = `<h2>Instructions</h2>
+    <span>Quickly press <span class='button_active'>W</span> or <span class='button_active'>↑</span> to accelerate to the starting point</span>
+    <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the tubing</span>
+    <span>The goal is to reach the finish line in the shortest time</span>`;
+
+    document.querySelector('.mobile_instr').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
+    <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>
+    <img src="/images/instr-mobile.png" alt="">`
+    
+  }
+};
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
@@ -424,8 +559,6 @@ hemiLight.color.setHSL(0.6, 1, 0.6);
 hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 hemiLight.position.set(0, 100, 0);
 
-
-
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 //scene.add(hemiLightHelper);
 
@@ -487,12 +620,18 @@ async function loadStorageData() {
       levelsTimes: {
         // time1: 10.222,
       },
-      canStart: false
+      canStart: false,
+      language: 0 //ru
     }
     localStorage.setItem('playerData', JSON.stringify(playerData));
   }
   else {
     playerData = JSON.parse(localStorage.getItem('playerData'))
+    languagesBtns.forEach((el)=>{
+      el.classList.remove('selected');
+    })
+    languagesBtns[playerData.language].classList.add('selected');
+    changeLanguage(playerData.language)
   }
 
 
@@ -510,10 +649,10 @@ async function loadStorageData() {
 
   levelsTimesBlock.forEach((value, index, array) => {
     if (playerData.levelsTimes['time' + (index + 1)] != undefined) {
-      value.childNodes[1].textContent = playerData.levelsTimes['time' + (index + 1)]
+      value.childNodes[2].textContent = playerData.levelsTimes['time' + (index + 1)]
     }
     else {
-      value.childNodes[1].textContent = '00.000';
+      value.childNodes[2].textContent = '00.000';
     }
 
   })
@@ -1085,7 +1224,7 @@ function animate() {
               setTimeout(() => {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
-              }, 2000);
+              }, 3000);
               player.userData.boom = true;
             }
             //camera.position.set(playerTtube.position); /////
@@ -1102,7 +1241,7 @@ function animate() {
               setTimeout(() => {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
-              }, 2000);
+              }, 3000);
             }
             //camera.position.set(playerTtube.position); /////
           }
@@ -1325,10 +1464,12 @@ function playerMove() {
   }
 
   if (player.position.z > startFlag.position.z) {
+    if (player.userData.onStartArea) playerBody.lockRotations(false, true, true);
     player.userData.onStartArea = false;
   }
   else {
     player.userData.onStartArea = true;
+    playerBody.lockRotations(true, true, true);
   }
 
 
