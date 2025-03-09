@@ -4,11 +4,11 @@
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
-   <title>My first three.js app</title>
-  <script type="module" crossorigin src="./assets/index-DCvaL8Mk.js"></script>
+   <title>Спуск на тюбинге</title>
+  <script type="module" crossorigin src="./assets/index-CEeBfQv4.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/three-CPvv5sxK.js">
   <link rel="modulepreload" crossorigin href="./assets/@dimforge-D3Mqfikn.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-Bj4iZ-PJ.css">
+  <link rel="stylesheet" crossorigin href="./assets/index-CcSr0PP0.css">
 </head>
 
 <body>
@@ -31,10 +31,16 @@
 
    <div class="overlay main_menu hidden_block">
       <div>
-         <img src="./images/title.png" alt="title">
-         <button class="startButton btn">Начать игру</button>
-         <button class="clear_rec btn">Удалить рекорды</button>
-
+         <img src="./images/title.png" alt="title" class = 'title_game'>
+         <button class="startButton btn startgame_title">Начать игру</button>
+         <button class="clear_rec">Удалить рекорды</button>
+         <div class = 'language_wrap'>
+            <span class = 'language_title'>Язык:</span>
+            <div class = 'language_block'>
+               <img src = './images/ru.jpg' class = 'ru_image selected'>
+               <img src = './images/en.jpg' class = 'en_image'>
+            </div>
+         </div>
       </div>
    </div>
 
@@ -50,8 +56,8 @@
       </div>
       <div class='mobile_instr hidden_instr'>
 
-         <span>Быстро нажимайте <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
-         <span>Нажимая на кнопки <span> ← </span> и <span> → </span> управляйте тюбингом</span>
+         <span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
+         <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>
          <img src="./images/instr-mobile.png" alt="">
       </div>
       <button class='instruction_start_btn btn'>СТАРТ</button>
@@ -84,56 +90,64 @@
                <img src="./assets/level1-DaPIxMbw.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Уровень 1</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 1</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level2-DZWpmkf5.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Уровень 2</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 2</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level3-jivvjJRR.jpg" alt="">
                <div class='level_shadow level_disabled'></div>
                <div class='level_text'>
-                  <h2>Уровень 3</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 3</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level1-DaPIxMbw.jpg" alt="">
                <div class='level_shadow level_disabled'></div>
                <div class='level_text'>
-                  <h2>Уровень 4</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 4</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level2-DZWpmkf5.jpg" alt="">
                <div class='level_shadow level_disabled'></div>
                <div class='level_text'>
-                  <h2>Уровень 5</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 5</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level3-jivvjJRR.jpg" alt="">
                <div class='level_shadow level_disabled'></div>
                <div class='level_text'>
-                  <h2>Уровень 6</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 6</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
             <div>
                <img src="./assets/level3-jivvjJRR.jpg" alt="">
                <div class='level_shadow level_disabled'></div>
                <div class='level_text'>
-                  <h2>Уровень 7</h2>
-                  <div class='level_time'>Время: <span class='time'></span></div>
+                  <h2><span>Уровень</span> 7</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
+               </div>
+            </div>
+            <div>
+               <img src="./assets/level3-jivvjJRR.jpg" alt="">
+               <div class='level_shadow level_disabled'></div>
+               <div class='level_text'>
+                  <h2><span>Уровень</span> 8</h2>
+                  <div class='level_time'><span class = 'leveltime_title'>Время: </span> <span class='time'></span></div>
                </div>
             </div>
 
@@ -144,20 +158,19 @@
 
    <div class="overlay select_tube hidden_block">
       <div>
-         <h2>Выбрать тюбинг</h2>
          <div class='load_tubes_wrap'>
             <div class='tube disabledTube'>
                <img src="./assets/tube1-wfwDSJc7.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Тюбинг №1</h2>
+                  <h2><span class = 'selecttube_title'>Тюбинг</span> №1</h2>
                   <div class='tubes_chars'>
                      <div class="tubes_char char_speed">
-                        <span>Скорость: </span>
+                        <span class = 'selecttubespeed_title'>Скорость: </span>
                         <div class='chars'><span>I </span><span>I </span></div>
                      </div>
                      <div class="tubes_char char_move">
-                        <span>Управление: </span>
+                        <span class = 'selecttubecontrol_title'>Управление: </span>
                         <div class='chars'><span>I </span><span>I </span></div>
                      </div>
                   </div>
@@ -167,14 +180,14 @@
                <img src="./assets/tube2-CxVY5kWS.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Тюбинг №2</h2>
+                  <h2><span class = 'selecttube_title'>Тюбинг</span> №2</h2>
                   <div class='tubes_chars'>
                      <div class="tubes_char char_speed">
-                        <span>Скорость: </span>
+                        <span class = 'selecttubespeed_title'>Скорость: </span>
                         <div class='chars'><span>I </span><span>I </span><span>I </span></div>
                      </div>
                      <div class="tubes_char char_move">
-                        <span>Управление: </span>
+                        <span class = 'selecttubecontrol_title'>Управление: </span>
                         <div class='chars'><span>I </span><span>I </span><span>I </span></div>
                      </div>
                   </div>
@@ -184,28 +197,28 @@
                <img src="./assets/tube3-qWqnVmaT.jpg" alt="">
                <div class='level_shadow'></div>
                <div class='level_text'>
-                  <h2>Тюбинг №3</h2>
+                  <h2><span class = 'selecttube_title'>Тюбинг</span> №3</h2>
                   <div class='tubes_chars'>
                      <div class="tubes_char char_speed">
-                        <span>Скорость: </span>
+                        <span class = 'selecttubespeed_title'>Скорость: </span>
                         <div class='chars'><span>I </span><span>I </span><span>I </span><span>I </span><span>I </span></div>
                      </div>
                      <div class="tubes_char char_move">
-                        <span>Управление: </span>
+                        <span class = 'selecttubecontrol_title'>Управление: </span>
                         <div class='chars'><span>I </span><span>I </span><span>I </span><span>I </span></div>
                      </div>
                   </div>
                </div>
             </div>
          </div>
-         <p>Проходите уровни, чтобы разблокировать тюбинги</p>
+         <p class = 'selecttubedesc_title'>Проходите уровни, чтобы разблокировать тюбинги</p>
       </div>
    </div>
 
    <div class="overlay finish_window hidden_block">
       <div>
-         <h2 class='finish_head'>Вы приехали</h2>
-         <div class='finish_you_time'>Ваше время: <span>25.47</span></div>
+         <h2 class='finish_head finish_title'>Вы приехали</h2>
+         <div class='finish_you_time'><span class = 'finish_you_time_title'>Ваше время: </span><span class = 'finish_you_time_time'>25.47</span></div>
          <div class='load_finish_wrap'>
             <div class='finish_again'>Еще раз</div>
             <div class='finish_in_menu'>В меню</div>
@@ -215,7 +228,7 @@
 
    <div class="overlay boom_window hidden_block">
       <div>
-         <h2 class='finish_head'>Вы врезались</h2>
+         <h2 class='finish_head crash_title'>Вы врезались</h2>
          <div class='load_finish_wrap'>
             <div class='finish_again'>Еще раз</div>
             <div class='finish_in_menu'>В меню</div>
@@ -229,11 +242,11 @@
 
    <div class="times hidden_block">
       <div class="current_time_block">
-         <div class='time_label'>Время</div>
+         <div class='time_label current_time_title'>Время</div>
          <div class='current_time time_data'>0</div>
       </div>
       <div class="best_time_block">
-         <div class='time_label'>Лучшее время</div>
+         <div class='time_label best_time_title'>Лучшее время</div>
          <div class='best_time time_data'>0</div>
       </div>
    </div>
