@@ -61,7 +61,7 @@ let boomInMenuButton = document.querySelector('.boom_window .finish_in_menu');
 let speedBlockWrap = document.querySelector('.speed_block');
 let speedBlock = document.querySelector('.speed_block>.speed');
 
-let shadowCheck = document.querySelector('.shadow_check');
+
 let instrCheck = document.querySelector('.instr_check');
 
 let loadPercent = document.querySelector('.load_percent');
@@ -91,37 +91,37 @@ clearRec.addEventListener('click', () => {
 languagesBtns.forEach((child, index) => {
   child.addEventListener('click', () => {
     if (playerData.language != index) {
-      languagesBtns.forEach((el)=>{
+      languagesBtns.forEach((el) => {
         el.classList.remove('selected');
       })
       child.classList.add('selected');
       playerData.language = index;
-      
+
       localStorage.setItem('playerData', JSON.stringify(playerData));
       changeLanguage(playerData.language);
     }
-    
+
   });
 })
 
 function changeLanguage(language) {
   if (language == 0) {
-    document.querySelector('.title_game').src="/images/title.png";
+    document.querySelector('.title_game').src = "/images/title.png";
     document.querySelector('.startgame_title').textContent = 'начать игру'
     document.querySelector('.language_title').textContent = 'Язык:'
-    document.querySelectorAll('.level_text h2>span').forEach((el)=>{
+    document.querySelectorAll('.level_text h2>span').forEach((el) => {
       el.textContent = 'Уровень'
     })
-    document.querySelectorAll('.leveltime_title').forEach((el)=>{
+    document.querySelectorAll('.leveltime_title').forEach((el) => {
       el.textContent = 'Время: '
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el) => {
       el.textContent = 'Тюбинг'
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el) => {
       el.textContent = 'Скорость: '
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el) => {
       el.textContent = 'Управление: '
     })
     document.querySelector('.selecttubedesc_title').textContent = 'Проходите уровни, чтобы разблокировать тюбинги'
@@ -130,15 +130,15 @@ function changeLanguage(language) {
     document.querySelector('.close_pause_button').textContent = 'Продолжить игру'
     document.querySelector('.reset_button').textContent = 'Начать заново'
     document.querySelector('.inmenu_button').textContent = 'Выйти'
-    
+
     document.querySelector('.finish_you_time_title').textContent = 'Ваше время: '
     document.querySelector('.crash_title').textContent = 'Вы врезались'
     document.querySelector('.finish_title').textContent = 'Вы приехали'
-    
-    document.querySelectorAll('.finish_again').forEach((el)=>{
+
+    document.querySelectorAll('.finish_again').forEach((el) => {
       el.textContent = 'Еще раз'
     })
-    document.querySelectorAll('.finish_in_menu').forEach((el)=>{
+    document.querySelectorAll('.finish_in_menu').forEach((el) => {
       el.textContent = 'В меню'
     })
 
@@ -160,26 +160,26 @@ function changeLanguage(language) {
     <img src="/images/instr-mobile.png" alt="">`
 
 
-    
+
 
   }
   else {
-    document.querySelector('.title_game').src="/images/title-en.png";
+    document.querySelector('.title_game').src = "/images/title-en.png";
     document.querySelector('.startgame_title').textContent = 'start game'
     document.querySelector('.language_title').textContent = 'Language:'
-    document.querySelectorAll('.level_text h2>span').forEach((el)=>{
+    document.querySelectorAll('.level_text h2>span').forEach((el) => {
       el.textContent = 'Level'
     })
-    document.querySelectorAll('.leveltime_title').forEach((el)=>{
+    document.querySelectorAll('.leveltime_title').forEach((el) => {
       el.textContent = 'Time: '
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el) => {
       el.textContent = 'Tubing'
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el) => {
       el.textContent = 'Speed: '
     })
-    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el)=>{
+    document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el) => {
       el.textContent = 'Control: '
     })
     document.querySelector('.selecttubedesc_title').textContent = 'Complete the levels to unlock the tubings'
@@ -192,11 +192,11 @@ function changeLanguage(language) {
     document.querySelector('.finish_you_time_title').textContent = 'You time: '
     document.querySelector('.crash_title').textContent = 'You crashed'
     document.querySelector('.finish_title').textContent = 'You finished'
-    
-    document.querySelectorAll('.finish_again').forEach((el)=>{
+
+    document.querySelectorAll('.finish_again').forEach((el) => {
       el.textContent = 'Again'
     })
-    document.querySelectorAll('.finish_in_menu').forEach((el)=>{
+    document.querySelectorAll('.finish_in_menu').forEach((el) => {
       el.textContent = 'In Menu'
     })
 
@@ -216,7 +216,7 @@ function changeLanguage(language) {
     document.querySelector('.mobile_instr').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
     <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>
     <img src="/images/instr-mobile.png" alt="">`
-    
+
   }
 };
 
@@ -379,17 +379,6 @@ closePauseButton.addEventListener('click', () => {
 
 
 
-shadowCheck.onchange = function () {
-  if (this.checked) {
-    renderer.shadowMap.enabled = true;
-    scene.traverse((child) => { if (child.material) child.material.needsUpdate = true })
-  }
-  else {
-    renderer.shadowMap.enabled = false;
-    scene.traverse((child) => { if (child.material) child.material.needsUpdate = true })
-  }
-
-};
 
 instrCheck.onchange = function () {
   if (this.checked) {
@@ -551,7 +540,7 @@ const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xdceef6);
+scene.background = new THREE.Color(0xdceef6); //dceef6
 scene.fog = new THREE.Fog(scene.background, 1, 300);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
@@ -567,23 +556,9 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 3);
 dirLight.position.set(1, 2, 0.2);
 dirLight.position.multiplyScalar(120);
 
-dirLight.castShadow = true;
 
 
 
-
-dirLight.shadow.mapSize.width = 2048;
-dirLight.shadow.mapSize.height = 2048;
-
-const d = 1000;
-
-dirLight.shadow.camera.left = - d;
-dirLight.shadow.camera.right = d;
-dirLight.shadow.camera.top = d;
-dirLight.shadow.camera.bottom = - d;
-
-dirLight.shadow.camera.far = 3500;
-dirLight.shadow.bias = - 0.001;
 
 const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 //scene.add(dirLightHelper);
@@ -591,18 +566,17 @@ const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 10);
 const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 //scene.add(ambientLight);
 
-const camera = new THREE.PerspectiveCamera(85, document.body.offsetWidth / document.body.offsetHeight, 0.1, 600);
+const camera = new THREE.PerspectiveCamera(85, document.body.offsetWidth / document.body.offsetHeight, 0.1, 310);
 camera.position.set(0, 4, -10);
 
 let stats = new Stats();
-//document.body.appendChild(stats.dom);
+document.body.appendChild(stats.dom);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: false });
 
 renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
 document.body.appendChild(renderer.domElement);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
@@ -627,7 +601,7 @@ async function loadStorageData() {
   }
   else {
     playerData = JSON.parse(localStorage.getItem('playerData'))
-    languagesBtns.forEach((el)=>{
+    languagesBtns.forEach((el) => {
       el.classList.remove('selected');
     })
     languagesBtns[playerData.language].classList.add('selected');
@@ -701,8 +675,6 @@ async function loadMenu() {
         player.userData.vertices = player.geometry.attributes.position.array;
         player.userData.indices = player.geometry.index.array;
 
-        player.castShadow = true;
-        player.receiveShadow = true;
         player.material.transparent = true;
         player.material.opacity = 0;
         player.userData.mass = 1;
@@ -753,7 +725,6 @@ async function loadMenu() {
         const size = box.getSize(new THREE.Vector3());
         groundBlock = el.clone();
 
-        groundBlock.receiveShadow = true;
 
         //groundBlock.position.z = size.z / 2;
         groundBlock.userData.mass = 0;
@@ -772,8 +743,6 @@ async function loadMenu() {
         const box = new THREE.Box3().setFromObject(el);
         const size = box.getSize(new THREE.Vector3());
         let wallBlock = el.clone();
-        wallBlock.castShadow = true;
-        wallBlock.receiveShadow = true;
         wallBlock.userData.mass = 1;
         addPhysicsToObject(wallBlock);
         allObjCollision.push(wallBlock);
@@ -782,7 +751,6 @@ async function loadMenu() {
       }
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
-        areaBlock.castShadow = true;
         scene.add(areaBlock);
       }
       else if (el.name.includes('start_flag')) {
@@ -915,7 +883,6 @@ async function loadLevel() {
         const box = new THREE.Box3().setFromObject(el);
         const size = box.getSize(new THREE.Vector3());
         let groundBlock = el.clone();
-        groundBlock.receiveShadow = true;
 
         //groundBlock.position.z = size.z / 2;
         groundBlock.userData.mass = 0;
@@ -953,8 +920,6 @@ async function loadLevel() {
       }
       else if (el.name.includes('area')) {
         let areaBlock = el.clone();
-        areaBlock.castShadow = true;
-        areaBlock.receiveShadow = true;
         scene.add(areaBlock);
       }
       else if (el.name.includes('finish_block')) {
@@ -1098,6 +1063,10 @@ async function resetAllMap() {
 
 function animate() {
   //console.log(renderer.info.render);
+
+  console.log("Number of calls :", renderer.info.render.calls);
+  console.log("Number of Triangles :", renderer.info.render.triangles);
+
 
   frames++;
   const time = performance.now();
@@ -1340,7 +1309,10 @@ function playerMove() {
   if (player.position.z > finishBlock.position.z && !player.userData.boom) {
 
     currentTime = timer.getElapsedTime().toFixed(3);
+
     currentTimeBlock.textContent = currentTime;
+
+
 
     playerIsFinish = true;
     finishScreenTime.textContent = currentTime;
@@ -1372,7 +1344,7 @@ function playerMove() {
 
 
 
-  if (playerBody.translation().y < 68 && playerBody.translation().y >= 10) {
+  if (playerBody.translation().y < 100 && playerBody.translation().y >= 10) {
     tubesChars[tubenum].nowSpeed += 0.05;
     if (playerBody.rotation().x < 0.04) {
       playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
@@ -1381,7 +1353,7 @@ function playerMove() {
 
   if (playerBody.translation().y < 10 && playerBody.translation().y > 1) {
     if (playerBody.rotation().x < 0.04) {
-      //playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
+      playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
       playerBody.lockRotations(true, true, true);
     }
   }

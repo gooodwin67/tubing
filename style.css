@@ -42,10 +42,7 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.shadow-map {
-    text-align: left;
-    font-size: 20px;
-}
+
 
 .instr-disabled {
     text-align: left;
@@ -67,10 +64,7 @@ body {
     cursor: pointer;
 }
 
-.shadow_check {
-    width: 20px;
-    height: 20px;
-}
+
 
 .pause_button_wrap .pause_button {
     padding: 0px;
@@ -233,6 +227,7 @@ canvas {
     flex-wrap: wrap;
     max-width: 1300px;
     justify-content: center;
+    margin-top: 50px;
 }
 
 .load_tubes_wrap>div {
@@ -332,6 +327,7 @@ canvas {
 .finish_head {
     font-size: 50px;
     margin-bottom: 30px;
+    margin-top: 20px;
 }
 
 .finish_you_time {
@@ -444,7 +440,7 @@ canvas {
 
 .time_label {
     font-size: 1.2em;
-    color: #aaa;
+    color: #747474;
     font-style: italic;
     margin-bottom: 3px;
     text-shadow: 0 0 0px rgba(0, 0, 0, 0.8)
@@ -543,7 +539,7 @@ canvas {
 
 .time_label {
     font-size: 1.4em;
-    color: #aaa;
+    color: #747474;
     font-style: italic;
     margin-bottom: 3px;
 }
@@ -674,12 +670,15 @@ canvas {
 .language_wrap {
     margin-top: 20px;
 }
+
 .language_title {
     font-size: 20px;
 }
+
 .language_block {
     display: flex;
 }
+
 .language_block img {
     width: 80px;
     margin-top: 10px;
@@ -687,12 +686,13 @@ canvas {
     padding: 5px;
     border: 2px solid transparent;
 }
+
 .language_block img.selected {
     opacity: 1;
     border: 2px solid #ffffff;
 }
-.language_block .ru_image {
-}
+
+.language_block .ru_image {}
 
 
 
@@ -722,15 +722,26 @@ canvas {
         top: 10px;
         right: 20px;
     }
+
     .title_game {
         margin-bottom: 10px;
         margin-top: 40px;
         max-width: 70%;
+    }
+
+    .load_tubes_wrap {
+        margin-top: 0;
     }
 }
 
 .clear_rec {
     position: absolute;
     left: 0;
+    bottom: 0;
+}
+
+body div canvas {
+    left: auto;
+    right: 0;
     bottom: 0;
 }
