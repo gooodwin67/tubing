@@ -471,47 +471,6 @@ canvas {
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.8)
 }
 
-.sci-fi-loader {
-    position: relative;
-    max-width: 3em;
-    top: -70px;
-}
-
-.outer,
-.middle,
-.inner {
-    border: 3px solid transparent;
-    border-top-color: #17c;
-    border-right-color: #17c;
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-}
-
-.outer {
-    width: 3.5em;
-    height: 3.5em;
-    margin-left: -1.75em;
-    margin-top: -1.75em;
-    animation: spin 2s linear infinite;
-}
-
-.middle {
-    width: 2.1em;
-    height: 2.1em;
-    margin-left: -1.05em;
-    margin-top: -1.05em;
-    animation: spin 1.75s linear reverse infinite;
-}
-
-.inner {
-    width: 0.8em;
-    height: 0.8em;
-    margin-left: -0.4em;
-    margin-top: -0.4em;
-    animation: spin 1.5s linear infinite;
-}
 
 
 
@@ -607,7 +566,37 @@ canvas {
     text-align: center;
 }
 
+.sci-fi-loader span {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+    top: 0;
+    left: 0;
+}
 
+.first_dot {
+    animation: top 0.3s ease infinite alternate;
+}
+
+.second_dot {
+    animation: top 0.3s ease infinite alternate -0.1s;
+}
+
+.third_dot {
+    animation: top 0.3s ease infinite alternate -0.2s;
+}
+
+@keyframes top {
+    from {
+        transform: translateY(0);
+
+    }
+
+    to {
+        transform: translateY(-15px);
+
+    }
+}
 
 .button_active {
     animation: push 0.1s linear infinite;

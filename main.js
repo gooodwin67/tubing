@@ -106,7 +106,7 @@ languagesBtns.forEach((child, index) => {
 
 function changeLanguage(language) {
   if (language == 0) {
-    document.querySelector('.title_game').src = "/images/title.png";
+    document.querySelector('.title_game').src = "./images/title.png";
     document.querySelector('.startgame_title').textContent = 'начать игру'
     document.querySelector('.language_title').textContent = 'Язык:'
     document.querySelectorAll('.level_text h2>span').forEach((el) => {
@@ -159,12 +159,12 @@ function changeLanguage(language) {
     <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>
     <img src="/images/instr-mobile.png" alt="">`
 
-
+    document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
 
   }
   else {
-    document.querySelector('.title_game').src = "/images/title-en.png";
+    document.querySelector('.title_game').src = "./images/title-en.png";
     document.querySelector('.startgame_title').textContent = 'start game'
     document.querySelector('.language_title').textContent = 'Language:'
     document.querySelectorAll('.level_text h2>span').forEach((el) => {
@@ -216,6 +216,8 @@ function changeLanguage(language) {
     document.querySelector('.mobile_instr').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
     <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>
     <img src="/images/instr-mobile.png" alt="">`
+
+    document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
   }
 };
