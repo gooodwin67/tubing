@@ -53,15 +53,16 @@ body {
 
 .pause_button_wrap {
     position: absolute;
-    left: 10px;
+    left: 60px;
     top: 10px;
     color: red;
     padding: 0px;
     z-index: 9;
-    width: 50px;
-    height: 50px;
-    background: rgba(25, 31, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    background: rgba(25, 31, 255, 0.4);
     cursor: pointer;
+    border-radius: 6px;
 }
 
 
@@ -70,13 +71,60 @@ body {
     padding: 0px;
 }
 
-.pause_button_wrap {
-    border-radius: 6px;
-}
 
 .pause_button_wrap img {
     width: 100%;
     height: 100%;
+}
+
+.audio_button_wrap {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    color: red;
+    padding: 0px;
+    z-index: 9;
+    width: 40px;
+    height: 40px;
+    background: rgba(25, 31, 255, 0.4);
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+
+
+.audio_button_wrap .audio_button {
+    padding: 0px;
+}
+
+
+.audio_button_wrap img {
+    width: 100%;
+    height: 100%;
+}
+
+.audio_off::before {
+    content: '';
+    position: absolute;
+    width: 10%;
+    height: 80%;
+    background: rgba(255, 0, 0, 0.9);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-radius: 50px;
+}
+
+.audio_off::after {
+    content: '';
+    position: absolute;
+    width: 10%;
+    height: 80%;
+    background: rgba(255, 0, 0, 0.9);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    border-radius: 50px;
 }
 
 .overlay {
@@ -680,8 +728,6 @@ canvas {
     opacity: 1;
     border: 2px solid #ffffff;
 }
-
-.language_block .ru_image {}
 
 
 

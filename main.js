@@ -48,6 +48,8 @@ let movingBlocks = [];
 let movingBlocksBody = [];
 
 
+
+
 let timesBlock = document.querySelector('.times');
 let currentTimeBlock = document.querySelector('.current_time');
 let bestTimeBlock = document.querySelector('.best_time');
@@ -82,6 +84,7 @@ let menuInGameWrap = document.querySelector('.menu_in_game_wrap');
 let startTimeBlock = document.querySelector('.start_time');
 let startTimeWrap = document.querySelector('.start_time_wrap');
 
+let audioButton = document.querySelector('.audio_button');
 
 let clearRec = document.querySelector('.clear_rec');
 clearRec.addEventListener('click', () => {
@@ -299,11 +302,30 @@ instructionStartBtn.addEventListener('click', () => {
   startRace();
 })
 
+audioButton.addEventListener('click', () => {
+  if (canAudio == true) {
+    audioButton.classList.add('audio_off');
+    if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+    if (soundSlide != undefined) soundSlide.stop();
+    canAudio = false;
+  }
+  else {
+    audioButton.classList.remove('audio_off');
+    if (soundAround != undefined && !soundAround.isPlaying) soundAround.play();
+    if (playerBody.linvel().z > 3 && player.userData.onGround && !pause) {
+      if (soundSlide != undefined) soundSlide.play();
+    }
+    canAudio = true;
+  }
+})
+
 
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
 
-  // soundAround.play();
+  document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
+
+  if (soundAround != undefined && canAudio) soundAround.play();
 
   if (isMobile) {
     document.body.requestFullscreen().then(() => {
@@ -368,6 +390,11 @@ pauseButton.addEventListener('click', () => {
     hiddenBlock(menuInGameWrap);
     player.userData.time = timer.getElapsedTime();
     timer.stop();
+    document.querySelector('.audio_button_wrap').classList.add('hidden_block');
+
+    if (soundSlide != undefined) soundSlide.stop();
+    if (soundAround != undefined) soundAround.stop();
+
     pause = true;
   }
 });
@@ -376,6 +403,14 @@ closePauseButton.addEventListener('click', () => {
   hiddenBlock(0);
   timer.start();
   timer.elapsedTime = player.userData.time;
+  document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
+  if (canAudio) {
+    if (soundAround != undefined) soundAround.play();
+  }
+  if (playerBody.linvel().z > 3 && player.userData.onGround && canAudio) {
+    if (soundSlide != undefined) soundSlide.play();
+  }
+
   pause = false;
 })
 
@@ -416,6 +451,8 @@ let levelItems = [];
 let currentLevel = 0;
 
 let pause = false;
+
+let canAudio = true;
 
 
 let player;
@@ -479,8 +516,10 @@ const tubesChars = [
 
 
 let soundSlide;
-let soundJump;
+
 let soundAround;
+
+let soundBoom;
 let soundMusic;
 
 let ground;
@@ -941,33 +980,41 @@ async function loadAudio() {
   player.add(listener);
 
 
-  // const audioLoader = new THREE.AudioLoader();
-  // await audioLoader.loadAsync('public/audio/slide.mp3').then((buffer) => {
-  //   soundSlide = new THREE.PositionalAudio(listener);
-  //   soundSlide.setBuffer(buffer);
-  //   soundSlide.setLoop(true);
-  //   soundSlide.setRefDistance(40);
-  //   soundSlide.setVolume(1);
-  //   player.add(soundSlide);
-  // });
+  const audioLoader = new THREE.AudioLoader();
+  await audioLoader.loadAsync('audio/slide.mp3').then((buffer) => {
+    soundSlide = new THREE.PositionalAudio(listener);
+    soundSlide.setBuffer(buffer);
+    soundSlide.setLoop(true);
+    soundSlide.setRefDistance(40);
+    soundSlide.setVolume(0.7);
+    player.add(soundSlide);
+  }).catch((error) => {
+    console.error('Ошибка при загрузке аудио:', error);
+  });
 
-  // await audioLoader.loadAsync('public/audio/jump.mp3').then((buffer) => {
-  //   soundJump = new THREE.PositionalAudio(listener);
-  //   soundJump.setBuffer(buffer);
-  //   soundJump.setLoop(false);
-  //   soundJump.setRefDistance(40);
-  //   soundJump.setVolume(0.4);
-  //   player.add(soundJump);
-  // });
+  await audioLoader.loadAsync('audio/around.mp3').then((buffer) => {
+    soundAround = new THREE.PositionalAudio(listener);
+    soundAround.setBuffer(buffer);
+    soundAround.setLoop(true);
+    soundAround.setRefDistance(40);
+    soundAround.setVolume(1);
+    soundAround.error = false;
+    player.add(soundAround);
+  }).catch((error) => {
+    console.error('Ошибка при загрузке аудио:', error);
+  });
 
-  // await audioLoader.loadAsync('public/audio/around.mp3').then((buffer) => {
-  //   soundAround = new THREE.PositionalAudio(listener);
-  //   soundAround.setBuffer(buffer);
-  //   soundAround.setLoop(true);
-  //   soundAround.setRefDistance(40);
-  //   soundAround.setVolume(1);
-  //   player.add(soundAround);
-  // });
+  await audioLoader.loadAsync('audio/boom1.mp3').then((buffer) => {
+    soundBoom = new THREE.PositionalAudio(listener);
+    soundBoom.setBuffer(buffer);
+    soundBoom.setLoop(false);
+    soundBoom.setRefDistance(40);
+    soundBoom.setVolume(0.9);
+    soundBoom.error = false;
+    player.add(soundBoom);
+  }).catch((error) => {
+    console.error('Ошибка при загрузке аудио:', error);
+  });
 
   // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
   //   soundMusic = new THREE.PositionalAudio(listener);
@@ -1003,12 +1050,14 @@ async function initAllData(needMenu, needLevel) {
 
 
 
+
+
   // mainLoadScreen.classList.add("hidden_block");
   // selectLevelScreen.classList.remove("hidden_block");
 
 
-  await loadAudio()
 
+  if (firststart) loadAudio();
 
 
 
@@ -1036,6 +1085,7 @@ async function resetAllMap() {
   pauseButton.classList.add('hidden_block');
   timesBlock.classList.add('hidden_block');
   speedBlockWrap.classList.add('hidden_block');
+  document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
 
   timer.start();
   timer.elapsedTime = player.userData.time;
@@ -1066,8 +1116,8 @@ async function resetAllMap() {
 function animate() {
   //console.log(renderer.info.render);
 
-  console.log("Number of calls :", renderer.info.render.calls);
-  console.log("Number of Triangles :", renderer.info.render.triangles);
+  // console.log("Number of calls :", renderer.info.render.calls);
+  // console.log("Number of Triangles :", renderer.info.render.triangles);
 
 
   frames++;
@@ -1084,12 +1134,14 @@ function animate() {
 
   if (menuLoaded && !playerIsFinish) {
 
-    // if (playerBody.linvel().z > 3 && player.userData.onGround) {
-    //   if (!soundSlide.isPlaying) soundSlide.play();
-    // }
-    // else {
-    //   if (soundSlide.isPlaying) soundSlide.stop()
-    // }
+    if (soundSlide != undefined && canAudio) {
+      if (playerBody.linvel().z > 3 && player.userData.onGround) {
+        if (!soundSlide.isPlaying) soundSlide.play();
+      }
+      else {
+        if (soundSlide.isPlaying) soundSlide.stop()
+      }
+    }
 
     if (isMobile) {
       if (!player.userData.boom) {
@@ -1100,6 +1152,7 @@ function animate() {
       }
       else {
         camera.lookAt(itsMenBody.position);
+        if (soundSlide != undefined) soundSlide.stop();
       }
     }
     else {
@@ -1110,8 +1163,8 @@ function animate() {
         camera.position.z = player.position.z - 4;
       }
       else {
-        if (playerTtube.position.y > 0)
-          camera.lookAt(itsMenBody.position);
+        if (playerTtube.position.y > 0) camera.lookAt(itsMenBody.position);
+        if (soundSlide != undefined) soundSlide.stop();
       }
     }
     targetCube.position.set(player.position.x, player.position.y, player.position.z + 5)
@@ -1131,6 +1184,7 @@ function animate() {
     }
     else {
       hiddenBlock(finishScreen);
+      if (soundSlide != undefined) soundSlide.stop();
     }
 
     // let shape = playerCollider;
@@ -1188,6 +1242,7 @@ function animate() {
 
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
+              if (soundBoom != undefined && canAudio) soundBoom.play();
               world.removeImpulseJoint(jointMenTube);
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
@@ -1204,6 +1259,7 @@ function animate() {
         else if (playerBody.handle == handle1 && !playerIsFinish) {
           if (playerBody.linvel().z < 15 && player.position.y < 5) {
             if (player.userData.boom == false) {
+              if (soundBoom != undefined && canAudio) soundBoom.play();
               world.removeImpulseJoint(jointMenTube);
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
@@ -1395,10 +1451,7 @@ function playerMove() {
   if (intersects.length > 0) {
     if (intersects[0].distance < 0.4) {
       player.userData.flying = false;
-      if (!player.userData.onGround && !player.userData.flying) {
-        // soundJump.play();
 
-      }
       player.userData.onGround = true;
     }
     else {
@@ -1712,6 +1765,12 @@ function addPhysicsToObject(obj) {
 
 document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
+    if (canAudio) {
+      if (soundAround != undefined) soundAround.play();
+    }
+    if (playerBody.linvel().z > 3 && player.userData.onGround && canAudio) {
+      if (soundSlide != undefined) soundSlide.play();
+    }
 
     if (!playerIsFinish && dataLoaded) {
       if (pause == false) {
@@ -1721,6 +1780,8 @@ document.addEventListener("visibilitychange", function () {
     }
 
   } else {
+    if (soundAround != undefined) soundAround.stop();
+    if (soundSlide != undefined) soundSlide.stop();
     if (pause == false) {
       if (!playerIsFinish && dataLoaded) {
         player.userData.time = timer.getElapsedTime();
