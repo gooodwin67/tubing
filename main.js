@@ -10,15 +10,10 @@ import Stats from 'three/addons/libs/stats.module.js';
 
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-import RAPIER, { RayColliderHit } from '@dimforge/rapier3d-compat';
+import RAPIER from '@dimforge/rapier3d-compat';
 
 
-import { OrbitControls } from "three/addons/controls/OrbitControls";
-
-import { detectCollisionCubes } from "./functions/detectColisions";
-import { detectCollisionCubeAndArray } from "./functions/detectColisions";
 import { detectDevice } from "./functions/detectColisions";
-import { remove } from 'three/examples/jsm/libs/tween.module.js';
 
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
@@ -272,13 +267,19 @@ function startRace() {
     timesBlock.classList.remove('hidden_block');
     speedBlockWrap.classList.remove('hidden_block');
     tubesMas[tubenum].position.copy(playerBody.translation());
-    let iter = 2; //0
+    let iter = 0; //0
     naStartTimer = true;
     let interval = setInterval((e) => {
+      if (soundBip != undefined && !soundBip.isPlaying) soundBip.play();
       startTimeWrap.classList.remove("hidden_block");
       iter++;
 
+      if (iter == 2 && isMobile) {
+        document.querySelector('.instr-mobile-ingame').classList.add('hidden_block')
+      }
+
       if (iter == 4) {
+        if (soundBip != undefined) soundBip.stop(2.5);
         naStartTimer = false;
         startTimeBlock.textContent = 'GO';
         dataLoaded = true;
@@ -299,6 +300,7 @@ function startRace() {
 instructionStartBtn.addEventListener('click', () => {
   playerData.canStart = true;
   hiddenBlock(0);
+  if (isMobile) document.querySelector('.instr-mobile-ingame').classList.remove('hidden_block')
   startRace();
 })
 
@@ -520,7 +522,7 @@ let soundSlide;
 let soundAround;
 
 let soundBoom;
-let soundMusic;
+let soundBip;
 
 let ground;
 let groundBody;
@@ -1016,14 +1018,18 @@ async function loadAudio() {
     console.error('Ошибка при загрузке аудио:', error);
   });
 
-  // await audioLoader.loadAsync('assets/audio/music.mp3').then((buffer) => {
-  //   soundMusic = new THREE.PositionalAudio(listener);
-  //   soundMusic.setBuffer(buffer);
-  //   soundMusic.setLoop(true);
-  //   soundMusic.setRefDistance(40);
-  //   soundMusic.setVolume(0.4);
-  //   player.add(soundMusic);
-  // });
+  await audioLoader.loadAsync('audio/bip.mp3').then((buffer) => {
+    soundBip = new THREE.PositionalAudio(listener);
+    soundBip.setBuffer(buffer);
+    soundBip.setLoop(false);
+    soundBip.setRefDistance(40);
+    soundBip.setVolume(1);
+    soundBip.error = false;
+    player.add(soundBip);
+  }).catch((error) => {
+    console.error('Ошибка при загрузке аудио:', error);
+  });
+
 
 }
 async function init() {
@@ -1120,17 +1126,7 @@ function animate() {
   // console.log("Number of Triangles :", renderer.info.render.triangles);
 
 
-  frames++;
-  const time = performance.now();
 
-  if (time >= prevTime + 1000) {
-
-    //console.log(Math.round((frames * 1000) / (time - prevTime)));
-
-    frames = 0;
-    prevTime = time;
-
-  }
 
   if (menuLoaded && !playerIsFinish) {
 
@@ -1177,19 +1173,12 @@ function animate() {
       blocksMove();
 
 
-
-
-
-
     }
     else {
       hiddenBlock(finishScreen);
       if (soundSlide != undefined) soundSlide.stop();
     }
 
-    // let shape = playerCollider;
-    // let shapePos = playerCollider.translation();
-    // let shapeRot = playerCollider.rotation();
 
 
     // world.intersectionsWithShape(shapePos, shapeRot, shape, (handle) => {
@@ -1301,7 +1290,6 @@ document.addEventListener('touchmove', onTouchMove);
 window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 
-document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 function blocksMove() {
 
@@ -1355,13 +1343,6 @@ function blocksMove() {
 }
 
 function playerMove() {
-
-
-
-
-
-
-
 
 
   if (player.position.z > finishBlock.position.z && !player.userData.boom) {
@@ -1431,21 +1412,6 @@ function playerMove() {
   }
 
 
-
-
-
-
-  //console.log(menBody.rotation.y)
-
-
-
-
-  // playerBody.setLinvel({
-  //   x: direction.x * -tubesChars[tubenum].hSpeed,
-  //   y: playerBody.linvel().y,
-  //   z: playerBody.linvel().z
-  // });
-
   raycaster1.set(player.position, direction1);
   const intersects = raycaster1.intersectObjects(allObjCollision);
   if (intersects.length > 0) {
@@ -1491,12 +1457,12 @@ function playerMove() {
   }
 
   if (player.position.z > startFlag.position.z) {
-    if (player.userData.onStartArea) playerBody.lockRotations(false, true, true);
+    playerBody.setEnabledRotations(true, false, false, true);
     player.userData.onStartArea = false;
   }
   else {
     player.userData.onStartArea = true;
-    playerBody.lockRotations(true, true, true);
+    playerBody.lockRotations(true, true, true, true);
   }
 
 
@@ -1537,32 +1503,8 @@ function onTouchMove(e) {
   }
 }
 
-function onDocumentMouseDown(e) {
-  e.preventDefault();
-  var rect = renderer.domElement.getBoundingClientRect();
-
-  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-  mouse.y = - ((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-
-  levelItems.forEach((item) => {
-    item.geometry.computeBoundingBox();
-    var box1 = item.geometry.boundingBox.clone();
-    box1.applyMatrix4(item.matrixWorld);
-
-    let intersects = raycaster.ray.intersectBox(box1, new THREE.Vector3());
-
-    if (intersects) {
-
-    }
-  })
 
 
-
-
-
-}
 
 function onTouchEnd(e) {
   player.userData.right = false;
@@ -1586,8 +1528,7 @@ function onKeyDown(event) {
       break;
     case 'KeyS':
     case 'ArrowDown':
-      playerBody.applyImpulse({ x: 0.0, y: 0.0, z: -tubesChars[tubenum].stepSpeed / 2 }, true);
-      player.userData.playerBraking = true;
+
 
       break;
     case 'KeyA':
@@ -1608,9 +1549,7 @@ function onKeyUp(event) {
       break;
     case 'KeyS':
     case 'ArrowDown':
-      if (playerBody.linvel().y < 0.1) {
-        player.userData.playerBraking = false;
-      }
+
       break;
     case 'KeyA':
     case 'ArrowLeft':
@@ -1760,9 +1699,6 @@ function addPhysicsToObject(obj) {
 
 
 
-
-
-
 document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
     if (canAudio) {
@@ -1790,27 +1726,3 @@ document.addEventListener("visibilitychange", function () {
     }
   }
 });
-
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////////*/
-
-// player.mixer = new THREE.AnimationMixer(player);
-//   player.mixers = [];
-//   player.allAnimations = [];
-//   player.mixers.push(player.mixer);
-//   player.clock = new THREE.Clock();
-//   player.animations = gltf.animations;
-
-
-//   player.allAnimations.push(player.userData.playerRotate = player.mixer.clipAction(player.animations[0]));
-//   //player.userData.playerRotate.timeScale = 1;
-
-//   //player.userData.playerRotate.play();
-
-// if (player.mixers.length > 0) {
-
-//   player.mixers[0].update(player.clock.getDelta());
-
-// }
-
-/*///////////////////////////////////////////////////////////////////////////////////////////////////////*/
