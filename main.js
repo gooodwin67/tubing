@@ -270,7 +270,7 @@ function startRace() {
     let iter = 0; //0
     naStartTimer = true;
     let interval = setInterval((e) => {
-      if (soundBip != undefined && !soundBip.isPlaying) soundBip.play();
+      if (soundBip != undefined && !soundBip.isPlaying && canAudio) soundBip.play();
       startTimeWrap.classList.remove("hidden_block");
       iter++;
 
@@ -308,7 +308,8 @@ audioButton.addEventListener('click', () => {
   if (canAudio == true) {
     audioButton.classList.add('audio_off');
     if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
-    if (soundSlide != undefined) soundSlide.stop();
+    if (soundSlide != undefined && soundSlide.isPlaying) soundSlide.stop();
+    if (soundBip != undefined && soundBip.isPlaying) soundBip.stop();
     canAudio = false;
   }
   else {
