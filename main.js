@@ -613,8 +613,8 @@ const ambientLight = new THREE.AmbientLight(0xaaaaaa, 1); // soft white light
 const camera = new THREE.PerspectiveCamera(85, document.body.offsetWidth / document.body.offsetHeight, 0.1, 310);
 camera.position.set(0, 4, -10);
 
-let stats = new Stats();
-document.body.appendChild(stats.dom);
+//let stats = new Stats();
+//document.body.appendChild(stats.dom);
 
 const renderer = new THREE.WebGLRenderer({ antialias: false });
 
@@ -1274,7 +1274,7 @@ function animate() {
   }
 
 
-  stats.update();
+  //stats.update();
 
 }
 
