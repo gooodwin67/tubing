@@ -140,7 +140,7 @@ function changeLanguage(language) {
       el.textContent = 'Еще раз'
     })
     document.querySelectorAll('.finish_in_menu').forEach((el) => {
-      el.textContent = 'В меню'
+      el.textContent = 'Выбор уровня'
     })
 
     document.querySelector('.current_time_title').textContent = 'Время'
@@ -198,7 +198,7 @@ function changeLanguage(language) {
       el.textContent = 'Again'
     })
     document.querySelectorAll('.finish_in_menu').forEach((el) => {
-      el.textContent = 'In Menu'
+      el.textContent = 'Select Level'
     })
 
     document.querySelector('.current_time_title').textContent = 'Time'
@@ -326,9 +326,15 @@ audioButton.addEventListener('click', () => {
 })
 
 
+
+
+let playerOn;
+
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
-  // initSDK();
+
+  
+
   document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
 
   if (soundAround != undefined && canAudio) soundAround.play();
@@ -378,6 +384,19 @@ finishInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
   await resetAllMap();
   await init();
+  ysdk.adv.showFullscreenAdv({
+      callbacks: {
+          onOpen : function(wasShown) {
+            if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+          },
+          onClose: function(wasShown) {
+            if (soundAround != undefined && !soundAround.isPlaying) soundAround.play();
+          },
+          onError: function(error) {
+            // Действие в случае ошибки.
+          }
+      }
+  })
 });
 boomInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
@@ -1044,6 +1063,7 @@ async function loadAudio() {
 }
 async function init() {
   await initAllData(true, false)
+  
   if (firststart) {
 
 
@@ -1711,6 +1731,7 @@ function addPhysicsToObject(obj) {
 
 
 }
+
 
 
 
