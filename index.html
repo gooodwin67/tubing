@@ -12,7 +12,7 @@
          if (typeof YaGames !== 'undefined') {
             YaGames.init().then(ysdk => {
                console.log('Yandex SDK initialized');
-               window.ysdk = ysdk; // Сохраняем экземпляр SDK глобально
+               window.ysdk = ysdk;
             });
          } else {
             console.error('YaGames is not defined!');
@@ -20,9 +20,11 @@
       }
    </script>
    <script src="/sdk.js" onload="initSDK()"></script>
+   <script type="module" src="/main.js"></script>
 </head>
 
 <body>
+   
 
 
    <div class="overlay main_load">
@@ -289,7 +291,7 @@
       <img src="/images/instr-mobile-ingame.png" alt="">
    </div>
 
-   <script type="module" src="/main.js"></script>
+   
 
 </body>
 

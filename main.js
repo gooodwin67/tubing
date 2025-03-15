@@ -1062,14 +1062,14 @@ async function loadAudio() {
 
 }
 async function init() {
+  
   await initAllData(true, false)
   
   if (firststart) {
-
-
-
-
     hiddenBlock(mainMenuScreen);
+    YaGames.init().then(ysdk => {
+      ysdk.features.LoadingAPI?.ready();
+    });
     firststart = false;
   }
   else {
