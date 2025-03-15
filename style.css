@@ -747,6 +747,8 @@ canvas {
 }
 
 @media (max-width: 960px) {
+    body {}
+
     .times {
         top: 65px;
     }
@@ -789,7 +791,6 @@ canvas {
     position: absolute;
     left: 0;
     bottom: 0;
-    /* display: none; */
 }
 
 body div canvas {

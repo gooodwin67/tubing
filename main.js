@@ -491,7 +491,7 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 26,
     resetHAngle: false,
-    levels: [1, 2, 3, 4, 5, 6, 7, 8],
+    levels: [1, 2, 3, 4, 5, 6, 7, 8, 9],
     canInLevel: false
   },
   {
@@ -501,17 +501,17 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 38, //38
     resetHAngle: false,
-    levels: [5, 6, 7, 8],
+    levels: [4, 5, 6, 7, 8, 9],
     canInLevel: false
   },
   {
     hSpeed: 14,
     maxHSpeed: 0.12,
-    stepSpeed: 3,
+    stepSpeed: 2,
     nowSpeed: 0,
     maxSpeed: 44,
     resetHAngle: true,
-    levels: [6, 7, 8],
+    levels: [7, 8, 9],
     canInLevel: false
   }
 ]
@@ -624,10 +624,16 @@ renderer.shadowMap.enabled = false;
 
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize() {
-
-  camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+  if (isMobile) {
+    camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  }
+  else {
+    camera.aspect = document.body.offsetWidth / document.body.offsetHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
+  }
 }
 
 
@@ -1024,7 +1030,7 @@ async function loadAudio() {
     soundBip.setBuffer(buffer);
     soundBip.setLoop(false);
     soundBip.setRefDistance(40);
-    soundBip.setVolume(1);
+    soundBip.setVolume(0.7);
     soundBip.error = false;
     player.add(soundBip);
   }).catch((error) => {
@@ -1384,18 +1390,19 @@ function playerMove() {
 
 
 
-  if (playerBody.translation().y < 100 && playerBody.translation().y >= 10) {
+  if (playerBody.translation().y < 100 && playerBody.translation().y >= 20) {
     tubesChars[tubenum].nowSpeed += 0.05;
     if (playerBody.rotation().x < 0.04) {
       playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
     }
   }
 
-  if (playerBody.translation().y < 10 && playerBody.translation().y > 1) {
-    if (playerBody.rotation().x < 0.04) {
-      playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
-      playerBody.lockRotations(true, true, true);
-    }
+  if (playerBody.translation().y < 20 && playerBody.translation().y > 1) {
+    playerBody.lockRotations(true, true, true, true);
+    // if (playerBody.rotation().x < 0.04) {
+    //   playerBody.setRotation({ w: playerBody.rotation().w, x: 0.04, y: playerBody.rotation().y, z: playerBody.rotation().z })
+    //   playerBody.lockRotations(true, true, true, true);
+    // }
   }
 
   playerBody.setLinvel(newVelocity, true);
@@ -1418,7 +1425,6 @@ function playerMove() {
   if (intersects.length > 0) {
     if (intersects[0].distance < 0.4) {
       player.userData.flying = false;
-
       player.userData.onGround = true;
     }
     else {
@@ -1458,12 +1464,13 @@ function playerMove() {
   }
 
   if (player.position.z > startFlag.position.z) {
-    playerBody.setEnabledRotations(true, false, false, true);
+    //playerBody.setEnabledRotations(true, false, false, true);
+    //if (player.position.y > 100) playerBody.lockRotations(false, true, true, true);
     player.userData.onStartArea = false;
   }
   else {
     player.userData.onStartArea = true;
-    playerBody.lockRotations(true, true, true, true);
+    //if (player.position.y > 100) playerBody.lockRotations(true, true, true, true);
   }
 
 
@@ -1491,7 +1498,7 @@ function onTouchMove(e) {
     }
     player.userData.canBoostStep = false;
 
-    if (mouse.y < 0) {
+    if (mouse.y < 0.5) {
       if (mouse.x > 0) {
         player.userData.left = false
         player.userData.right = true
