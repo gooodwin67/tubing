@@ -222,7 +222,7 @@ function changeLanguage(language) {
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
-    if (index + 1 <= openLevels + 10) {
+    if (index + 1 <= openLevels) {
       currentLevel = index + 1;
       tubesBlock.forEach((child, index) => {
         if (tubesChars[index].levels.includes(currentLevel)) {
