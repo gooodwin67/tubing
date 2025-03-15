@@ -81,10 +81,10 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 
 let audioButton = document.querySelector('.audio_button');
 
-let clearRec = document.querySelector('.clear_rec');
-clearRec.addEventListener('click', () => {
-  localStorage.clear();
-})
+// let clearRec = document.querySelector('.clear_rec');
+// clearRec.addEventListener('click', () => {
+//   localStorage.clear();
+// })
 
 languagesBtns.forEach((child, index) => {
   child.addEventListener('click', () => {
