@@ -4,6 +4,9 @@
 // npm run build 
 // npm run deploy 
 
+
+
+
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 
@@ -325,7 +328,7 @@ audioButton.addEventListener('click', () => {
 
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
-
+  // initSDK();
   document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
 
   if (soundAround != undefined && canAudio) soundAround.play();
@@ -1042,6 +1045,10 @@ async function loadAudio() {
 async function init() {
   await initAllData(true, false)
   if (firststart) {
+
+
+
+
     hiddenBlock(mainMenuScreen);
     firststart = false;
   }

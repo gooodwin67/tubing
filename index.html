@@ -6,10 +6,24 @@
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
    <title>Спуск на тюбинге</title>
    <link href="style.css" rel="stylesheet" />
+   <!-- Yandex Games SDK -->
+   <script>
+      function initSDK() {
+         if (typeof YaGames !== 'undefined') {
+            YaGames.init().then(ysdk => {
+               console.log('Yandex SDK initialized');
+               window.ysdk = ysdk; // Сохраняем экземпляр SDK глобально
+            });
+         } else {
+            console.error('YaGames is not defined!');
+         }
+      }
+   </script>
+   <script src="/sdk.js" onload="initSDK()"></script>
 </head>
 
 <body>
-   <script type="module" src="/main.js"></script>
+
 
    <div class="overlay main_load">
       <!-- <button class="clear_rec">Удалить рекорды</button> -->
@@ -274,6 +288,8 @@
    <div class="instr-mobile-ingame hidden_block">
       <img src="/images/instr-mobile-ingame.png" alt="">
    </div>
+
+   <script type="module" src="/main.js"></script>
 
 </body>
 
