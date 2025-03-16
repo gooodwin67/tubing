@@ -674,7 +674,12 @@ canvas {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-
+}
+.mobile_instr>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .mobile_instr>img {
@@ -686,8 +691,9 @@ canvas {
     margin: 0px 0;
 }
 
-.mobile_instr>span {
-    display: inline-block;
+.mobile_instr>div>span {
+    display: flex;
+    align-items: center;
     margin-bottom: 0px;
     font-size: 13px;
     margin-top: 10px;
@@ -696,6 +702,7 @@ canvas {
 .mobile_instr span>span {
     font-size: 20px;
     color: yellow;
+    padding: 0 5px;
 }
 
 .mobile_instr~.btn {

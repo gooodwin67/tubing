@@ -156,9 +156,8 @@ function changeLanguage(language) {
     <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте тюбингом</span>
     <span>Цель - доехать до финиша за кратчайшее время</span>`;
 
-    document.querySelector('.mobile_instr').innerHTML = `<span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
-    <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>
-    <img src="/images/instr-mobile.png" alt="">`
+    document.querySelector('.mobile_instr div').innerHTML = `<span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
+    <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>`
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
@@ -214,9 +213,8 @@ function changeLanguage(language) {
     <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the tubing</span>
     <span>The goal is to reach the finish line in the shortest time</span>`;
 
-    document.querySelector('.mobile_instr').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
-    <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>
-    <img src="/images/instr-mobile.png" alt="">`
+    document.querySelector('.mobile_instr div').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
+    <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>`
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
@@ -1750,10 +1748,10 @@ document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
     noVisible = false;
     
-    if (canAudio) {
+    if (canAudio && pause == false) {
       if (soundAround != undefined) soundAround.play();
     }
-    if (playerBody.linvel().z > 3 && player.userData.onGround && canAudio) {
+    if (playerBody.linvel().z > 3 && player.userData.onGround && canAudio && pause == false) {
       if (soundSlide != undefined) soundSlide.play();
     }
 
