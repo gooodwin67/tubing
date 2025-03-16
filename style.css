@@ -739,12 +739,96 @@ canvas {
     z-index: 99;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    opacity: 0.5;
 }
 
 .instr-mobile-ingame img {
     width: 100%;
     height: 100%;
 }
+
+/*///////////////////////////////////////////////*/
+
+.anim_tap {
+    display: flex;
+    z-index: 999;
+    position: absolute;
+    left: 50%;
+    top: 15%;
+}
+
+.anim_tap svg {
+	display: inline-block;
+	width: 130px;
+    position: absolute;
+}
+
+/* SVG RULES */
+
+ 
+.anim_tap .hand-tap {
+	fill: #fff;
+	stroke: #000;
+	stroke-width: 3px;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+
+.tap-1 {
+	fill: transparent;
+	stroke: #000;
+	stroke-width: 3px;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+
+@keyframes tap {
+	0% {
+		transform: rotateX(0deg);
+	}
+	10% {
+		transform: rotateX(12.5deg);
+	}
+	25% {
+		transform: rotateX(25deg);
+	}
+}
+
+@keyframes tap-circle {
+	0% {
+		transform: scale(0);
+		opacity: 0;
+	}
+	75% {
+		transform: scale(1.05);
+		opacity: .6;
+	}
+	80% {
+		transform: scale(1);
+		opacity: .5;
+	}
+}
+
+/* SVG ANIMATION */
+
+.anim_tap  * {
+	transform-origin: 50% 50%;
+	perspective: 100px;
+}
+
+.anim_tap .hand-tap {
+	animation: tap 0.1s ease-out backwards;
+	animation-iteration-count:infinite;
+}
+
+.anim_tap .tap-1 {
+	animation: tap-circle 0.1s ease-out backwards;
+	animation-iteration-count:infinite;
+}
+
 
 @media (max-width: 960px) {
     body {}

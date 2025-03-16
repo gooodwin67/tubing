@@ -272,13 +272,16 @@ function startRace() {
     tubesMas[tubenum].position.copy(playerBody.translation());
     let iter = 0; //0
     naStartTimer = true;
+    if (isMobile) document.querySelector('.instr-mobile-ingame').classList.remove('hidden_block')
+    if (isMobile) document.querySelector('.anim_tap').classList.remove('hidden_block')
     let interval = setInterval((e) => {
-      if (soundBip != undefined && !soundBip.isPlaying && canAudio) soundBip.play();
+      if (soundBip != undefined && !soundBip.isPlaying && canAudio && !noVisible) soundBip.play();
       startTimeWrap.classList.remove("hidden_block");
-      iter++;
+      if (!noVisible) iter++;
 
       if (iter == 2 && isMobile) {
         document.querySelector('.instr-mobile-ingame').classList.add('hidden_block')
+        document.querySelector('.anim_tap').classList.add('hidden_block')
       }
 
       if (iter == 4) {
@@ -288,6 +291,7 @@ function startRace() {
         dataLoaded = true;
         pauseButton.classList.remove('hidden_block');
         clearInterval(interval);
+        ysdk.features.GameplayAPI.start();
         setTimeout(() => {
           startTimeWrap.classList.add("hidden_block");
         }, 600);
@@ -303,7 +307,7 @@ function startRace() {
 instructionStartBtn.addEventListener('click', () => {
   playerData.canStart = true;
   hiddenBlock(0);
-  if (isMobile) document.querySelector('.instr-mobile-ingame').classList.remove('hidden_block')
+  
   startRace();
 })
 
@@ -412,6 +416,7 @@ inmenuButton.addEventListener('click', async () => {
 
 pauseButton.addEventListener('click', () => {
   if (naStartTimer == false && dataLoaded && !playerIsFinish) {
+    ysdk.features.GameplayAPI?.stop()
     hiddenBlock(menuInGameWrap);
     player.userData.time = timer.getElapsedTime();
     timer.stop();
@@ -437,6 +442,7 @@ closePauseButton.addEventListener('click', () => {
   }
 
   pause = false;
+  ysdk.features.GameplayAPI?.start()
 })
 
 
@@ -500,6 +506,8 @@ let chooseTubeNow = false;
 let selectTubeWall;
 
 let startFlag;
+
+let noVisible = false;
 
 
 let finishBlock;
@@ -1274,6 +1282,7 @@ function animate() {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
               }, 3000);
+              ysdk.features.GameplayAPI?.stop()
               player.userData.boom = true;
             }
             //camera.position.set(playerTtube.position); /////
@@ -1287,6 +1296,7 @@ function animate() {
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
               playerShape.setFriction(20);
+              ysdk.features.GameplayAPI?.stop()
               player.userData.boom = true;
               setTimeout(() => {
                 dataLoaded = false;
@@ -1388,6 +1398,7 @@ function playerMove() {
 
 
     playerIsFinish = true;
+    ysdk.features.GameplayAPI?.stop()
     finishScreenTime.textContent = currentTime;
     if (playerData.levelsTimes['time' + (currentLevel)] != undefined) {
       bestTime = playerData.levelsTimes['time' + (currentLevel)];
@@ -1737,6 +1748,8 @@ function addPhysicsToObject(obj) {
 
 document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
+    noVisible = false;
+    
     if (canAudio) {
       if (soundAround != undefined) soundAround.play();
     }
@@ -1746,12 +1759,16 @@ document.addEventListener("visibilitychange", function () {
 
     if (!playerIsFinish && dataLoaded) {
       if (pause == false) {
+        ysdk.features.GameplayAPI?.start()
         timer.start();
         timer.elapsedTime = player.userData.time;
       }
     }
 
   } else {
+    noVisible = true;
+    ysdk.features.GameplayAPI?.stop()
+    if (soundBip != undefined && soundBip.isPlaying) soundBip.pause();
     if (soundAround != undefined) soundAround.stop();
     if (soundSlide != undefined) soundSlide.stop();
     if (pause == false) {
@@ -1762,3 +1779,4 @@ document.addEventListener("visibilitychange", function () {
     }
   }
 });
+
