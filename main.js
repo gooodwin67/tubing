@@ -29,6 +29,9 @@ let finishScreenTime = document.querySelector('.finish_you_time .finish_you_time
 
 let BoomScreen = document.querySelector('.boom_window');
 
+
+let mainRecordText = document.querySelector('.main_record');
+
 let allOverlies = document.querySelectorAll('body>.overlay');
 
 
@@ -161,6 +164,9 @@ function changeLanguage(language) {
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
+    document.querySelector('.main_record_title').textContent = 'Общее время: '
+    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы сохранить общий рекорд'
+
 
   }
   else {
@@ -217,6 +223,9 @@ function changeLanguage(language) {
     <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>`
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
+
+    document.querySelector('.main_record_title').textContent = 'Total time: '
+    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Complete all the levels to keep the overall record'
 
   }
 };
@@ -305,7 +314,7 @@ function startRace() {
 instructionStartBtn.addEventListener('click', () => {
   playerData.canStart = true;
   hiddenBlock(0);
-  
+
   startRace();
 })
 
@@ -335,7 +344,7 @@ let playerOn;
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
 
-  
+
 
   document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
 
@@ -387,17 +396,17 @@ finishInMenuButton.addEventListener('click', async () => {
   await resetAllMap();
   await init();
   ysdk.adv.showFullscreenAdv({
-      callbacks: {
-          onOpen : function(wasShown) {
-            if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
-          },
-          onClose: function(wasShown) {
-            if (soundAround != undefined && !soundAround.isPlaying) soundAround.play();
-          },
-          onError: function(error) {
-            // Действие в случае ошибки.
-          }
+    callbacks: {
+      onOpen: function (wasShown) {
+        if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+      },
+      onClose: function (wasShown) {
+        if (soundAround != undefined && !soundAround.isPlaying) soundAround.play();
+      },
+      onError: function (error) {
+        // Действие в случае ошибки.
       }
+    }
   })
 });
 boomInMenuButton.addEventListener('click', async () => {
@@ -482,6 +491,9 @@ let currentLevel = 0;
 let pause = false;
 
 let canAudio = true;
+
+let mainRecord = 0;
+let levelsDone = 0;
 
 
 let player;
@@ -684,6 +696,15 @@ async function loadStorageData() {
     })
     languagesBtns[playerData.language].classList.add('selected');
     changeLanguage(playerData.language)
+    levelsDone = Object.keys(playerData.levelsTimes).length;
+    if (levelsDone == levelShadow.length) {
+      mainRecord = 0;
+      Object.values(playerData.levelsTimes).forEach((el) => {
+        mainRecord += parseFloat(el);
+      })
+      mainRecordText.textContent = mainRecord.toFixed(3);
+      mainRecordText.classList.add('main_record_green');
+    }
   }
 
 
@@ -1068,9 +1089,9 @@ async function loadAudio() {
 
 }
 async function init() {
-  
+
   await initAllData(true, false)
-  
+
   if (firststart) {
     hiddenBlock(mainMenuScreen);
     YaGames.init().then(ysdk => {
@@ -1403,12 +1424,25 @@ function playerMove() {
     }
     else {
       bestTime = 0;
+
     }
 
     if (currentTime < bestTime || bestTime == 0) {
       bestTime = currentTime;
       bestTimeBlock.textContent = bestTime;
       playerData.levelsTimes['time' + (currentLevel)] = bestTime;
+      levelsDone = Object.keys(playerData.levelsTimes).length;
+
+      if (levelsDone == levelShadow.length) {
+        mainRecord = 0;
+        Object.values(playerData.levelsTimes).forEach((el) => {
+          mainRecord += parseFloat(el);
+        })
+        mainRecordText.textContent = mainRecord.toFixed(3);
+        mainRecordText.classList.add('main_record_green');
+        console.log('mainRecord ' + mainRecord.toFixed(3))
+      }
+
       localStorage.setItem('playerData', JSON.stringify(playerData));
     }
 
@@ -1747,7 +1781,7 @@ function addPhysicsToObject(obj) {
 document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
     noVisible = false;
-    
+
     if (canAudio && pause == false) {
       if (soundAround != undefined) soundAround.play();
     }
