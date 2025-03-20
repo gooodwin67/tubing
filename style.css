@@ -854,6 +854,13 @@ canvas {
     color: #52e452;
 }
 
+.records_wrap {
+    display: inline-block;
+    padding: 0px 20px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+}
+
 @media (max-width: 960px) {
     body {}
 

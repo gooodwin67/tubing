@@ -17,6 +17,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 
 
 import { detectDevice } from "./functions/detectColisions";
+import { convertToMilliseconds } from "./functions/detectColisions";
 
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
@@ -68,6 +69,8 @@ let speedBlock = document.querySelector('.speed_block>.speed');
 let instrCheck = document.querySelector('.instr_check');
 
 let loadPercent = document.querySelector('.load_percent');
+
+let records_wrap = document.querySelector('.records_wrap');
 
 let pauseButton = document.querySelector('.pause_button_wrap');
 let closePauseButton = document.querySelector('.close_pause_button');
@@ -494,6 +497,11 @@ let canAudio = true;
 
 let mainRecord = 0;
 let levelsDone = 0;
+
+let lb;
+let resLb;
+let canSetLb = false;
+let canGetLb = false;
 
 
 let player;
@@ -1096,12 +1104,35 @@ async function init() {
     hiddenBlock(mainMenuScreen);
     YaGames.init().then(ysdk => {
       ysdk.features.LoadingAPI?.ready();
+
+      ysdk.getLeaderboards()
+        .then(_lb => {
+          lb = _lb;
+          _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
+            .then(res => {
+              console.log(res);
+              res.entries.forEach((el, index) => {
+                document.querySelector('.records_wrap').innerHTML = document.querySelector('.records_wrap').innerHTML + '<p>' + parseInt(index + 1) + '. ' + el.score + '<p/>'
+
+              })
+
+            });
+        });
+
+      ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
+        canSetLb = el;
+      })
+      ysdk.isAvailableMethod('leaderboards.getLeaderboardPlayerEntry').then((el) => {
+        canGetLb = el;
+      })
     });
+
     firststart = false;
   }
   else {
     hiddenBlock(selectLevelScreen);
   }
+
 
 }
 init();
@@ -1440,6 +1471,10 @@ function playerMove() {
         })
         mainRecordText.textContent = mainRecord.toFixed(3);
         mainRecordText.classList.add('main_record_green');
+        if (canSetLb) {
+          lb.setLeaderboardScore('main', convertToMilliseconds(mainRecord.toFixed(3)));
+          console.log("setNewRec")
+        }
         console.log('mainRecord ' + mainRecord.toFixed(3))
       }
 

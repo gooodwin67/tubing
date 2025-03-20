@@ -71,3 +71,12 @@ export function detectDevice() {
  }
  return false;
 }
+
+export function convertToMilliseconds(seconds) {
+ // Разделяем целую и дробную часть
+ const wholeSeconds = Math.floor(seconds); // целая часть (секунды)
+ const milliseconds = Math.round((seconds - wholeSeconds) * 1000); // дробная часть (миллисекунды)
+
+ // Переводим секунды в миллисекунды и добавляем миллисекунды
+ return (wholeSeconds * 1000) + milliseconds;
+}
