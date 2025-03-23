@@ -850,7 +850,7 @@ canvas {
 }
 
 .main_record_green {
-    font-size: 20px;
+    font-size: 18px;
     color: #52e452;
 }
 
@@ -859,6 +859,12 @@ canvas {
     padding: 0px 20px;
     border: 1px solid #ccc;
     border-radius: 9px;
+    text-align: left;
+}
+.records_wrap>div>p {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 960px) {

@@ -18,6 +18,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 
 import { detectDevice } from "./functions/detectColisions";
 import { convertToMilliseconds } from "./functions/detectColisions";
+import { convertMilliseconds } from "./functions/detectColisions";
 
 let mainLoadScreen = document.querySelector('.main_load');
 let mainMenuScreen = document.querySelector('.main_menu');
@@ -70,7 +71,7 @@ let instrCheck = document.querySelector('.instr_check');
 
 let loadPercent = document.querySelector('.load_percent');
 
-let records_wrap = document.querySelector('.records_wrap');
+let records_wrap = document.querySelector('.records_wrap>div');
 
 let pauseButton = document.querySelector('.pause_button_wrap');
 let closePauseButton = document.querySelector('.close_pause_button');
@@ -167,8 +168,11 @@ function changeLanguage(language) {
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
-    document.querySelector('.main_record_title').textContent = 'Общее время: '
+    document.querySelector('.main_record_title').textContent = 'Мое общее время: '
+    
     if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы сохранить общий рекорд'
+
+    document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
 
 
   }
@@ -227,8 +231,10 @@ function changeLanguage(language) {
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
-    document.querySelector('.main_record_title').textContent = 'Total time: '
+    document.querySelector('.main_record_title').textContent = 'My total time: '
     if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Complete all the levels to keep the overall record'
+
+    document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
 
   }
 };
@@ -710,7 +716,7 @@ async function loadStorageData() {
       Object.values(playerData.levelsTimes).forEach((el) => {
         mainRecord += parseFloat(el);
       })
-      mainRecordText.textContent = mainRecord.toFixed(3);
+      mainRecordText.textContent =  convertMilliseconds(mainRecord*1000);
       mainRecordText.classList.add('main_record_green');
     }
   }
@@ -1112,7 +1118,13 @@ async function init() {
             .then(res => {
               console.log(res);
               res.entries.forEach((el, index) => {
-                document.querySelector('.records_wrap').innerHTML = document.querySelector('.records_wrap').innerHTML + '<p>' + parseInt(index + 1) + '. ' + el.score + '<p/>'
+                if (res.userRank == index+1) {
+                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+
+                }
+                else {
+                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                }
 
               })
 
@@ -1469,11 +1481,30 @@ function playerMove() {
         Object.values(playerData.levelsTimes).forEach((el) => {
           mainRecord += parseFloat(el);
         })
-        mainRecordText.textContent = mainRecord.toFixed(3);
+        mainRecordText.textContent =  convertMilliseconds(mainRecord*1000);
         mainRecordText.classList.add('main_record_green');
         if (canSetLb) {
-          lb.setLeaderboardScore('main', convertToMilliseconds(mainRecord.toFixed(3)));
-          console.log("setNewRec")
+          lb.setLeaderboardScore('main', mainRecord*1000);
+          console.log("setNewRec");
+          ysdk.getLeaderboards()
+            .then(_lb => {
+              lb = _lb;
+              _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
+                .then(res => {
+                  console.log(res);
+                  document.querySelector('.records_wrap>div').innerHTML = '';
+                  res.entries.forEach((el, index) => {
+                    if (res.userRank == index+1) {
+                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                    }
+                    else {
+                      document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                    }
+
+                  })
+
+                });
+            });
         }
         console.log('mainRecord ' + mainRecord.toFixed(3))
       }

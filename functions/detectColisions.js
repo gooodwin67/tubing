@@ -80,3 +80,23 @@ export function convertToMilliseconds(seconds) {
  // Переводим секунды в миллисекунды и добавляем миллисекунды
  return (wholeSeconds * 1000) + milliseconds;
 }
+
+export function convertMilliseconds(ms) {
+    // Преобразуем миллисекунды в секунды
+    const totalSeconds = ms / 1000;
+
+    // Получаем целое количество секунд
+    const seconds = Math.floor(totalSeconds);
+
+    // Получаем миллисекунды
+    const milliseconds = Math.floor((totalSeconds - seconds) * 1000);
+
+    // Преобразуем секунды в минуты и оставшиеся секунды
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    // Форматируем результат
+    const formattedTime = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+
+    return formattedTime;
+}
