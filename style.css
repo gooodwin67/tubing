@@ -603,7 +603,7 @@ canvas {
     margin-bottom: 29px;
 }
 
-.need_auth>span {
+.need_auth>.auth_link {
     border-bottom: 1px solid;
     cursor: pointer;
 }
@@ -868,6 +868,10 @@ canvas {
     display: inline-block;
 }
 
+.green {
+    color: #52e452 !important;
+}
+
 .records_wrap {
     display: inline-block;
     padding: 0px 20px;
@@ -884,7 +888,6 @@ canvas {
 }
 
 @media (max-width: 960px) {
-    body {}
 
     .times {
         top: 65px;

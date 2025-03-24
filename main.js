@@ -92,11 +92,12 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 let audioButton = document.querySelector('.audio_button');
 
 
-let authLink = document.querySelector('.auth_link');
 
-authLink.addEventListener('click', () => {
-  console.log(123); ////////////////////////////////////?????????????????
-})
+
+
+
+
+
 
 
 
@@ -183,7 +184,8 @@ function changeLanguage(language) {
 
     document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
 
-    document.querySelector('.need_auth').innerHTML = 'Чтобы участвовать в рейтинге <button class="auth_link">авторизуйтесь</button> в Яндексе'
+    document.querySelector('.need_auth_text').textContent = 'Чтобы участвовать в рейтинге  '
+    document.querySelector('.auth_link').textContent = 'войдите в Яндекс аккаунт'
 
 
   }
@@ -247,10 +249,13 @@ function changeLanguage(language) {
 
     document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
 
-    document.querySelector('.need_auth').innerHTML = 'To participate in the rating, <button class="auth_link">login</button> to Yandex'
+    document.querySelector('.need_auth_text').textContent = 'To participate in the rating '
+    document.querySelector('.auth_link').textContent = 'login to Yandex account'
 
   }
 };
+
+
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
@@ -344,7 +349,10 @@ instructionStartBtn.addEventListener('click', () => {
   startRace();
 })
 
+
+
 audioButton.addEventListener('click', () => {
+  console.log(123)
   if (canAudio == true) {
     audioButton.classList.add('audio_off');
     if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
@@ -1119,9 +1127,57 @@ async function loadAudio() {
 
 
 }
+
+document.querySelector('.auth_link').addEventListener('click', () => {
+  ysdk.auth.openAuthDialog().then(() => {
+
+
+    ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
+      canSetLb = el;
+
+      ysdk.getLeaderboards()
+        .then(_lb => {
+          lb = _lb;
+
+          _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
+            .then(res => {
+              console.log(res);
+              document.querySelector('.records_wrap>div').innerHTML = '';
+              if (playerData.language == 0) document.querySelector('.need_auth').textContent = 'Вы авторизовались! Можете ставить рекорды!';
+              else document.querySelector('.need_auth').textContent = 'You have logged in! You can set records!';
+              document.querySelector('.need_auth').classList.add('green');
+
+              res.entries.forEach((el, index) => {
+                if (res.userRank == index + 1) {
+                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+
+                }
+                else {
+                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                }
+
+              })
+
+            });
+
+        });
+    });
+    initPlayer().catch(err => {
+      // Ошибка при инициализации объекта Player.
+    });
+  }).catch(() => {
+    // Игрок не авторизован.
+  });
+})
+
+
+
+
 async function init() {
 
   await initAllData(true, false)
+
+
 
   if (firststart) {
     hiddenBlock(mainMenuScreen);
@@ -1142,6 +1198,7 @@ async function init() {
             _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
               .then(res => {
                 console.log(res);
+
                 res.entries.forEach((el, index) => {
                   if (res.userRank == index + 1) {
                     document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
