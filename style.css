@@ -597,6 +597,17 @@ canvas {
 }
 
 
+.need_auth {
+    font-size: 17px;
+    color: #bfe6f9;
+    margin-bottom: 29px;
+}
+
+.need_auth>span {
+    border-bottom: 1px solid;
+    cursor: pointer;
+}
+
 
 .desktop_instr span {
     display: inline-block;
@@ -850,8 +861,11 @@ canvas {
 }
 
 .main_record_green {
-    font-size: 18px;
+    font-size: 16px;
     color: #52e452;
+    border: 1px solid #9eff9e;
+    padding: 4px 12px !important;
+    display: inline-block;
 }
 
 .records_wrap {
@@ -860,7 +874,9 @@ canvas {
     border: 1px solid #ccc;
     border-radius: 9px;
     text-align: left;
+    min-width: 230px;
 }
+
 .records_wrap>div>p {
     margin: 0;
     padding: 0;

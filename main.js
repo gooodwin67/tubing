@@ -91,6 +91,15 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 
 let audioButton = document.querySelector('.audio_button');
 
+
+let authLink = document.querySelector('.auth_link');
+
+authLink.addEventListener('click', () => {
+  console.log(123); ////////////////////////////////////?????????????????
+})
+
+
+
 // let clearRec = document.querySelector('.clear_rec');
 // clearRec.addEventListener('click', () => {
 //   localStorage.clear();
@@ -169,10 +178,12 @@ function changeLanguage(language) {
     document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
     document.querySelector('.main_record_title').textContent = 'Мое общее время: '
-    
-    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы сохранить общий рекорд'
+
+    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы поставить рекорд'
 
     document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
+
+    document.querySelector('.need_auth').innerHTML = 'Чтобы участвовать в рейтинге <button class="auth_link">авторизуйтесь</button> в Яндексе'
 
 
   }
@@ -232,9 +243,11 @@ function changeLanguage(language) {
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
     document.querySelector('.main_record_title').textContent = 'My total time: '
-    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Complete all the levels to keep the overall record'
+    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Complete all the levels to set a record'
 
     document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
+
+    document.querySelector('.need_auth').innerHTML = 'To participate in the rating, <button class="auth_link">login</button> to Yandex'
 
   }
 };
@@ -271,6 +284,8 @@ tubesBlock.forEach((child, index) => {
     }
   });
 });
+
+
 
 function startRace() {
 
@@ -320,6 +335,8 @@ function startRace() {
     }, 1000)
   }
 }
+
+
 instructionStartBtn.addEventListener('click', () => {
   playerData.canStart = true;
   hiddenBlock(0);
@@ -410,10 +427,10 @@ finishInMenuButton.addEventListener('click', async () => {
         if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
       },
       onClose: function (wasShown) {
-        if (soundAround != undefined && !soundAround.isPlaying) soundAround.play();
+        if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
       },
       onError: function (error) {
-        // Действие в случае ошибки.
+        if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
       }
     }
   })
@@ -716,7 +733,7 @@ async function loadStorageData() {
       Object.values(playerData.levelsTimes).forEach((el) => {
         mainRecord += parseFloat(el);
       })
-      mainRecordText.textContent =  convertMilliseconds(mainRecord*1000);
+      mainRecordText.textContent = convertMilliseconds(Math.round(mainRecord * 1000));
       mainRecordText.classList.add('main_record_green');
     }
   }
@@ -1111,32 +1128,40 @@ async function init() {
     YaGames.init().then(ysdk => {
       ysdk.features.LoadingAPI?.ready();
 
-      ysdk.getLeaderboards()
-        .then(_lb => {
-          lb = _lb;
-          _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
-            .then(res => {
-              console.log(res);
-              res.entries.forEach((el, index) => {
-                if (res.userRank == index+1) {
-                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-
-                }
-                else {
-                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                }
-
-              })
-
-            });
-        });
-
       ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
         canSetLb = el;
+
+        if (canSetLb) {
+          document.querySelector('.need_auth').classList.add('hidden_block');
+        }
+
+        ysdk.getLeaderboards()
+          .then(_lb => {
+            lb = _lb;
+
+            _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
+              .then(res => {
+                console.log(res);
+                res.entries.forEach((el, index) => {
+                  if (res.userRank == index + 1) {
+                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+
+                  }
+                  else {
+                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                  }
+
+                })
+
+              });
+
+          });
       })
-      ysdk.isAvailableMethod('leaderboards.getLeaderboardPlayerEntry').then((el) => {
-        canGetLb = el;
-      })
+
+
+
+
+
     });
 
     firststart = false;
@@ -1481,30 +1506,33 @@ function playerMove() {
         Object.values(playerData.levelsTimes).forEach((el) => {
           mainRecord += parseFloat(el);
         })
-        mainRecordText.textContent =  convertMilliseconds(mainRecord*1000);
+        mainRecordText.textContent = convertMilliseconds(Math.round(mainRecord * 1000));
         mainRecordText.classList.add('main_record_green');
         if (canSetLb) {
-          lb.setLeaderboardScore('main', mainRecord*1000);
-          console.log("setNewRec");
-          ysdk.getLeaderboards()
-            .then(_lb => {
-              lb = _lb;
-              _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
-                .then(res => {
-                  console.log(res);
-                  document.querySelector('.records_wrap>div').innerHTML = '';
-                  res.entries.forEach((el, index) => {
-                    if (res.userRank == index+1) {
-                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                    }
-                    else {
-                      document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                    }
+          console.log(Math.round(mainRecord * 1000));
+          lb.setLeaderboardScore('main', Math.round(mainRecord * 1000)).then(() => {
+            console.log("setNewRec");
+            ysdk.getLeaderboards()
+              .then(_lb => {
+                lb = _lb;
+                _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
+                  .then(res => {
+                    console.log(res);
+                    document.querySelector('.records_wrap>div').innerHTML = '';
+                    res.entries.forEach((el, index) => {
+                      if (res.userRank == index + 1) {
+                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                      }
+                      else {
+                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                      }
 
-                  })
+                    })
 
-                });
-            });
+                  });
+              });
+          })
+
         }
         console.log('mainRecord ' + mainRecord.toFixed(3))
       }
