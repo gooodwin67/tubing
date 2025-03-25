@@ -695,7 +695,7 @@ camera.position.set(0, 4, -10);
 //let stats = new Stats();
 //document.body.appendChild(stats.dom);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: false });
 
 renderer.setSize(document.body.offsetWidth, document.body.offsetHeight);
 document.body.appendChild(renderer.domElement);
