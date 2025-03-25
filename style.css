@@ -777,6 +777,18 @@ canvas {
     top: 15%;
 }
 
+.anim_tap_left {
+    top: auto;
+    left: 10%;
+    bottom: 40%
+}
+
+.anim_tap_right {
+    top: auto;
+    left: 65%;
+    bottom: 40%
+}
+
 .anim_tap svg {
     display: inline-block;
     width: 130px;
@@ -842,18 +854,31 @@ canvas {
     perspective: 100px;
 }
 
-.anim_tap .hand-tap {
+.anim_tap_top .hand-tap {
     animation: tap 0.1s ease-out backwards;
     animation-iteration-count: infinite;
 }
 
-.anim_tap .tap-1 {
+.anim_tap_top .tap-1 {
     animation: tap-circle 0.1s ease-out backwards;
+    animation-iteration-count: infinite;
+}
+
+.anim_tap_left .hand-tap,
+.anim_tap_right .hand-tap {
+    animation: tap 0.7s ease-out backwards;
+    animation-iteration-count: infinite;
+}
+
+.anim_tap_left .tap-1,
+.anim_tap_right .tap-1 {
+    animation: tap-circle 0.7s ease-out backwards;
     animation-iteration-count: infinite;
 }
 
 .main_record_title {
     color: #fff;
+    font-size: 17px;
 }
 
 .main_record {

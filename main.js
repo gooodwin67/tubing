@@ -309,7 +309,7 @@ function startRace() {
     let iter = 0; //0
     naStartTimer = true;
     if (isMobile) document.querySelector('.instr-mobile-ingame').classList.remove('hidden_block')
-    if (isMobile) document.querySelector('.anim_tap').classList.remove('hidden_block')
+    if (isMobile) document.querySelector('.anim_tap_top').classList.remove('hidden_block')
     let interval = setInterval((e) => {
       if (soundBip != undefined && !soundBip.isPlaying && canAudio && !noVisible) soundBip.play();
       startTimeWrap.classList.remove("hidden_block");
@@ -317,7 +317,7 @@ function startRace() {
 
       if (iter == 2 && isMobile) {
         document.querySelector('.instr-mobile-ingame').classList.add('hidden_block')
-        document.querySelector('.anim_tap').classList.add('hidden_block')
+
       }
 
       if (iter == 4) {
@@ -657,6 +657,8 @@ let currentTime = 0;
 let openLevels = 2;
 
 let playerData;
+
+let tapInstr = 'onStart';
 
 
 const raycaster1 = new THREE.Raycaster();
@@ -1687,7 +1689,17 @@ function playerMove() {
   if (player.position.z > startFlag.position.z) {
     //playerBody.setEnabledRotations(true, false, false, true);
     //if (player.position.y > 100) playerBody.lockRotations(false, true, true, true);
+    if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_top').classList.add('hidden_block')
+    if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_left').classList.remove('hidden_block')
+    if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_right').classList.remove('hidden_block')
+    if (player.userData.onStartArea == true && isMobile) {
+      setTimeout(() => {
+        document.querySelector('.anim_tap_left').classList.add('hidden_block')
+        document.querySelector('.anim_tap_right').classList.add('hidden_block')
+      }, 2000)
+    }
     player.userData.onStartArea = false;
+
   }
   else {
     player.userData.onStartArea = true;
