@@ -1,3 +1,10 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 @font-face {
     font-display: swap;
     font-family: 'Moderustic';
@@ -28,17 +35,28 @@ html {
 body {
     margin: 0;
     background: #1C1D21;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     width: 100%;
     height: 100%;
     max-width: 1920px;
     max-height: 1080px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     position: relative;
     left: 50%;
     top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 
     overflow: auto !important;
@@ -120,6 +138,8 @@ body {
     background: rgba(255, 0, 0, 0.9);
     left: 50%;
     top: 50%;
+    -webkit-transform: translate(-50%, -50%) rotate(45deg);
+    -ms-transform: translate(-50%, -50%) rotate(45deg);
     transform: translate(-50%, -50%) rotate(45deg);
     border-radius: 50px;
 }
@@ -132,6 +152,8 @@ body {
     background: rgba(255, 0, 0, 0.9);
     left: 50%;
     top: 50%;
+    -webkit-transform: translate(-50%, -50%) rotate(-45deg);
+    -ms-transform: translate(-50%, -50%) rotate(-45deg);
     transform: translate(-50%, -50%) rotate(-45deg);
     border-radius: 50px;
 }
@@ -143,13 +165,20 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
     align-items: flex-start;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     opacity: 1;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     overflow: auto;
+    -webkit-box-shadow: 0 0 200px rgba(0, 0, 0, 0.8) inset;
     box-shadow: 0 0 200px rgba(0, 0, 0, 0.8) inset;
 
 
@@ -172,8 +201,14 @@ body .hidden_block {
     border: 0px;
     cursor: pointer;
     padding: 20px 30px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -192,10 +227,19 @@ canvas {
 }
 
 .main_menu>div {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
     height: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     width: 100%;
     max-width: 1000px;
@@ -207,19 +251,29 @@ canvas {
 }
 
 .main_menu button {
+    -ms-flex-item-align: center;
+    -ms-grid-row-align: center;
     align-self: center;
+    -ms-grid-column-align: center;
     justify-self: center;
 }
 
 .main_load {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
 .load_level_wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     margin-top: 30px;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     max-width: 1300px;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
 }
 
@@ -230,6 +284,7 @@ canvas {
     padding: 10px 15px;
     background: #4ac14a;
     border-radius: 5px;
+    -webkit-box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
@@ -243,6 +298,7 @@ canvas {
     border-radius: 18px;
     position: relative;
     background-color: #4c4660e0;
+    -webkit-box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     overflow: hidden;
 
@@ -260,6 +316,7 @@ canvas {
     top: 0;
     width: 100%;
     height: 100%;
+    -webkit-box-shadow: 0 -80px 200px rgba(0, 0, 0, 0.8) inset;
     box-shadow: 0 -80px 200px rgba(0, 0, 0, 0.8) inset;
 }
 
@@ -277,9 +334,18 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -293,9 +359,14 @@ canvas {
 }
 
 .load_tubes_wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     max-width: 1300px;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     margin-top: 50px;
 }
@@ -307,10 +378,16 @@ canvas {
     border-radius: 18px;
     position: relative;
     background-color: #4c4660e0;
+    -webkit-box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     cursor: pointer;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
 }
 
@@ -326,6 +403,7 @@ canvas {
     top: 0;
     width: 100%;
     height: 100%;
+    -webkit-box-shadow: 0 -0px 200px rgba(0, 0, 0, 0.8) inset;
     box-shadow: 0 -0px 200px rgba(0, 0, 0, 0.8) inset;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 555;
@@ -338,9 +416,18 @@ canvas {
 .load_tubes_wrap>div>.level_text {
     width: 100%;
     height: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
     justify-content: flex-end;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -361,14 +448,21 @@ canvas {
 
 .tubes_char {
     width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
     padding: 3px 15px;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
 
 
 .finish_window {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -378,10 +472,13 @@ canvas {
     border-radius: 18px;
     position: relative;
     background-color: #4c4660e0;
+    -webkit-box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
 }
 
 .boom_window {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -391,6 +488,7 @@ canvas {
     border-radius: 18px;
     position: relative;
     background-color: #4c4660e0;
+    -webkit-box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
 }
 
@@ -406,11 +504,19 @@ canvas {
 }
 
 .load_finish_wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
     position: absolute;
     bottom: 0;
+    -webkit-transform: translateY(50%);
+    -ms-transform: translateY(50%);
     transform: translateY(50%);
     left: 0;
     width: 100%;
@@ -440,6 +546,8 @@ canvas {
 }
 
 .menu_in_game_wrap {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 }
 
@@ -450,8 +558,14 @@ canvas {
     border-radius: 18px;
     position: relative;
     background-color: #4c4660e0;
+    -webkit-box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
 }
 
@@ -466,6 +580,7 @@ canvas {
 
 .btn {
     background: transparent;
+    -webkit-box-shadow: none;
     box-shadow: none;
     border: 2px solid rgb(190, 190, 190);
     outline: 1px solid rgb(204, 204, 204);
@@ -475,11 +590,14 @@ canvas {
     text-transform: uppercase;
     cursor: pointer;
     font-weight: bold;
+    -webkit-transition: 0.5s;
+    -o-transition: 0.5s;
     transition: 0.5s;
 }
 
 .btn:hover {
     background: rgb(190, 190, 190);
+    -webkit-box-shadow: none;
     box-shadow: none;
     border: 2px solid rgb(190, 190, 190);
     outline: 1px solid rgb(204, 204, 204);
@@ -494,10 +612,15 @@ canvas {
     position: absolute;
     top: 80px;
     left: 5px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     color: #fff;
     z-index: 9;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
 }
 
@@ -543,6 +666,8 @@ canvas {
     position: absolute;
     left: 50%;
     top: 20%;
+    -webkit-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
     transform: translate(-50%, 0);
     z-index: 9;
 }
@@ -578,10 +703,19 @@ canvas {
 
 
 .before_start {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     height: 100%;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
     justify-content: flex-start;
     position: static;
 }
@@ -593,7 +727,12 @@ canvas {
 }
 
 .desktop_instr {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
     max-width: 460px;
     text-align: left !important;
@@ -638,6 +777,7 @@ canvas {
     font-weight: bold;
     border: 1px solid #aaa;
     border-radius: 2px;
+    -webkit-box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
     box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
     min-width: 12px;
     text-align: center;
@@ -663,6 +803,8 @@ canvas {
     height: 22px;
     right: -2px;
     top: 50%;
+    -webkit-transform: translate(100%, -50%);
+    -ms-transform: translate(100%, -50%);
     transform: translate(100%, -50%);
     background: url(../images/ad-icon.png) no-repeat;
 }
@@ -676,58 +818,118 @@ canvas {
 }
 
 .first_dot {
+    -webkit-animation: top 0.3s ease infinite alternate;
     animation: top 0.3s ease infinite alternate;
 }
 
 .second_dot {
+    -webkit-animation: top 0.3s ease infinite alternate -0.1s;
     animation: top 0.3s ease infinite alternate -0.1s;
 }
 
 .third_dot {
+    -webkit-animation: top 0.3s ease infinite alternate -0.2s;
     animation: top 0.3s ease infinite alternate -0.2s;
 }
 
-@keyframes top {
+@-webkit-keyframes top {
     from {
+        -webkit-transform: translateY(0);
         transform: translateY(0);
 
     }
 
     to {
+        -webkit-transform: translateY(-15px);
+        transform: translateY(-15px);
+
+    }
+}
+
+@keyframes top {
+    from {
+        -webkit-transform: translateY(0);
+        transform: translateY(0);
+
+    }
+
+    to {
+        -webkit-transform: translateY(-15px);
         transform: translateY(-15px);
 
     }
 }
 
 .button_active {
+    -webkit-animation: push 0.1s linear infinite;
     animation: push 0.1s linear infinite;
 }
 
-@keyframes push {
+@-webkit-keyframes push {
     from {
         background: #ccc;
+        -webkit-box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
         box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
+        -webkit-transform: translate(0);
         transform: translate(0);
     }
 
     to {
         background: #aaa;
+        -webkit-box-shadow: 0px 0px 0px 2px rgba(204, 204, 204, 1);
         box-shadow: 0px 0px 0px 2px rgba(204, 204, 204, 1);
+        -webkit-transform: translate(2px);
+        transform: translate(2px);
+    }
+}
+
+@keyframes push {
+    from {
+        background: #ccc;
+        -webkit-box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
+        box-shadow: 1px 1px 0px 2px rgba(204, 204, 204, 1);
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+
+    to {
+        background: #aaa;
+        -webkit-box-shadow: 0px 0px 0px 2px rgba(204, 204, 204, 1);
+        box-shadow: 0px 0px 0px 2px rgba(204, 204, 204, 1);
+        -webkit-transform: translate(2px);
         transform: translate(2px);
     }
 }
 
 .mobile_instr {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
     justify-content: flex-start;
 }
 
 .mobile_instr>div {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
     justify-content: flex-start;
 }
 
@@ -741,7 +943,11 @@ canvas {
 }
 
 .mobile_instr>div>span {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     margin-bottom: 0px;
     font-size: 13px;
@@ -774,6 +980,8 @@ canvas {
 }
 
 .language_block {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
 }
 
@@ -807,6 +1015,8 @@ canvas {
 /*///////////////////////////////////////////////*/
 
 .anim_tap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     z-index: 999;
     position: absolute;
@@ -853,32 +1063,76 @@ canvas {
 }
 
 
-@keyframes tap {
+@-webkit-keyframes tap {
     0% {
+        -webkit-transform: rotateX(0deg);
         transform: rotateX(0deg);
     }
 
     10% {
+        -webkit-transform: rotateX(12.5deg);
         transform: rotateX(12.5deg);
     }
 
     25% {
+        -webkit-transform: rotateX(25deg);
         transform: rotateX(25deg);
     }
 }
 
-@keyframes tap-circle {
+
+@keyframes tap {
     0% {
+        -webkit-transform: rotateX(0deg);
+        transform: rotateX(0deg);
+    }
+
+    10% {
+        -webkit-transform: rotateX(12.5deg);
+        transform: rotateX(12.5deg);
+    }
+
+    25% {
+        -webkit-transform: rotateX(25deg);
+        transform: rotateX(25deg);
+    }
+}
+
+@-webkit-keyframes tap-circle {
+    0% {
+        -webkit-transform: scale(0);
         transform: scale(0);
         opacity: 0;
     }
 
     75% {
+        -webkit-transform: scale(1.05);
         transform: scale(1.05);
         opacity: .6;
     }
 
     80% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: .5;
+    }
+}
+
+@keyframes tap-circle {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    75% {
+        -webkit-transform: scale(1.05);
+        transform: scale(1.05);
+        opacity: .6;
+    }
+
+    80% {
+        -webkit-transform: scale(1);
         transform: scale(1);
         opacity: .5;
     }
@@ -887,29 +1141,40 @@ canvas {
 /* SVG ANIMATION */
 
 .anim_tap * {
+    -webkit-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
     transform-origin: 50% 50%;
+    -webkit-perspective: 100px;
     perspective: 100px;
 }
 
 .anim_tap_top .hand-tap {
+    -webkit-animation: tap 0.1s ease-out backwards;
     animation: tap 0.1s ease-out backwards;
+    -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
 }
 
 .anim_tap_top .tap-1 {
+    -webkit-animation: tap-circle 0.1s ease-out backwards;
     animation: tap-circle 0.1s ease-out backwards;
+    -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
 }
 
 .anim_tap_left .hand-tap,
 .anim_tap_right .hand-tap {
+    -webkit-animation: tap 0.7s ease-out backwards;
     animation: tap 0.7s ease-out backwards;
+    -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
 }
 
 .anim_tap_left .tap-1,
 .anim_tap_right .tap-1 {
+    -webkit-animation: tap-circle 0.7s ease-out backwards;
     animation: tap-circle 0.7s ease-out backwards;
+    -webkit-animation-iteration-count: infinite;
     animation-iteration-count: infinite;
 }
 
