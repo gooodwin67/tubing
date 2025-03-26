@@ -223,6 +223,19 @@ canvas {
     justify-content: center;
 }
 
+.load_level_wrap .btn_lev {
+    border: none;
+    outline: none;
+    color: #ffffff;
+    padding: 10px 15px;
+    background: #4ac14a;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+
+
 .load_level_wrap>div {
     max-width: 25%;
     margin: 10px;
@@ -232,7 +245,7 @@ canvas {
     background-color: #4c4660e0;
     box-shadow: 3px 3px 45px rgba(0, 0, 0, 0.5);
     overflow: hidden;
-    cursor: pointer;
+
 }
 
 .load_level_wrap>div>img {
@@ -630,6 +643,30 @@ canvas {
     text-align: center;
 }
 
+.ad_res {
+    position: relative;
+    background-color: #daffe3;
+    color: #333;
+    padding: 2px 9px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.not_vis {
+    visibility: hidden;
+}
+
+.ad_res:after {
+    content: "";
+    position: absolute;
+    width: 31px;
+    height: 22px;
+    right: -2px;
+    top: 50%;
+    transform: translate(100%, -50%);
+    background: url(../images/ad-icon.png) no-repeat;
+}
+
 .sci-fi-loader span {
     position: relative;
     display: inline-block;
@@ -949,6 +986,45 @@ canvas {
 
     .load_tubes_wrap {
         margin-top: 0;
+    }
+
+    .load_level_wrap>div>.level_text h2 {
+        font-size: 15px;
+    }
+
+    .load_level_wrap .btn_lev {
+        font-size: 13px;
+        padding: 6px 15px;
+    }
+
+    .level_text .time {
+        font-size: 14px;
+    }
+
+    .level_time {
+        font-size: 14px;
+    }
+
+    .load_level_wrap>div {
+        min-height: 150px;
+        max-width: 27%;
+    }
+
+    .load_level_wrap>div>.level_text {
+        bottom: 0;
+    }
+
+    .load_level_wrap h2 {
+        margin: 0 !important;
+        margin-top: 10px !important;
+    }
+
+    .load_level_wrap {
+        padding: 10px;
+    }
+
+    .ad_res {
+        margin-bottom: 10px;
     }
 }
 

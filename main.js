@@ -39,7 +39,7 @@ let allOverlies = document.querySelectorAll('body>.overlay');
 
 
 let startButton = document.querySelector('.startButton');
-let levelsBlock = document.querySelectorAll('.load_level_wrap>div');
+let levelsBlock = document.querySelectorAll('.load_level_wrap .btn_lev');
 let levelsTimesBlock = document.querySelectorAll('.load_level_wrap .level_time');
 
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
@@ -142,6 +142,15 @@ function changeLanguage(language) {
     document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el) => {
       el.textContent = 'Управление: '
     })
+
+    document.querySelectorAll('.load_level_wrap .btn_lev').forEach((el) => {
+      el.textContent = 'Начать'
+    })
+
+    document.querySelectorAll('.load_level_wrap .ad_res').forEach((el) => {
+      el.textContent = 'Пропустить'
+    })
+
     document.querySelector('.selecttubedesc_title').textContent = 'Проходите уровни, чтобы разблокировать тюбинги'
 
     document.querySelector('.menu_in_game_wrap_head').textContent = 'Пауза'
@@ -252,14 +261,52 @@ function changeLanguage(language) {
     document.querySelector('.need_auth_text').textContent = 'To participate in the rating '
     document.querySelector('.auth_link').textContent = 'login to Yandex account'
 
+    document.querySelectorAll('.load_level_wrap .btn_lev').forEach((el) => {
+      el.textContent = 'Start'
+    })
+
+    document.querySelectorAll('.load_level_wrap .ad_res').forEach((el) => {
+      el.textContent = 'Skip'
+    })
+
   }
 };
 
+document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, index) => {
+  el.addEventListener('click', async () => {
 
+
+    ysdk.adv.showRewardedVideo({
+      callbacks: {
+        onOpen: () => {
+          console.log('Video ad open.');
+          if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+        },
+        onRewarded: async () => {
+          console.log('Rewarded! ' + index);
+          hiddenBlock(mainLoadScreen);
+          playerData.levelsTimes['time' + (index + 1)] = 120.111;
+          levelsDone = Object.keys(playerData.levelsTimes).length;
+          localStorage.setItem('playerData', JSON.stringify(playerData));
+          await resetAllMap();
+          await init();
+        },
+        onClose: () => {
+          console.log('Video ad closed.');
+          if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
+        },
+        onError: (e) => {
+          console.log('Error while open video ad:', e);
+          if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
+        }
+      }
+    })
+  })
+})
 
 levelsBlock.forEach((child, index) => {
   child.addEventListener('click', async () => {
-    if (index + 1 <= openLevels) {
+    if (index + 1 <= openLevels + 1) {
       currentLevel = index + 1;
       tubesBlock.forEach((child, index) => {
         if (tubesChars[index].levels.includes(currentLevel)) {
@@ -527,6 +574,7 @@ let pause = false;
 let canAudio = true;
 
 let mainRecord = 0;
+let boardMainRecord = 0;
 let levelsDone = 0;
 
 let lb;
@@ -755,7 +803,7 @@ async function loadStorageData() {
   openLevels = 0;
 
   levelShadow.forEach((el, index) => {
-    if (index < Object.keys(playerData.levelsTimes).length + 2) {
+    if (index < Object.keys(playerData.levelsTimes).length + 1) {
       openLevels++;
       el.classList.remove('level_disabled');
     }
@@ -764,6 +812,14 @@ async function loadStorageData() {
   levelsTimesBlock.forEach((value, index, array) => {
     if (playerData.levelsTimes['time' + (index + 1)] != undefined) {
       value.childNodes[2].textContent = playerData.levelsTimes['time' + (index + 1)]
+
+      document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, ind) => {
+        if (index == ind || ind == levelsTimesBlock.length - 1) {
+          el.classList.add('not_vis');
+        }
+
+      })
+
     }
     else {
       value.childNodes[2].textContent = '00.000';
@@ -1150,9 +1206,9 @@ document.querySelector('.auth_link').addEventListener('click', () => {
               document.querySelector('.need_auth').classList.add('green');
 
               res.entries.forEach((el, index) => {
-                if (res.userRank == index + 1) {
-                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-
+                if (res.userRank == el.rank) {
+                  boardMainRecord = convertMilliseconds(el.score);
+                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
                 }
                 else {
                   document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
@@ -1180,7 +1236,6 @@ async function init() {
   await initAllData(true, false)
 
 
-
   if (firststart) {
     hiddenBlock(mainMenuScreen);
     YaGames.init().then(ysdk => {
@@ -1202,8 +1257,9 @@ async function init() {
                 console.log(res);
 
                 res.entries.forEach((el, index) => {
-                  if (res.userRank == index + 1) {
-                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                  if (res.userRank == el.rank) {
+                    boardMainRecord = el.score;
+                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
 
                   }
                   else {
@@ -1567,7 +1623,9 @@ function playerMove() {
         })
         mainRecordText.textContent = convertMilliseconds(Math.round(mainRecord * 1000));
         mainRecordText.classList.add('main_record_green');
-        if (canSetLb) {
+        console.log(boardMainRecord)
+        console.log(Math.round(mainRecord * 1000))
+        if (canSetLb && Math.round(mainRecord * 1000) < boardMainRecord) {
           console.log(Math.round(mainRecord * 1000));
           lb.setLeaderboardScore('main', Math.round(mainRecord * 1000)).then(() => {
             console.log("setNewRec");
@@ -1579,8 +1637,10 @@ function playerMove() {
                     console.log(res);
                     document.querySelector('.records_wrap>div').innerHTML = '';
                     res.entries.forEach((el, index) => {
-                      if (res.userRank == index + 1) {
-                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                      if (res.userRank == el.rank) {
+                        boardMainRecord = el.score;
+                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
+
                       }
                       else {
                         document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
