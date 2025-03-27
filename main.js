@@ -189,7 +189,7 @@ function changeLanguage(language) {
 
     document.querySelector('.main_record_title').textContent = 'Мое общее время: '
 
-    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы поставить рекорд'
+    if (mainRecord == 0) document.querySelector('.main_record').textContent = 'Пройдите все уровни, чтобы поставить рекорд'
 
     document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
 
@@ -254,7 +254,7 @@ function changeLanguage(language) {
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
     document.querySelector('.main_record_title').textContent = 'My total time: '
-    if (mainRecord = 0) document.querySelector('.main_record').textContent = 'Complete all the levels to set a record'
+    if (mainRecord == 0) document.querySelector('.main_record').textContent = 'Complete all the levels to set a record'
 
     document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
 
@@ -399,7 +399,7 @@ instructionStartBtn.addEventListener('click', () => {
 
 
 audioButton.addEventListener('click', () => {
-  console.log(123)
+
   if (canAudio == true) {
     audioButton.classList.add('audio_off');
     if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
@@ -431,11 +431,13 @@ startButton.addEventListener('click', () => {
 
   if (soundAround != undefined && canAudio) soundAround.play();
 
-  if (isMobile) {
-    document.body.requestFullscreen().then(() => {
-      screen.orientation.lock("landscape");
-    })
-  }
+  // if (isMobile) {
+  //   console.log(123);
+  //   ysdk.screen.fullscreen.request
+  //   document.body.requestFullscreen().then(() => {
+  //     screen.orientation.lock("landscape");
+  //   })
+  // }
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
 });
@@ -852,7 +854,7 @@ async function loadMenu() {
   const gltfLoader = new GLTFLoader();
   const url = 'models/map-menu.glb';
   await gltfLoader.loadAsync(url, onprogress = (e) => {
-    console.log(`Loaded: ${e.loaded}, Total: ${e.total}`);
+    // console.log(`Loaded: ${e.loaded}, Total: ${e.total}`);
     let percent = Math.min(Math.round((e.loaded / e.total) * 100), 100);
     loadPercent.textContent = percent + '%';
   }).then((gltf) => {
@@ -1199,7 +1201,7 @@ document.querySelector('.auth_link').addEventListener('click', () => {
 
           _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
             .then(res => {
-              console.log(res);
+              // console.log(res);
               document.querySelector('.records_wrap>div').innerHTML = '';
               if (playerData.language == 0) document.querySelector('.need_auth').textContent = 'Вы авторизовались! Можете ставить рекорды!';
               else document.querySelector('.need_auth').textContent = 'You have logged in! You can set records!';
@@ -1237,7 +1239,7 @@ async function init() {
 
 
   if (firststart) {
-    hiddenBlock(mainMenuScreen);
+
     YaGames.init().then(ysdk => {
       ysdk.features.LoadingAPI?.ready();
 
@@ -1254,7 +1256,8 @@ async function init() {
 
             _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
               .then(res => {
-                console.log(res);
+                // console.log(res);
+                hiddenBlock(mainMenuScreen);
 
                 res.entries.forEach((el, index) => {
                   if (res.userRank == el.rank) {
@@ -1623,18 +1626,18 @@ function playerMove() {
         })
         mainRecordText.textContent = convertMilliseconds(Math.round(mainRecord * 1000));
         mainRecordText.classList.add('main_record_green');
-        console.log(boardMainRecord)
-        console.log(Math.round(mainRecord * 1000))
+        // console.log(boardMainRecord)
+        // console.log(Math.round(mainRecord * 1000))
         if (canSetLb && Math.round(mainRecord * 1000) < boardMainRecord) {
-          console.log(Math.round(mainRecord * 1000));
+          // console.log(Math.round(mainRecord * 1000));
           lb.setLeaderboardScore('main', Math.round(mainRecord * 1000)).then(() => {
-            console.log("setNewRec");
+            // console.log("setNewRec");
             ysdk.getLeaderboards()
               .then(_lb => {
                 lb = _lb;
                 _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
                   .then(res => {
-                    console.log(res);
+                    // console.log(res);
                     document.querySelector('.records_wrap>div').innerHTML = '';
                     res.entries.forEach((el, index) => {
                       if (res.userRank == el.rank) {
@@ -1653,7 +1656,7 @@ function playerMove() {
           })
 
         }
-        console.log('mainRecord ' + mainRecord.toFixed(3))
+        // console.log('mainRecord ' + mainRecord.toFixed(3))
       }
 
       localStorage.setItem('playerData', JSON.stringify(playerData));
