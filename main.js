@@ -1245,7 +1245,7 @@ async function init() {
 
       console.log(ysdk.environment.i18n.lang);
 
-      if (ysdk.environment.i18n.lang == 'ru') {
+      if (ysdk.environment.i18n.lang == 'ru' || ysdk.environment.i18n.lang == 'be' || ysdk.environment.i18n.lang == 'kk' || ysdk.environment.i18n.lang == 'uk' || ysdk.environment.i18n.lang == 'uz') {
         languagesBtns[0].classList.add('selected');
         changeLanguage(0);
         playerData.language = 0;
