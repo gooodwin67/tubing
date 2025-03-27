@@ -785,8 +785,8 @@ async function loadStorageData() {
     languagesBtns.forEach((el) => {
       el.classList.remove('selected');
     })
-    languagesBtns[playerData.language].classList.add('selected');
-    changeLanguage(playerData.language)
+    // languagesBtns[playerData.language].classList.add('selected');
+    // changeLanguage(playerData.language)
     levelsDone = Object.keys(playerData.levelsTimes).length;
     if (levelsDone == levelShadow.length) {
       mainRecord = 0;
@@ -1242,6 +1242,19 @@ async function init() {
 
     YaGames.init().then(ysdk => {
       ysdk.features.LoadingAPI?.ready();
+
+      console.log(ysdk.environment.i18n.lang);
+
+      if (ysdk.environment.i18n.lang == 'ru') {
+        languagesBtns[0].classList.add('selected');
+        changeLanguage(0);
+        playerData.language = 0;
+      }
+      else { //en
+        languagesBtns[1].classList.add('selected');
+        changeLanguage(1);
+        playerData.language = 1;
+      }
 
       ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
         canSetLb = el;
