@@ -17,6 +17,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 
 
 import { detectDevice } from "./functions/detectColisions";
+import { isIOS } from "./functions/detectColisions";
 import { convertToMilliseconds } from "./functions/detectColisions";
 import { convertMilliseconds } from "./functions/detectColisions";
 
@@ -92,7 +93,7 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 let audioButton = document.querySelector('.audio_button');
 
 
-
+document.oncontextmenu = function () { return false };
 
 
 
@@ -194,7 +195,7 @@ function changeLanguage(language) {
     document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
 
     document.querySelector('.need_auth_text').textContent = 'Чтобы участвовать в рейтинге  '
-    document.querySelector('.auth_link').textContent = 'войдите в Яндекс аккаунт'
+    document.querySelector('.auth_link').textContent = 'войдите в аккаунт'
 
 
   }
@@ -259,7 +260,7 @@ function changeLanguage(language) {
     document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
 
     document.querySelector('.need_auth_text').textContent = 'To participate in the rating '
-    document.querySelector('.auth_link').textContent = 'login to Yandex account'
+    document.querySelector('.auth_link').textContent = 'login to account'
 
     document.querySelectorAll('.load_level_wrap .btn_lev').forEach((el) => {
       el.textContent = 'Start'
@@ -370,7 +371,8 @@ function startRace() {
       if (iter == 4) {
         if (soundBip != undefined) soundBip.stop(2.5);
         naStartTimer = false;
-        startTimeBlock.textContent = 'GO';
+        if (playerData.language == 0) startTimeBlock.textContent = 'СТАРТ';
+        else startTimeBlock.textContent = 'GO';
         dataLoaded = true;
         pauseButton.classList.remove('hidden_block');
         clearInterval(interval);
@@ -424,8 +426,18 @@ let playerOn;
 
 startButton.addEventListener('click', () => {
   isMobile = detectDevice();
+  isIos = isIOS();
 
+  if (isIos) audioButton.classList.add('hidden_block');
 
+  if (playerData.language == 0) {
+    startFlag = startFlagRu
+    scene.add(startFlag);
+  }
+  else {
+    startFlag = startFlagEn
+    scene.add(startFlag);
+  }
 
   document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
 
@@ -605,6 +617,8 @@ let chooseTubeNow = false;
 let selectTubeWall;
 
 let startFlag;
+let startFlagRu;
+let startFlagEn;
 
 let noVisible = false;
 
@@ -694,6 +708,7 @@ let allWallBodyCollision = [];
 let targetCube;
 
 let isMobile = detectDevice();
+let isIos = isIOS();
 
 let clock = new THREE.Clock();
 let timer = new THREE.Clock();
@@ -797,6 +812,8 @@ async function loadStorageData() {
       mainRecordText.classList.add('main_record_green');
     }
   }
+
+
 
 
   let aaa = JSON.stringify(playerData);
@@ -951,9 +968,13 @@ async function loadMenu() {
         let areaBlock = el.clone();
         scene.add(areaBlock);
       }
-      else if (el.name.includes('start_flag')) {
-        startFlag = el.clone();
-        scene.add(startFlag); 9
+      else if (el.name.includes('start_flag_en')) {
+        startFlagEn = el.clone();
+
+      }
+      else if (el.name.includes('start_flag_ru')) {
+        startFlagRu = el.clone();
+
       }
       else if (el.name.includes('itsmen_body')) {
         itsMenBody = el.clone();
@@ -1023,6 +1044,7 @@ async function loadMenu() {
 
 
   await loadStorageData();
+
 
 
   let params = RAPIER.JointData.spherical({ x: 0.2, y: 0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
@@ -1134,7 +1156,7 @@ async function loadLevel() {
 
 async function loadAudio() {
   const listener = new THREE.AudioListener();
-  player.add(listener);
+  camera.add(listener);
 
 
   const audioLoader = new THREE.AudioLoader();
@@ -1243,7 +1265,22 @@ async function init() {
     YaGames.init().then(ysdk => {
       ysdk.features.LoadingAPI?.ready();
 
-      console.log(ysdk.environment.i18n.lang);
+      // console.log(ysdk.environment.i18n.lang);
+      ysdk.adv.showFullscreenAdv({
+        callbacks: {
+          onOpen: function (wasShown) {
+            if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+          },
+          onClose: function (wasShown) {
+
+          },
+          onError: function (error) {
+
+          }
+        }
+      })
+
+
 
       if (ysdk.environment.i18n.lang == 'ru' || ysdk.environment.i18n.lang == 'be' || ysdk.environment.i18n.lang == 'kk' || ysdk.environment.i18n.lang == 'uk' || ysdk.environment.i18n.lang == 'uz') {
         languagesBtns[0].classList.add('selected');
@@ -1266,6 +1303,7 @@ async function init() {
         ysdk.getLeaderboards()
           .then(_lb => {
             lb = _lb;
+
 
             _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
               .then(res => {
@@ -1323,7 +1361,7 @@ async function initAllData(needMenu, needLevel) {
 
 
 
-  if (firststart) loadAudio();
+  if (firststart && !isIos) loadAudio();
 
 
 
@@ -1384,6 +1422,9 @@ function animate() {
 
   // console.log("Number of calls :", renderer.info.render.calls);
   // console.log("Number of Triangles :", renderer.info.render.triangles);
+
+
+  // if (ysdk != undefined) document.querySelector('.temp-test').textContent = ysdk.environment.i18n.lang;
 
 
 
