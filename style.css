@@ -36,7 +36,6 @@ img {
     -webkit-user-drag: none;
     -webkit-touch-callout: none;
 }
-
 body {
     margin: 0;
     background: #1C1D21;
@@ -73,6 +72,8 @@ body {
     scrollbar-color: rgba(14, 14, 24, 0) #73747300;
     -moz-appearance: none !important;
     scrollbar-width: 0px;
+
+    
 }
 
 

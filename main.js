@@ -93,11 +93,11 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 let audioButton = document.querySelector('.audio_button');
 
 
-document.oncontextmenu = function () { return false };
-
-
-
-
+window.oncontextmenu = function (e) { 
+  e.preventDefault();
+  e.stopPropagation();
+  return false 
+};
 
 
 
