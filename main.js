@@ -46,7 +46,7 @@ let levelsTimesBlock = document.querySelectorAll('.load_level_wrap .level_time')
 let tubesBlock = document.querySelectorAll('.load_tubes_wrap>div');
 
 
-let languagesBtns = document.querySelectorAll('.language_block>img');
+let languagesBtns = document.querySelectorAll('.language_block img');
 
 let movingBlocks = [];
 let movingBlocksBody = [];
@@ -1270,6 +1270,7 @@ async function init() {
         callbacks: {
           onOpen: function (wasShown) {
             if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+            hiddenBlock(mainMenuScreen);
           },
           onClose: function (wasShown) {
 
@@ -1308,7 +1309,7 @@ async function init() {
             _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
               .then(res => {
                 // console.log(res);
-                hiddenBlock(mainMenuScreen);
+
 
                 res.entries.forEach((el, index) => {
                   if (res.userRank == el.rank) {
