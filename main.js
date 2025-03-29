@@ -52,7 +52,7 @@ let movingBlocks = [];
 let movingBlocksBody = [];
 
 
-
+let language;
 
 let timesBlock = document.querySelector('.times');
 let currentTimeBlock = document.querySelector('.current_time');
@@ -93,10 +93,9 @@ let startTimeWrap = document.querySelector('.start_time_wrap');
 let audioButton = document.querySelector('.audio_button');
 
 
-window.oncontextmenu = function (e) { 
-  e.preventDefault();
-  e.stopPropagation();
-  return false 
+window.oncontextmenu = function (e) {
+
+  return false
 };
 
 
@@ -109,15 +108,13 @@ window.oncontextmenu = function (e) {
 
 languagesBtns.forEach((child, index) => {
   child.addEventListener('click', () => {
-    if (playerData.language != index) {
+    if (language != index) {
       languagesBtns.forEach((el) => {
         el.classList.remove('selected');
       })
       child.classList.add('selected');
-      playerData.language = index;
-
-      localStorage.setItem('playerData', JSON.stringify(playerData));
-      changeLanguage(playerData.language);
+      language = index;
+      changeLanguage(language);
     }
 
   });
@@ -371,7 +368,7 @@ function startRace() {
       if (iter == 4) {
         if (soundBip != undefined) soundBip.stop(2.5);
         naStartTimer = false;
-        if (playerData.language == 0) startTimeBlock.textContent = 'СТАРТ';
+        if (language == 0) startTimeBlock.textContent = 'СТАРТ';
         else startTimeBlock.textContent = 'GO';
         dataLoaded = true;
         pauseButton.classList.remove('hidden_block');
@@ -430,13 +427,11 @@ startButton.addEventListener('click', () => {
 
   if (isIos) audioButton.classList.add('hidden_block');
 
-  if (playerData.language == 0) {
+  if (language == 0) {
     startFlag = startFlagRu
-    scene.add(startFlag);
   }
   else {
     startFlag = startFlagEn
-    scene.add(startFlag);
   }
 
   document.querySelector('.audio_button_wrap').classList.remove('hidden_block');
@@ -791,7 +786,6 @@ async function loadStorageData() {
         // time1: 10.222,
       },
       canStart: false,
-      language: 0 //ru
     }
     localStorage.setItem('playerData', JSON.stringify(playerData));
   }
@@ -800,8 +794,6 @@ async function loadStorageData() {
     languagesBtns.forEach((el) => {
       el.classList.remove('selected');
     })
-    // languagesBtns[playerData.language].classList.add('selected');
-    // changeLanguage(playerData.language)
     levelsDone = Object.keys(playerData.levelsTimes).length;
     if (levelsDone == levelShadow.length) {
       mainRecord = 0;
@@ -1034,6 +1026,8 @@ async function loadMenu() {
 
     })
 
+
+
   });
   scene.traverse(function (child) {
     if (child.material) {
@@ -1044,6 +1038,7 @@ async function loadMenu() {
 
 
   await loadStorageData();
+
 
 
 
@@ -1081,6 +1076,8 @@ async function loadMenu() {
 
 
 async function loadLevel() {
+
+  scene.add(startFlag);
 
   playerIsFinish = false;
 
@@ -1225,7 +1222,7 @@ document.querySelector('.auth_link').addEventListener('click', () => {
             .then(res => {
               // console.log(res);
               document.querySelector('.records_wrap>div').innerHTML = '';
-              if (playerData.language == 0) document.querySelector('.need_auth').textContent = 'Вы авторизовались! Можете ставить рекорды!';
+              if (language == 0) document.querySelector('.need_auth').textContent = 'Вы авторизовались! Можете ставить рекорды!';
               else document.querySelector('.need_auth').textContent = 'You have logged in! You can set records!';
               document.querySelector('.need_auth').classList.add('green');
 
@@ -1286,12 +1283,12 @@ async function init() {
       if (ysdk.environment.i18n.lang == 'ru' || ysdk.environment.i18n.lang == 'be' || ysdk.environment.i18n.lang == 'kk' || ysdk.environment.i18n.lang == 'uk' || ysdk.environment.i18n.lang == 'uz') {
         languagesBtns[0].classList.add('selected');
         changeLanguage(0);
-        playerData.language = 0;
+        language = 0;
       }
       else { //en
         languagesBtns[1].classList.add('selected');
         changeLanguage(1);
-        playerData.language = 1;
+        language = 1;
       }
 
       ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {

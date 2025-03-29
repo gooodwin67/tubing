@@ -36,6 +36,7 @@ img {
     -webkit-user-drag: none;
     -webkit-touch-callout: none;
 }
+
 body {
     margin: 0;
     background: #1C1D21;
@@ -73,7 +74,7 @@ body {
     -moz-appearance: none !important;
     scrollbar-width: 0px;
 
-    
+
 }
 
 
@@ -681,7 +682,7 @@ canvas {
 }
 
 .start_time {
-    font-size: 180px;
+    font-size: 100px;
     color: rgb(53, 25, 214);
     text-shadow: 5px 5px 4px rgba(0, 0, 0, 0.8);
     font-family: 'ObelixPro', Verdana;
@@ -1035,7 +1036,7 @@ canvas {
 
 .anim_tap_left {
     top: auto;
-    left: 10%;
+    left: 20%;
     bottom: 40%
 }
 
@@ -1047,7 +1048,7 @@ canvas {
 
 .anim_tap svg {
     display: inline-block;
-    width: 130px;
+    width: 90px;
     position: absolute;
 }
 
