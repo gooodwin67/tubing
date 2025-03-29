@@ -1592,6 +1592,25 @@ window.addEventListener('keydown', onKeyDown);
 window.addEventListener('keyup', onKeyUp);
 
 
+document.querySelector("canvas").addEventListener("touchstart", (e) => {
+
+
+  e.preventDefault();
+  e.stopPropagation();
+
+
+})
+
+
+
+
+
+
+
+
+
+
+
 function blocksMove() {
 
   movingBlocks.forEach((value, index) => {

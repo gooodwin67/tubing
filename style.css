@@ -1328,3 +1328,17 @@ body div canvas {
 .audio_button_wrap:has(.hidden_block) {
     display: none !important;
 }
+
+.overlay {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.overlay div {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
