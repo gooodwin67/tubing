@@ -1153,7 +1153,7 @@ async function loadLevel() {
 
 async function loadAudio() {
   const listener = new THREE.AudioListener();
-  camera.add(listener);
+  player.add(listener);
 
 
   const audioLoader = new THREE.AudioLoader();
