@@ -1195,7 +1195,7 @@ async function loadAudio() {
     soundBip.setBuffer(buffer);
     soundBip.setLoop(false);
     soundBip.setRefDistance(40);
-    soundBip.setVolume(0.1);
+    soundBip.setVolume(0.3);
     soundBip.error = false;
     player.add(soundBip);
   }).catch((error) => {
