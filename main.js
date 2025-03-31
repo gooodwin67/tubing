@@ -1411,7 +1411,7 @@ async function resetAllMap() {
     scene.remove(object); // Удаляем объект со сцены
   }
   playerIsFinish = false;
-  soundAround.play();
+  if (soundAround != undefined && canAudio && !noVisible) soundAround.play();
 }
 
 function animate() {
