@@ -177,8 +177,7 @@ function changeLanguage(language) {
 
     document.querySelector('.desktop_instr').innerHTML = `<h2>Управление</h2>
     <span>Быстро нажимайте <span class='button_active'>W</span> или <span class='button_active'>↑</span> чтобы разогнаться до стартовой отметки</span>
-    <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте тюбингом</span>
-    <span>Цель - доехать до финиша за кратчайшее время</span>`;
+    <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте тюбингом</span>`;
 
     document.querySelector('.mobile_instr div').innerHTML = `<span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
     <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>`
@@ -243,8 +242,7 @@ function changeLanguage(language) {
 
     document.querySelector('.desktop_instr').innerHTML = `<h2>Instructions</h2>
     <span>Quickly press <span class='button_active'>W</span> or <span class='button_active'>↑</span> to accelerate to the starting point</span>
-    <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the tubing</span>
-    <span>The goal is to reach the finish line in the shortest time</span>`;
+    <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the tubing</span>`;
 
     document.querySelector('.mobile_instr div').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
     <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>`
@@ -341,7 +339,7 @@ function startRace() {
 
 
 
-  if (!playerData.canStart) {
+  if (playerData.canStart) {
     hiddenBlock(beforeStartWrap);
     if (isMobile) document.querySelector('.mobile_instr').classList.remove('hidden_instr');
     else document.querySelector('.desktop_instr').classList.remove('hidden_instr');
@@ -356,7 +354,7 @@ function startRace() {
     if (isMobile) document.querySelector('.instr-mobile-ingame').classList.remove('hidden_block')
     if (isMobile) document.querySelector('.anim_tap_top').classList.remove('hidden_block')
     let interval = setInterval((e) => {
-      if (soundBip != undefined && !soundBip.isPlaying && canAudio && !noVisible) soundBip.play();
+      if (soundBip != undefined && !soundBip.isPlaying && canAudio && !noVisible && iter == 0) soundBip.play();
       startTimeWrap.classList.remove("hidden_block");
       if (!noVisible) iter++;
 
@@ -366,7 +364,6 @@ function startRace() {
       }
 
       if (iter == 4) {
-        if (soundBip != undefined) soundBip.stop(2.5);
         naStartTimer = false;
         if (language == 0) startTimeBlock.textContent = 'СТАРТ';
         else startTimeBlock.textContent = 'GO';
@@ -376,7 +373,8 @@ function startRace() {
         ysdk.features.GameplayAPI.start();
         setTimeout(() => {
           startTimeWrap.classList.add("hidden_block");
-        }, 600);
+          if (soundBip != undefined) soundBip.stop();
+        }, 1500);
       }
       else {
         startTimeBlock.textContent = 4 - iter;
@@ -1413,6 +1411,7 @@ async function resetAllMap() {
     scene.remove(object); // Удаляем объект со сцены
   }
   playerIsFinish = false;
+  soundAround.play();
 }
 
 function animate() {
@@ -2090,7 +2089,7 @@ document.addEventListener("visibilitychange", function () {
   } else {
     noVisible = true;
     ysdk.features.GameplayAPI?.stop()
-    if (soundBip != undefined && soundBip.isPlaying) soundBip.pause();
+    if (soundBip != undefined && soundBip.isPlaying) soundBip.stop();
     if (soundAround != undefined) soundAround.stop();
     if (soundSlide != undefined) soundSlide.stop();
     if (pause == false) {
