@@ -339,7 +339,7 @@ function startRace() {
 
 
 
-  if (playerData.canStart) {
+  if (!playerData.canStart) {
     hiddenBlock(beforeStartWrap);
     if (isMobile) document.querySelector('.mobile_instr').classList.remove('hidden_instr');
     else document.querySelector('.desktop_instr').classList.remove('hidden_instr');
