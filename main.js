@@ -1151,7 +1151,7 @@ async function loadLevel() {
 
 async function loadAudio() {
   const listener = new THREE.AudioListener();
-  player.add(listener);
+  //player.add(listener);
 
 
   const audioLoader = new THREE.AudioLoader();
@@ -1159,7 +1159,7 @@ async function loadAudio() {
     soundSlide = new THREE.PositionalAudio(listener);
     soundSlide.setBuffer(buffer);
     soundSlide.setLoop(true);
-    soundSlide.setRefDistance(40);
+    soundSlide.setRefDistance(400);
     soundSlide.setVolume(0.7);
     player.add(soundSlide);
   }).catch((error) => {
@@ -1170,7 +1170,7 @@ async function loadAudio() {
     soundAround = new THREE.PositionalAudio(listener);
     soundAround.setBuffer(buffer);
     soundAround.setLoop(true);
-    soundAround.setRefDistance(40);
+    soundAround.setRefDistance(400);
     soundAround.setVolume(1);
     soundAround.error = false;
     player.add(soundAround);
@@ -1182,7 +1182,7 @@ async function loadAudio() {
     soundBoom = new THREE.PositionalAudio(listener);
     soundBoom.setBuffer(buffer);
     soundBoom.setLoop(false);
-    soundBoom.setRefDistance(40);
+    soundBoom.setRefDistance(400);
     soundBoom.setVolume(0.3);
     soundBoom.error = false;
     player.add(soundBoom);
@@ -1194,7 +1194,7 @@ async function loadAudio() {
     soundBip = new THREE.PositionalAudio(listener);
     soundBip.setBuffer(buffer);
     soundBip.setLoop(false);
-    soundBip.setRefDistance(40);
+    soundBip.setRefDistance(400);
     soundBip.setVolume(0.3);
     soundBip.error = false;
     player.add(soundBip);
