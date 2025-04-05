@@ -276,6 +276,7 @@ document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, index) => {
       callbacks: {
         onOpen: () => {
           console.log('Video ad open.');
+          rekOpened = true;
           if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
         },
         onRewarded: async () => {
@@ -290,6 +291,7 @@ document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, index) => {
         onClose: () => {
           console.log('Video ad closed.');
           if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
+          rekOpened = false;
         },
         onError: (e) => {
           console.log('Error while open video ad:', e);
@@ -614,6 +616,8 @@ let startFlagRu;
 let startFlagEn;
 
 let noVisible = false;
+
+let rekOpened = false;
 
 
 let finishBlock;
@@ -1411,7 +1415,7 @@ async function resetAllMap() {
     scene.remove(object); // Удаляем объект со сцены
   }
   playerIsFinish = false;
-  if (soundAround != undefined && canAudio && !noVisible) soundAround.play();
+  if (soundAround != undefined && canAudio && !noVisible && !rekOpened) soundAround.play();
 }
 
 function animate() {
@@ -2071,7 +2075,7 @@ document.addEventListener("visibilitychange", function () {
   if (document.visibilityState === 'visible') {
     noVisible = false;
 
-    if (canAudio && pause == false) {
+    if (canAudio && pause == false && !rekOpened) {
       if (soundAround != undefined) soundAround.play();
     }
     if (playerBody.linvel().z > 3 && player.userData.onGround && canAudio && pause == false) {
