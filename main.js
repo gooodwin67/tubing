@@ -52,7 +52,7 @@ let movingBlocks = [];
 let movingBlocksBody = [];
 
 
-let language;
+let language = 0;
 
 let timesBlock = document.querySelector('.times');
 let currentTimeBlock = document.querySelector('.current_time');
@@ -272,33 +272,7 @@ document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, index) => {
   el.addEventListener('click', async () => {
 
 
-    ysdk.adv.showRewardedVideo({
-      callbacks: {
-        onOpen: () => {
-          console.log('Video ad open.');
-          rekOpened = true;
-          if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
-        },
-        onRewarded: async () => {
-          console.log('Rewarded! ' + index);
-          hiddenBlock(mainLoadScreen);
-          playerData.levelsTimes['time' + (index + 1)] = 120.111;
-          levelsDone = Object.keys(playerData.levelsTimes).length;
-          localStorage.setItem('playerData', JSON.stringify(playerData));
-          await resetAllMap();
-          await init();
-        },
-        onClose: () => {
-          console.log('Video ad closed.');
-          if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
-          rekOpened = false;
-        },
-        onError: (e) => {
-          console.log('Error while open video ad:', e);
-          if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
-        }
-      }
-    })
+
   })
 })
 
@@ -372,7 +346,7 @@ function startRace() {
         dataLoaded = true;
         pauseButton.classList.remove('hidden_block');
         clearInterval(interval);
-        ysdk.features.GameplayAPI.start();
+
         setTimeout(() => {
           startTimeWrap.classList.add("hidden_block");
           if (soundBip != undefined) soundBip.stop();
@@ -438,13 +412,6 @@ startButton.addEventListener('click', () => {
 
   if (soundAround != undefined && canAudio) soundAround.play();
 
-  // if (isMobile) {
-  //   console.log(123);
-  //   ysdk.screen.fullscreen.request
-  //   document.body.requestFullscreen().then(() => {
-  //     screen.orientation.lock("landscape");
-  //   })
-  // }
   mainMenuScreen.classList.add("hidden_block");
   selectLevelScreen.classList.remove("hidden_block");
 });
@@ -485,19 +452,7 @@ finishInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
   await resetAllMap();
   await init();
-  ysdk.adv.showFullscreenAdv({
-    callbacks: {
-      onOpen: function (wasShown) {
-        if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
-      },
-      onClose: function (wasShown) {
-        if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
-      },
-      onError: function (error) {
-        if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
-      }
-    }
-  })
+
 });
 boomInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
@@ -513,7 +468,7 @@ inmenuButton.addEventListener('click', async () => {
 
 pauseButton.addEventListener('click', () => {
   if (naStartTimer == false && dataLoaded && !playerIsFinish) {
-    ysdk.features.GameplayAPI?.stop()
+
     hiddenBlock(menuInGameWrap);
     player.userData.time = timer.getElapsedTime();
     timer.stop();
@@ -539,7 +494,7 @@ closePauseButton.addEventListener('click', () => {
   }
 
   pause = false;
-  ysdk.features.GameplayAPI?.start()
+
 })
 
 
@@ -1210,45 +1165,7 @@ async function loadAudio() {
 }
 
 document.querySelector('.auth_link').addEventListener('click', () => {
-  ysdk.auth.openAuthDialog().then(() => {
 
-
-    ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
-      canSetLb = el;
-
-      ysdk.getLeaderboards()
-        .then(_lb => {
-          lb = _lb;
-
-          _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
-            .then(res => {
-              // console.log(res);
-              document.querySelector('.records_wrap>div').innerHTML = '';
-              if (language == 0) document.querySelector('.need_auth').textContent = 'Вы авторизовались! Можете ставить рекорды!';
-              else document.querySelector('.need_auth').textContent = 'You have logged in! You can set records!';
-              document.querySelector('.need_auth').classList.add('green');
-
-              res.entries.forEach((el, index) => {
-                if (res.userRank == el.rank) {
-                  boardMainRecord = convertMilliseconds(el.score);
-                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
-                }
-                else {
-                  document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                }
-
-              })
-
-            });
-
-        });
-    });
-    initPlayer().catch(err => {
-      // Ошибка при инициализации объекта Player.
-    });
-  }).catch(() => {
-    // Игрок не авторизован.
-  });
 })
 
 
@@ -1261,77 +1178,9 @@ async function init() {
 
   if (firststart) {
 
-    YaGames.init().then(ysdk => {
-      ysdk.features.LoadingAPI?.ready();
-
-      // console.log(ysdk.environment.i18n.lang);
-      ysdk.adv.showFullscreenAdv({
-        callbacks: {
-          onOpen: function (wasShown) {
-            if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
-            hiddenBlock(mainMenuScreen);
-          },
-          onClose: function (wasShown) {
-
-          },
-          onError: function (error) {
-
-          }
-        }
-      })
-
-
-
-      if (ysdk.environment.i18n.lang == 'ru' || ysdk.environment.i18n.lang == 'be' || ysdk.environment.i18n.lang == 'kk' || ysdk.environment.i18n.lang == 'uk' || ysdk.environment.i18n.lang == 'uz') {
-        languagesBtns[0].classList.add('selected');
-        changeLanguage(0);
-        language = 0;
-      }
-      else { //en
-        languagesBtns[1].classList.add('selected');
-        changeLanguage(1);
-        language = 1;
-      }
-
-      ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then((el) => {
-        canSetLb = el;
-
-        if (canSetLb) {
-          document.querySelector('.need_auth').classList.add('hidden_block');
-        }
-
-        ysdk.getLeaderboards()
-          .then(_lb => {
-            lb = _lb;
-
-
-            _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: canSetLb, quantityAround: 0 })
-              .then(res => {
-                // console.log(res);
-
-
-                res.entries.forEach((el, index) => {
-                  if (res.userRank == el.rank) {
-                    boardMainRecord = el.score;
-                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
-
-                  }
-                  else {
-                    document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                  }
-
-                })
-
-              });
-
-          });
-      })
-
-
-
-
-
-    });
+    languagesBtns[0].classList.add('selected');
+    changeLanguage(0);
+    hiddenBlock(mainMenuScreen);
 
     firststart = false;
   }
@@ -1425,7 +1274,7 @@ function animate() {
   // console.log("Number of Triangles :", renderer.info.render.triangles);
 
 
-  // if (ysdk != undefined) document.querySelector('.temp-test').textContent = ysdk.environment.i18n.lang;
+
 
 
 
@@ -1542,7 +1391,7 @@ function animate() {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
               }, 3000);
-              ysdk.features.GameplayAPI?.stop()
+
               player.userData.boom = true;
             }
             //camera.position.set(playerTtube.position); /////
@@ -1556,7 +1405,7 @@ function animate() {
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
               playerShape.setFriction(20);
-              ysdk.features.GameplayAPI?.stop()
+
               player.userData.boom = true;
               setTimeout(() => {
                 dataLoaded = false;
@@ -1670,7 +1519,7 @@ function playerMove() {
 
 
     playerIsFinish = true;
-    ysdk.features.GameplayAPI?.stop()
+
     finishScreenTime.textContent = currentTime;
     if (playerData.levelsTimes['time' + (currentLevel)] != undefined) {
       bestTime = playerData.levelsTimes['time' + (currentLevel)];
@@ -1697,30 +1546,6 @@ function playerMove() {
         // console.log(Math.round(mainRecord * 1000))
         if (canSetLb && Math.round(mainRecord * 1000) < boardMainRecord) {
           // console.log(Math.round(mainRecord * 1000));
-          lb.setLeaderboardScore('main', Math.round(mainRecord * 1000)).then(() => {
-            // console.log("setNewRec");
-            ysdk.getLeaderboards()
-              .then(_lb => {
-                lb = _lb;
-                _lb.getLeaderboardEntries('main', { quantityTop: 3, includeUser: true, quantityAround: 0 })
-                  .then(res => {
-                    // console.log(res);
-                    document.querySelector('.records_wrap>div').innerHTML = '';
-                    res.entries.forEach((el, index) => {
-                      if (res.userRank == el.rank) {
-                        boardMainRecord = el.score;
-                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
-
-                      }
-                      else {
-                        document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
-                      }
-
-                    })
-
-                  });
-              });
-          })
 
         }
         // console.log('mainRecord ' + mainRecord.toFixed(3))
@@ -2084,7 +1909,7 @@ document.addEventListener("visibilitychange", function () {
 
     if (!playerIsFinish && dataLoaded) {
       if (pause == false) {
-        ysdk.features.GameplayAPI?.start()
+
         timer.start();
         timer.elapsedTime = player.userData.time;
       }
@@ -2092,7 +1917,7 @@ document.addEventListener("visibilitychange", function () {
 
   } else {
     noVisible = true;
-    ysdk.features.GameplayAPI?.stop()
+
     if (soundBip != undefined && soundBip.isPlaying) soundBip.stop();
     if (soundAround != undefined) soundAround.stop();
     if (soundSlide != undefined) soundSlide.stop();

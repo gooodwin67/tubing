@@ -8,18 +8,18 @@
    <link href="style.css" rel="stylesheet" />
    <!-- Yandex Games SDK -->
    <script>
-      function initSDK() {
-         if (typeof YaGames !== 'undefined') {
-            YaGames.init().then(ysdk => {
-               console.log('Yandex SDK initialized');
-               window.ysdk = ysdk;
-            });
-         } else {
-            console.error('YaGames is not defined!');
-         }
-      }
+      // function initSDK() {
+      //    if (typeof YaGames !== 'undefined') {
+      //       YaGames.init().then(ysdk => {
+      //          console.log('Yandex SDK initialized');
+      //          window.ysdk = ysdk;
+      //       });
+      //    } else {
+      //       console.error('YaGames is not defined!');
+      //    }
+      // }
    </script>
-   <script src="/sdk.js" onload="initSDK()"></script>
+   <!-- <script src="/sdk.js" onload="initSDK()"></script> -->
    <script type="module" src="/main.js"></script>
 </head>
 
@@ -351,6 +351,12 @@
    <!-- <div class='temp-test' style='padding-bottom: 200px; padding-right: 200px; position: absolute; bottom: 0; right: 0; z-index: 99999; background: #fff'>123</div> -->
 
 
+   <script async src="https://gamepush.com/sdk/gamepush.js?projectId=21226&publicToken=4EmEoWSe91nv8MsxYJDdNX3UYebzvTAJ&callback=onGPInit"></script>
+   <script>
+      window.onGPInit = function (gp) {
+         // Все возможности GamePush доступны здесь
+      }
+   </script>
 
 </body>
 
