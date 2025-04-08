@@ -190,8 +190,8 @@ function changeLanguage(language) {
 
     document.querySelector('.records_wrap>p').textContent = 'Мировой рейтинг: '
 
-    document.querySelector('.need_auth_text').textContent = 'Чтобы участвовать в рейтинге  '
-    document.querySelector('.auth_link').textContent = 'войдите в аккаунт'
+    // document.querySelector('.need_auth_text').textContent = 'Чтобы участвовать в рейтинге  '
+    // document.querySelector('.auth_link').textContent = 'войдите в аккаунт'
 
 
   }
@@ -254,8 +254,8 @@ function changeLanguage(language) {
 
     document.querySelector('.records_wrap>p').textContent = 'World Ranking: '
 
-    document.querySelector('.need_auth_text').textContent = 'To participate in the rating '
-    document.querySelector('.auth_link').textContent = 'login to account'
+    // document.querySelector('.need_auth_text').textContent = 'To participate in the rating '
+    // document.querySelector('.auth_link').textContent = 'login to account'
 
     document.querySelectorAll('.load_level_wrap .btn_lev').forEach((el) => {
       el.textContent = 'Start'
@@ -1173,9 +1173,6 @@ async function loadAudio() {
 
 }
 
-document.querySelector('.auth_link').addEventListener('click', () => {
-
-})
 
 
 let gpsdk;
@@ -1206,18 +1203,21 @@ async function init() {
         showNearest: 0,
       });
 
+      console.log(result)
+
       const { players, fields, topPlayers, abovePlayers, belowPlayers, player } = result;
 
-
+      let playerIndex = 0;
       result.topPlayers.forEach((el, index) => {
         if (el.score != 0) {
-          if (player.id == topPlayers[1].id) {
+          playerIndex++;
+          if (player.id == topPlayers[index].id) {
             boardMainRecord = el.score;
-            document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
+            document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
 
           }
           else {
-            document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+            document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
           }
         }
 
@@ -1567,7 +1567,7 @@ function blocksMove() {
 
 }
 
-function playerMove() {
+async function playerMove() {
 
 
   if (player.position.z > finishBlock.position.z && !player.userData.boom) {
@@ -1582,7 +1582,7 @@ function playerMove() {
 
     finishScreenTime.textContent = currentTime;
     if (playerData.levelsTimes['time' + (currentLevel)] != undefined) {
-      bestTime = playerData.levelsTimes['time' + (currentLevel)];
+      bestTime = parseFloat(playerData.levelsTimes['time' + (currentLevel)]);
     }
     else {
       bestTime = 0;
@@ -1616,9 +1616,8 @@ function playerMove() {
           console.log(Math.round(mainRecord * 1000));
 
           gpsdk.player.set('score', Math.round(mainRecord * 1000));
-          gpsdk.player.sync();
-
-          const result = gpsdk.leaderboard.fetch({
+          await gpsdk.player.sync()
+          const result = await gpsdk.leaderboard.fetch({
             orderBy: ['score'],
             order: 'ASC',
             limit: 3,
@@ -1629,15 +1628,18 @@ function playerMove() {
           const { players, fields, topPlayers, abovePlayers, belowPlayers, player } = result;
 
           console.log(result)
+          let playerIndex = 0;
+          document.querySelector('.records_wrap>div').innerHTML = '';
           result.topPlayers.forEach((el, index) => {
             if (el.score != 0) {
-              if (player.id == topPlayers[1].id) {
+              playerIndex++;
+              if (player.id == topPlayers[index].id) {
                 boardMainRecord = el.score;
-                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + parseInt(el.rank) + '. ' + convertMilliseconds(el.score) + '</p>'
-
+                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
+                console.log('123123123')
               }
               else {
-                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + parseInt(index + 1) + '. ' + convertMilliseconds(el.score) + '</p>'
+                document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p>' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
               }
             }
 
