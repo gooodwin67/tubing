@@ -1693,9 +1693,9 @@ function playerMove() {
         })
         mainRecordText.textContent = convertMilliseconds(Math.round(mainRecord * 1000));
         mainRecordText.classList.add('main_record_green');
-        // console.log(boardMainRecord)
+        console.log(boardMainRecord)
         // console.log(Math.round(mainRecord * 1000))
-        if (canSetLb && Math.round(mainRecord * 1000) < boardMainRecord) {
+        if (canSetLb && Math.round(mainRecord * 1000) < boardMainRecord || boardMainRecord == 0) {
           // console.log(Math.round(mainRecord * 1000));
           lb.setLeaderboardScore('main', Math.round(mainRecord * 1000)).then(() => {
             // console.log("setNewRec");
