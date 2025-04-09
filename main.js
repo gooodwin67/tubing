@@ -271,13 +271,31 @@ function changeLanguage(language) {
 document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, index) => {
   el.addEventListener('click', async () => {
 
-    console.log('Rewarded! ' + index);
-    hiddenBlock(mainLoadScreen);
-    playerData.levelsTimes['time' + (index + 1)] = '120.111';
-    levelsDone = Object.keys(playerData.levelsTimes).length;
-    localStorage.setItem('playerData', JSON.stringify(playerData));
-    await resetAllMap();
-    await init();
+    if (gpsdk.ads.isRewardedAvailable) gpsdk.ads.showRewardedVideo();
+
+
+    // Начался показ
+    gpsdk.ads.on('rewarded:start', () => {
+      console.log('Video ad open.');
+      rekOpened = true;
+      if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+    });
+    // Закончился показ
+    gpsdk.ads.on('rewarded:close', (success) => {
+      console.log('Video ad closed.');
+      if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
+      rekOpened = false;
+    });
+    // Получена награда
+    gpsdk.ads.on('rewarded:reward', async () => {
+      console.log('Rewarded! ' + index);
+      hiddenBlock(mainLoadScreen);
+      playerData.levelsTimes['time' + (index + 1)] = '120.111';
+      levelsDone = Object.keys(playerData.levelsTimes).length;
+      localStorage.setItem('playerData', JSON.stringify(playerData));
+      await resetAllMap();
+      await init();
+    });
 
 
 
@@ -460,6 +478,16 @@ finishInMenuButton.addEventListener('click', async () => {
   hiddenBlock(mainLoadScreen);
   await resetAllMap();
   await init();
+  if (gpsdk.ads.isFullscreenAvailable) gpsdk.ads.showFullscreen();
+
+  // Начался показ
+  gpsdk.ads.on('fullscreen:start', () => {
+    if (soundAround != undefined && soundAround.isPlaying) soundAround.stop();
+  });
+  // Закончился показ
+  gpsdk.ads.on('fullscreen:close', (success) => {
+    if (soundAround != undefined && !soundAround.isPlaying && canAudio) soundAround.play();
+  });
 
 });
 boomInMenuButton.addEventListener('click', async () => {
@@ -794,7 +822,6 @@ async function loadStorageData() {
         if (index == ind || ind == levelsTimesBlock.length - 1) {
           el.classList.add('not_vis');
         }
-
       })
 
     }
@@ -1183,22 +1210,33 @@ async function init() {
 
 
   if (firststart) {
-
+    console.log('000')
     window.onGPInit = async (gp) => {
       // Wait while the player syncs with the server
+      console.log('001')
       await gp.player.ready;
+      console.log('002')
       // Show the ad preloader and wait until it ends
-      await gp.ads.showPreloader();
+      if (gp.ads.isPreloaderAvailable && gp.ads.canShowFullscreenBeforeGamePlay) await gp.ads.showPreloader();
       // Show the sticky banner (then it will update itself)
-      gp.ads.showSticky();
+      if (gp.ads.isStickyAvailable) gp.ads.showSticky();
 
       gpsdk = gp;
       canSetLb = true;
+      if (!gp.ads.isRewardedAvailable) {
+
+        document.querySelectorAll('.load_level_wrap .ad_res').forEach((el, ind) => {
+
+          el.classList.add('not_vis');
+
+        })
+      }
+      console.log(111)
 
       const result = await gp.leaderboard.fetch({
         orderBy: ['score'],
         order: 'ASC',
-        limit: 3,
+        limit: 4,
         withMe: 'last',
         showNearest: 0,
       });
@@ -1208,10 +1246,11 @@ async function init() {
       const { players, fields, topPlayers, abovePlayers, belowPlayers, player } = result;
 
       let playerIndex = 0;
-      result.topPlayers.forEach((el, index) => {
+      console.log(222)
+      result.players.forEach((el, index) => {
         if (el.score != 0) {
           playerIndex++;
-          if (player.id == topPlayers[index].id) {
+          if (player.id == players[index].id) {
             boardMainRecord = el.score;
             document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
 
@@ -1234,7 +1273,7 @@ async function init() {
 
 
 
-
+      console.log(333)
       languagesBtns[0].classList.add('selected');
       changeLanguage(0);
       hiddenBlock(mainMenuScreen);
@@ -1630,10 +1669,10 @@ async function playerMove() {
           console.log(result)
           let playerIndex = 0;
           document.querySelector('.records_wrap>div').innerHTML = '';
-          result.topPlayers.forEach((el, index) => {
+          result.players.forEach((el, index) => {
             if (el.score != 0) {
               playerIndex++;
-              if (player.id == topPlayers[index].id) {
+              if (player.id == players[index].id) {
                 boardMainRecord = el.score;
                 document.querySelector('.records_wrap>div').innerHTML = document.querySelector('.records_wrap>div').innerHTML + '<p class = "main_record_green">' + playerIndex + '. ' + convertMilliseconds(el.score) + '</p>'
                 console.log('123123123')
