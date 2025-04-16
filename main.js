@@ -1236,9 +1236,9 @@ async function init() {
 
 
     // Show the ad preloader and wait until it ends
-    if (gpsdk.ads.isPreloaderAvailable && gp.ads.canShowFullscreenBeforeGamePlay) await gp.ads.showPreloader();
+    if (gpsdk.ads.isPreloaderAvailable && gpsdk.ads.canShowFullscreenBeforeGamePlay) await gpsdk.ads.showPreloader();
     // Show the sticky banner (then it will update itself)
-    if (gpsdk.ads.isStickyAvailable) gp.ads.showSticky();
+    if (gpsdk.ads.isStickyAvailable) gpsdk.ads.showSticky();
 
 
     canSetLb = true;
