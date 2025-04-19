@@ -1029,21 +1029,21 @@ canvas {
     display: flex;
     z-index: 999;
     position: absolute;
-    left: 50%;
-    top: 15%;
+    left: 23%;
+    top: 30%;
     z-index: 9;
 }
 
 .anim_tap_left {
     top: auto;
     left: 20%;
-    bottom: 40%
+    bottom: 30%
 }
 
 .anim_tap_right {
     top: auto;
     left: 65%;
-    bottom: 40%
+    bottom: 30%
 }
 
 .anim_tap svg {
@@ -1233,6 +1233,26 @@ canvas {
     padding: 0;
     margin-bottom: 10px;
 }
+
+.svg_text {
+    background: #fff;
+    padding: 3px 7px;
+    border-radius: 4px;
+    position: absolute;
+    width: 290px;
+    top: -44px;
+}
+
+.svg_text_arrow {
+    transform: translate(10px, -6px);
+    color: white;
+    background: black;
+    padding: 5px 10px;
+    border-radius: 5px;
+    opacity: 40%;
+    font-size: 20px;
+}
+
 
 @media (max-width: 960px) {
 

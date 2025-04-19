@@ -192,6 +192,9 @@ function changeLanguage(language) {
 
     document.querySelector('.need_auth_text').textContent = 'Чтобы участвовать в рейтинге  '
     document.querySelector('.auth_link').textContent = 'войдите в аккаунт'
+    document.querySelector('.svg_text').textContent = 'Быстро нажимайте на верхнюю часть экрана, чтобы разогнаться до стартовой отметки!'
+    document.querySelector('.svg_text_left').textContent = 'Влево'
+    document.querySelector('.svg_text_right').textContent = 'Вправо'
 
 
   }
@@ -264,6 +267,9 @@ function changeLanguage(language) {
     document.querySelectorAll('.load_level_wrap .ad_res').forEach((el) => {
       el.textContent = 'Skip'
     })
+    document.querySelector('.svg_text').textContent = 'Quickly tap on the top of the screen to accelerate to the starting flag!'
+    document.querySelector('.svg_text_left').textContent = 'LEFT'
+    document.querySelector('.svg_text_right').textContent = 'RIGHT'
 
   }
 };
@@ -376,6 +382,7 @@ function startRace() {
         setTimeout(() => {
           startTimeWrap.classList.add("hidden_block");
           if (soundBip != undefined) soundBip.stop();
+          if (Object.keys(playerData.levelsTimes).length == 0) document.querySelector('.svg_text').classList.remove('hidden_block');
         }, 1500);
       }
       else {
@@ -781,6 +788,9 @@ function onWindowResize() {
 
 
 async function loadStorageData() {
+
+
+  //localStorage.clear();
 
   if (!localStorage.getItem('playerData')) {
     playerData = {
@@ -1820,13 +1830,14 @@ function playerMove() {
     //playerBody.setEnabledRotations(true, false, false, true);
     //if (player.position.y > 100) playerBody.lockRotations(false, true, true, true);
     if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_top').classList.add('hidden_block')
+    if (Object.keys(playerData.levelsTimes).length == 0) document.querySelector('.svg_text').classList.add('hidden_block');
     if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_left').classList.remove('hidden_block')
     if (player.userData.onStartArea == true && isMobile) document.querySelector('.anim_tap_right').classList.remove('hidden_block')
     if (player.userData.onStartArea == true && isMobile) {
       setTimeout(() => {
         document.querySelector('.anim_tap_left').classList.add('hidden_block')
         document.querySelector('.anim_tap_right').classList.add('hidden_block')
-      }, 2000)
+      }, 4000)
     }
     player.userData.onStartArea = false;
 
