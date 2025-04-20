@@ -1054,21 +1054,21 @@ async function loadMenu() {
 
 
 
-  let params = RAPIER.JointData.spherical({ x: 0.4, y: -0.2, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
+  let params = RAPIER.JointData.spherical({ x: 0.2, y: -0.2, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
 
   let params2 = RAPIER.JointData.spherical({ x: -0.4, y: -0.2, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
 
-  let params3 = RAPIER.JointData.spherical({ x: 0.22, y: 0.0, z: 0.5 }, { x: 0.0, y: 0.0, z: -0.5 });
+  let params3 = RAPIER.JointData.spherical({ x: 0.1, y: 0.0, z: 0.6 }, { x: 0.0, y: 0.1, z: -0.5 });
   let joint3 = world.createImpulseJoint(params3, itsMenBody.userData.body, itsMenLeftLeg.userData.body, true);
 
-  let params4 = RAPIER.JointData.spherical({ x: -0.22, y: 0.0, z: 0.5 }, { x: 0.0, y: 0.0, z: -0.5 });
+  let params4 = RAPIER.JointData.spherical({ x: -0.3, y: 0.0, z: 0.6 }, { x: 0.0, y: 0.1, z: -0.5 });
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
-  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.6, z: 0.0 });
+  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.1, y: 0.6, z: 0.0 });
   jointMenTube = world.createImpulseJoint(params0, itsMenBody.userData.body, playerBody, true);
 
 
