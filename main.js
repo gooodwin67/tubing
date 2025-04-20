@@ -873,7 +873,7 @@ async function loadMenu() {
 
 
   const gltfLoader = new GLTFLoader();
-  const url = 'models/map-menu.glb';
+  const url = 'models/map-menu-noob.glb';
   await gltfLoader.loadAsync(url, onprogress = (e) => {
     // console.log(`Loaded: ${e.loaded}, Total: ${e.total}`);
     let percent = Math.min(Math.round((e.loaded / e.total) * 100), 100);
@@ -1054,11 +1054,11 @@ async function loadMenu() {
 
 
 
-  let params = RAPIER.JointData.spherical({ x: 0.2, y: 0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
+  let params = RAPIER.JointData.spherical({ x: 0.4, y: -0.2, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
 
-  let params2 = RAPIER.JointData.spherical({ x: -0.2, y: 0.0, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
+  let params2 = RAPIER.JointData.spherical({ x: -0.4, y: -0.2, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
 
   let params3 = RAPIER.JointData.spherical({ x: 0.22, y: 0.0, z: 0.5 }, { x: 0.0, y: 0.0, z: -0.5 });
@@ -1068,7 +1068,7 @@ async function loadMenu() {
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
-  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.3, z: 0.0 });
+  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.6, z: 0.0 });
   jointMenTube = world.createImpulseJoint(params0, itsMenBody.userData.body, playerBody, true);
 
 
