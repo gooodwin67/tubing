@@ -734,10 +734,10 @@ const raycaster1 = new THREE.Raycaster();
 const direction1 = new THREE.Vector3(0, -1, 0); // Направление вниз
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xdceef6); //dceef6
-scene.fog = new THREE.Fog(scene.background, 1, 300);
+scene.background = new THREE.Color(0x000000); //dceef6
+scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 200);
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 2);
+const hemiLight = new THREE.HemisphereLight(0x000000, 0x000000, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
 hemiLight.groundColor.setHSL(0.095, 1, 0.75);
 hemiLight.position.set(0, 100, 0);
@@ -745,7 +745,7 @@ hemiLight.position.set(0, 100, 0);
 const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
 //scene.add(hemiLightHelper);
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+const dirLight = new THREE.DirectionalLight(0x000000, 3);
 //dirLight.color.setHSL(0.1, 1, 0.95);
 dirLight.position.set(1, 2, 0.2);
 dirLight.position.multiplyScalar(120);
@@ -1054,21 +1054,21 @@ async function loadMenu() {
 
 
 
-  let params = RAPIER.JointData.spherical({ x: 0.2, y: -0.2, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
+  let params = RAPIER.JointData.spherical({ x: 0.3, y: -0.0, z: -0.2 }, { x: -0.4, y: 0.0, z: 0.0 });
   let joint = world.createImpulseJoint(params, itsMenBody.userData.body, itsMenLeftHand.userData.body, true);
 
 
-  let params2 = RAPIER.JointData.spherical({ x: -0.4, y: -0.2, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
+  let params2 = RAPIER.JointData.spherical({ x: -0.3, y: -0.0, z: -0.2 }, { x: 0.4, y: 0.0, z: 0.0 });
   let joint2 = world.createImpulseJoint(params2, itsMenBody.userData.body, itsMenRightHand.userData.body, true);
 
-  let params3 = RAPIER.JointData.spherical({ x: 0.1, y: 0.0, z: 0.6 }, { x: 0.0, y: 0.1, z: -0.5 });
+  let params3 = RAPIER.JointData.spherical({ x: 0.2, y: 0.2, z: 0.4 }, { x: 0.0, y: 0.1, z: -0.5 });
   let joint3 = world.createImpulseJoint(params3, itsMenBody.userData.body, itsMenLeftLeg.userData.body, true);
 
-  let params4 = RAPIER.JointData.spherical({ x: -0.3, y: 0.0, z: 0.6 }, { x: 0.0, y: 0.1, z: -0.5 });
+  let params4 = RAPIER.JointData.spherical({ x: -0.2, y: 0.2, z: 0.4 }, { x: 0.0, y: 0.1, z: -0.5 });
   let joint4 = world.createImpulseJoint(params4, itsMenBody.userData.body, itsMenRightLeg.userData.body, true);
 
 
-  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.1, y: 0.6, z: 0.0 });
+  let params0 = RAPIER.JointData.spherical({ x: 0, y: 0.0, z: 0.0 }, { x: 0.0, y: 0.7, z: 0.0 });
   jointMenTube = world.createImpulseJoint(params0, itsMenBody.userData.body, playerBody, true);
 
 
