@@ -735,7 +735,7 @@ const direction1 = new THREE.Vector3(0, -1, 0); // Направление вни
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000); //dceef6
-scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 200);
+scene.fog = new THREE.Fog(new THREE.Color(0x000000), 1, 350);
 
 const hemiLight = new THREE.HemisphereLight(0x000000, 0x000000, 2);
 hemiLight.color.setHSL(0.6, 1, 0.6);
@@ -1073,6 +1073,22 @@ async function loadMenu() {
 
 
 
+  // const vertices = [];
+
+  // for (let i = 0; i < 100000; i++) {
+  //   const x = THREE.MathUtils.randFloatSpread(2000);
+  //   const y = THREE.MathUtils.randFloatSpread(20);
+  //   const z = THREE.MathUtils.randFloatSpread(3000);
+
+  //   vertices.push(x, y, z);
+  // }
+
+  // const geometry = new THREE.BufferGeometry();
+  // geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 4));
+  // const material = new THREE.PointsMaterial({ color: 0xffffff, fog: false });
+  // const points = new THREE.Points(geometry, material);
+  // points.position.y = 200;
+  // scene.add(points);
 
 
 
@@ -1962,7 +1978,7 @@ function addPhysicsToObject(obj) {
     player.userData.orgRotation = originalRotation;
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0));
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 5, size.y / 1.5, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 5, size.y / 1.8, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerShape = shape;
