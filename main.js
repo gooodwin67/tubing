@@ -1767,7 +1767,10 @@ function playerMove() {
     direction.z * -tubesChars[tubenum].nowSpeed  // Устанавливаем скорость по Z
   );
 
+  if (playerBody.rotation().x < -0.2) {
 
+    playerBody.setRotation({ w: playerBody.rotation().w, x: -0.2, y: playerBody.rotation().y, z: playerBody.rotation().z })
+  }
 
   if (playerBody.translation().y < 100 && playerBody.translation().y >= 20) {
     tubesChars[tubenum].nowSpeed += 0.05;
@@ -1978,7 +1981,7 @@ function addPhysicsToObject(obj) {
     player.userData.orgRotation = originalRotation;
 
     body = world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(obj.position.x, obj.position.y, obj.position.z).setRotation(obj.quaternion).setCanSleep(false).enabledRotations(true, false, false).setLinearDamping(0).setAngularDamping(2.0));
-    shape = RAPIER.ColliderDesc.cuboid(size.x / 5, size.y / 1.8, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
+    shape = RAPIER.ColliderDesc.cuboid(size.x / 6, size.y / 1.8, size.z / 3).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     //shape = RAPIER.ColliderDesc.trimesh(player.userData.vertices, player.userData.indices).setMass(obj.userData.mass).setRestitution(0).setFriction(0);
     playerBody = body;
     playerShape = shape;
