@@ -132,7 +132,7 @@ function changeLanguage(language) {
       el.textContent = 'Время: '
     })
     document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el) => {
-      el.textContent = 'Тюбинг'
+      el.textContent = 'Транспорт'
     })
     document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el) => {
       el.textContent = 'Скорость: '
@@ -149,7 +149,7 @@ function changeLanguage(language) {
       el.textContent = 'Пропустить'
     })
 
-    document.querySelector('.selecttubedesc_title').textContent = 'Проходите уровни, чтобы разблокировать тюбинги'
+    document.querySelector('.selecttubedesc_title').textContent = 'Проходите уровни, чтобы разблокировать Транспорт'
 
     document.querySelector('.menu_in_game_wrap_head').textContent = 'Пауза'
     document.querySelector('.close_pause_button').textContent = 'Продолжить игру'
@@ -177,10 +177,10 @@ function changeLanguage(language) {
 
     document.querySelector('.desktop_instr').innerHTML = `<h2>Управление</h2>
     <span>Быстро нажимайте <span class='button_active'>W</span> или <span class='button_active'>↑</span> чтобы разогнаться до стартовой отметки</span>
-    <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте тюбингом</span>`;
+    <span>Клавишами <span>←</span> <span>→</span> или <span>A</span> <span>D</span> управляйте транспортом</span>`;
 
     document.querySelector('.mobile_instr div').innerHTML = `<span>Быстро нажимайте на зону <span> ↑ </span> чтобы разогнаться до стартовой отметки</span>
-    <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте тюбингом</span>`
+    <span>Нажимая на зоны <span> ← </span> и <span> → </span> управляйте транспортом</span>`
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Загрузка'
 
@@ -209,7 +209,7 @@ function changeLanguage(language) {
       el.textContent = 'Time: '
     })
     document.querySelectorAll('.load_tubes_wrap .selecttube_title').forEach((el) => {
-      el.textContent = 'Tubing'
+      el.textContent = 'Transport'
     })
     document.querySelectorAll('.load_tubes_wrap .selecttubespeed_title').forEach((el) => {
       el.textContent = 'Speed: '
@@ -217,7 +217,7 @@ function changeLanguage(language) {
     document.querySelectorAll('.load_tubes_wrap .selecttubecontrol_title').forEach((el) => {
       el.textContent = 'Control: '
     })
-    document.querySelector('.selecttubedesc_title').textContent = 'Complete the levels to unlock the tubings'
+    document.querySelector('.selecttubedesc_title').textContent = 'Complete the levels to unlock the Transport'
 
     document.querySelector('.menu_in_game_wrap_head').textContent = 'Pause'
     document.querySelector('.close_pause_button').textContent = 'Continue'
@@ -245,10 +245,10 @@ function changeLanguage(language) {
 
     document.querySelector('.desktop_instr').innerHTML = `<h2>Instructions</h2>
     <span>Quickly press <span class='button_active'>W</span> or <span class='button_active'>↑</span> to accelerate to the starting point</span>
-    <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the tubing</span>`;
+    <span>Use <span>←</span> <span>→</span> or <span>A</span> <span>D</span> keys to control the Transport</span>`;
 
     document.querySelector('.mobile_instr div').innerHTML = `<span>Quickly press on zone <span> ↑ </span> to accelerate to the starting point</span>
-    <span>By taps on zones <span> ← </span> and <span> → </span> control the tubing</span>`
+    <span>By taps on zones <span> ← </span> and <span> → </span> control the Transport</span>`
 
     document.querySelector('.sci-fi-loader strong').textContent = 'Loading '
 
@@ -638,7 +638,7 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 26,
     resetHAngle: false,
-    levels: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    levels: [1, 2, 3, 4, 5, 6],
     canInLevel: false
   },
   {
@@ -648,19 +648,10 @@ const tubesChars = [
     nowSpeed: 0,
     maxSpeed: 38, //38
     resetHAngle: false,
-    levels: [4, 5, 6, 7, 8, 9],
+    levels: [4, 5, 6],
     canInLevel: false
   },
-  {
-    hSpeed: 14,
-    maxHSpeed: 0.12,
-    stepSpeed: 2,
-    nowSpeed: 0,
-    maxSpeed: 44,
-    resetHAngle: true,
-    levels: [7, 8, 9],
-    canInLevel: false
-  }
+
 ]
 
 
@@ -1190,7 +1181,7 @@ async function loadAudio() {
     soundSlide.setBuffer(buffer);
     soundSlide.setLoop(true);
     soundSlide.setRefDistance(400);
-    soundSlide.setVolume(0.7);
+    soundSlide.setVolume(0.6);
     player.add(soundSlide);
   }).catch((error) => {
     console.error('Ошибка при загрузке аудио:', error);
@@ -1201,24 +1192,24 @@ async function loadAudio() {
     soundAround.setBuffer(buffer);
     soundAround.setLoop(true);
     soundAround.setRefDistance(400);
-    soundAround.setVolume(1);
+    soundAround.setVolume(2);
     soundAround.error = false;
     player.add(soundAround);
   }).catch((error) => {
     console.error('Ошибка при загрузке аудио:', error);
   });
 
-  await audioLoader.loadAsync('audio/boom1.mp3').then((buffer) => {
-    soundBoom = new THREE.PositionalAudio(listener);
-    soundBoom.setBuffer(buffer);
-    soundBoom.setLoop(false);
-    soundBoom.setRefDistance(400);
-    soundBoom.setVolume(0.3);
-    soundBoom.error = false;
-    player.add(soundBoom);
-  }).catch((error) => {
-    console.error('Ошибка при загрузке аудио:', error);
-  });
+  // await audioLoader.loadAsync('audio/boom1.mp3').then((buffer) => {
+  //   soundBoom = new THREE.PositionalAudio(listener);
+  //   soundBoom.setBuffer(buffer);
+  //   soundBoom.setLoop(false);
+  //   soundBoom.setRefDistance(400);
+  //   soundBoom.setVolume(0.3);
+  //   soundBoom.error = false;
+  //   player.add(soundBoom);
+  // }).catch((error) => {
+  //   console.error('Ошибка при загрузке аудио:', error);
+  // });
 
   await audioLoader.loadAsync('audio/bip.mp3').then((buffer) => {
     soundBip = new THREE.PositionalAudio(listener);
@@ -1559,7 +1550,7 @@ function animate() {
 
           if (playerBody.linvel().z < 15) {
             if (player.userData.boom == false) {
-              if (soundBoom != undefined && canAudio) soundBoom.play();
+
               world.removeImpulseJoint(jointMenTube);
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
@@ -1567,7 +1558,7 @@ function animate() {
               setTimeout(() => {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
-              }, 3000);
+              }, 30);
               ysdk.features.GameplayAPI?.stop()
               player.userData.boom = true;
             }
@@ -1577,7 +1568,7 @@ function animate() {
         else if (playerBody.handle == handle1 && !playerIsFinish) {
           if (playerBody.linvel().z < 15 && player.position.y < 5) {
             if (player.userData.boom == false) {
-              if (soundBoom != undefined && canAudio) soundBoom.play();
+
               world.removeImpulseJoint(jointMenTube);
               itsMenBody.userData.body.applyImpulse({ x: 5.0, y: 5, z: 5 }, true);
               itsMenBody.userData.body.setEnabledRotations(true);
@@ -1587,7 +1578,7 @@ function animate() {
               setTimeout(() => {
                 dataLoaded = false;
                 hiddenBlock(BoomScreen);
-              }, 3000);
+              }, 30);
             }
             //camera.position.set(playerTtube.position); /////
           }
